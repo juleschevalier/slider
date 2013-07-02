@@ -95,8 +95,4 @@ public class TripleImplNaive implements Triple {
 			return false;
 		return true;
 	}
-	
-	public static void main (String [] args) {
-		System.out.println("Hello worlrd!");
-	}
 }
