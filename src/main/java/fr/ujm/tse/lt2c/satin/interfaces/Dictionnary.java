@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin;
+package fr.ujm.tse.lt2c.satin.interfaces;
 
 
 /**
@@ -18,5 +18,7 @@ public interface Dictionnary {
 	public abstract int hashCode();
 
 	public abstract boolean equals(Object obj);
+	
+	public String printTriple(Triple t);
 	
 }

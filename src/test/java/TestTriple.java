@@ -2,8 +2,8 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.Triple;
-import fr.ujm.tse.lt2c.satin.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
 public class TestTriple {
 

@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin;
+package fr.ujm.tse.lt2c.satin.interfaces;
 
 /**
  * @author Jules Chevalier

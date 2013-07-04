@@ -1,9 +1,12 @@
-package fr.ujm.tse.lt2c.satin;
+package fr.ujm.tse.lt2c.satin.naiveImpl;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 
 
 /**
@@ -77,6 +80,22 @@ public class DictionnaryImplNaive implements Dictionnary {
 		} else if (!triples.equals(other.triples))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String printTriple(Triple t){
+		String s = this.get(t.getSubject()),
+			   p = this.get(t.getPredicate()),
+			   o = this.get(t.getObject());
+		
+		if(s.split("#").length>1)
+			s=s.split("#")[1];
+		if(p.split("#").length>1)
+			p=p.split("#")[1];
+		if(o.split("#").length>1)
+			o=o.split("#")[1];
+		
+		return s+" "+p+" "+o;
 	}
 
 }

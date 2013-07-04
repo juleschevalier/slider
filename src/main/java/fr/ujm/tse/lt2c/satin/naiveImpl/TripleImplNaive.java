@@ -1,4 +1,6 @@
-package fr.ujm.tse.lt2c.satin;
+package fr.ujm.tse.lt2c.satin.naiveImpl;
+
+import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 
 
 
