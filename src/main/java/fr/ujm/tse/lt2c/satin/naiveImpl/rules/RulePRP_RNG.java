@@ -37,10 +37,10 @@ public class RulePRP_RNG implements Rule {
 		 * Get triples matching input 
 		 * Create
 		 */
-		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(range);
+		Collection<Triple> range_Triples = tripleStore.getbyPredicate(range);
 		Collection<Triple> outputTriples = new HashSet<>();
 		
-		for (Triple t1 : subClassOf_Triples) {
+		for (Triple t1 : range_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 			for (Triple t2 : tripleStore.getAll()) {
 				long p2=t2.getPredicate(), o2=t2.getObject();

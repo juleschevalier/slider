@@ -26,6 +26,7 @@ public class DictionnaryImplNaive implements Dictionnary {
 
 	@Override
 	public long add(String s) {
+		s=s.toLowerCase();
 		if(this.triples.containsKey(s)){
 			return this.get(s);
 		}
@@ -46,6 +47,7 @@ public class DictionnaryImplNaive implements Dictionnary {
 
 	@Override
 	public long get(String s) {
+		s=s.toLowerCase();
 		return this.triples.get(s);
 	}
 

@@ -32,12 +32,43 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#digere -->
+
+    <owl:ObjectProperty rdf:about="&sample1;digere">
+        <rdfs:subPropertyOf rdf:resource="&sample1;mange"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estIdiot -->
+
+    <owl:ObjectProperty rdf:about="&sample1;estIdiot">
+        <rdfs:subPropertyOf rdf:resource="&sample1;estStupide"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estStupide -->
+
+    <owl:ObjectProperty rdf:about="&sample1;estStupide">
+        <rdfs:subPropertyOf rdf:resource="&sample1;estIdiot"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#mange -->
 
     <owl:ObjectProperty rdf:about="&sample1;mange">
         <rdfs:domain rdf:resource="&sample1;Chat"/>
         <rdfs:range rdf:resource="&sample1;Souris"/>
+        <rdfs:subPropertyOf rdf:resource="&sample1;tue"/>
     </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#tue -->
+
+    <owl:ObjectProperty rdf:about="&sample1;tue"/>
     
 
 
@@ -94,6 +125,22 @@
 
     <owl:Class rdf:about="&sample1;Humain">
         <rdfs:subClassOf rdf:resource="&sample1;Animal"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot -->
+
+    <owl:Class rdf:about="&sample1;Idiot">
+        <rdfs:subClassOf rdf:resource="&sample1;Imbecile"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile -->
+
+    <owl:Class rdf:about="&sample1;Imbecile">
+        <rdfs:subClassOf rdf:resource="&sample1;Idiot"/>
     </owl:Class>
     
 

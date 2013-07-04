@@ -30,17 +30,17 @@ public class RulePRP_DOM implements Rule {
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long range = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#domain");
+		long domain = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#domain");
 		long type = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#type");
 		
 		/*
 		 * Get triples matching input 
 		 * Create
 		 */
-		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(range);
+		Collection<Triple> domain_Triples = tripleStore.getbyPredicate(domain);
 		Collection<Triple> outputTriples = new HashSet<>();
 		
-		for (Triple t1 : subClassOf_Triples) {
+		for (Triple t1 : domain_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 			for (Triple t2 : tripleStore.getAll()) {
 				long s2=t2.getSubject(), p2=t2.getPredicate();
