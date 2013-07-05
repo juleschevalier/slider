@@ -44,6 +44,13 @@
 
     <owl:ObjectProperty rdf:about="&sample1;estIdiot">
         <rdfs:subPropertyOf rdf:resource="&sample1;estStupide"/>
+    </owl:ObjectProperty>    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estMangePar -->
+
+    <owl:ObjectProperty rdf:about="&sample1;estMangePar">
+        <owl:propertyDisjointWith rdf:resource="&sample1;mange"/>
     </owl:ObjectProperty>
     
 
@@ -56,11 +63,20 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estTuePar -->
+
+    <owl:ObjectProperty rdf:about="&sample1;estTuePar">
+        <owl:inverseOf rdf:resource="&sample1;tue"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#mange -->
 
     <owl:ObjectProperty rdf:about="&sample1;mange">
         <rdfs:domain rdf:resource="&sample1;Chat"/>
         <rdfs:range rdf:resource="&sample1;Souris"/>
+        <owl:inverseOf rdf:resource="&sample1;estMangePar"/>
         <rdfs:subPropertyOf rdf:resource="&sample1;tue"/>
     </owl:ObjectProperty>
     
@@ -80,8 +96,13 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
 
+    <owl:Class rdf:about="&sample1;A">
+        <owl:sameAs rdf:resource="&sample1;B"/>
+    </owl:Class>
+    <owl:Class rdf:about="&sample1;Z">
+        <owl:differentFrom rdf:resource="&sample1;B"/>
+    </owl:Class>
 
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal -->
 
@@ -192,6 +213,14 @@
 
     <owl:NamedIndividual rdf:about="&sample1;Edward">
         <mange rdf:resource="&sample1;Oscar"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&sample1;Bob">
+        <mange rdf:resource="&sample1;Alice"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&sample1;Alice">
+        <mange rdf:resource="&sample1;Bob"/>
     </owl:NamedIndividual>
     
 
