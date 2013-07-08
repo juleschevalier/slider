@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    <owl:Ontology rdf:about=""/>
+    <owl:Class rdf:about="http://cohse.semanticweb.org/ontologies/people#animal_hater_II">
+        <rdfs:label>animal hater II</rdfs:label>
+        <rdfs:comment><![CDATA[]]></rdfs:comment>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://cohse.semanticweb.org/ontologies/people#has_pet"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:maxCardinality>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+    <owl:Class rdf:about="http://cohse.semanticweb.org/ontologies/people#animal_hater_I">
+        <rdfs:label>animal hater I</rdfs:label>
+        <rdfs:comment><![CDATA[]]></rdfs:comment>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://cohse.semanticweb.org/ontologies/people#has_pet"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:complementOf>
+                            <owl:Class rdf:about="http://cohse.semanticweb.org/ontologies/people#animal"/>
+                        </owl:complementOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+</rdf:RDF>

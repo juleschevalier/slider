@@ -11,9 +11,9 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RulePRP_RNG implements Rule {
+public class RulePRP_INV2 implements Rule {
 	
-	private static Logger logger = Logger.getLogger(RulePRP_RNG.class);
+	private static Logger logger = Logger.getLogger(RulePRP_INV2.class);
 
 	@Override
 	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
@@ -21,35 +21,32 @@ public class RulePRP_RNG implements Rule {
 		
 		/**
 		 * 	INPUT
-		 * p rdfs:range c
-		 * x p y
+		 * p1 owl:InverseOf p2
+		 * y p2 x
 		 *  OUPUT
-		 * y rdf:type c
+		 * x p1 y
 		 */
 		
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long range = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#range");
-		long type = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#type");
+		long inverseOf = dictionnary.add("http://www.w3.org/2002/07/owl#inverseOf");
 		
 		/*
 		 * Get triples matching input 
 		 * Create
 		 */
-		Collection<Triple> range_Triples = tripleStore.getbyPredicate(range);
+		Collection<Triple> inverseOf_Triples = tripleStore.getbyPredicate(inverseOf);
 		Collection<Triple> outputTriples = new HashSet<>();
 		
-		for (Triple t1 : range_Triples) {
+		for (Triple t1 : inverseOf_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 			
 			for (Triple t2 : tripleStore.getAll()) {
-				long p2=t2.getPredicate(), o2=t2.getObject();
-				
-				if(s1==p2){
-					Triple result = new TripleImplNaive(o2, type, o1);
-					
-					logger.trace("PRP_RNG "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
+				if(o1==p2){
+					Triple result = new TripleImplNaive(o2, s1, s2);
+					logger.trace("PRP_INV2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}

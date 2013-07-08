@@ -32,7 +32,7 @@ import fr.ujm.tse.lt2c.satin.naiveImpl.rules.RuleSCM_RNG2;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.RuleSCM_SCO;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.RuleSCM_SPO;
 
-public class Reasonner {
+public class MTReasonner {
 	
 	private static Logger logger = Logger.getLogger(RulePRP_PDW.class);
 	
