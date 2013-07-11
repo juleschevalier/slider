@@ -11,48 +11,56 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RulePRP_INV1 implements Rule {
-	
-	private static Logger logger = Logger.getLogger(RulePRP_INV1.class);
+public class NaiveEQ_REP_S implements Rule {
+
+	private static Logger logger = Logger.getLogger(NaiveEQ_REP_S.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaiveEQ_REP_S(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
-		
-		
+	public void run() {
+
+
 		/**
 		 * 	INPUT
-		 * p1 owl:InverseOf p2
-		 * x p1 y
+		 * s owl:sameAs s'
+		 * s p o
 		 *  OUPUT
-		 * y p2 x
+		 * s' p o
 		 */
-		
+
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long inverseOf = dictionnary.add("http://www.w3.org/2002/07/owl#inverseOf");
-		
+		long sameAs = dictionnary.add("http://www.w3.org/2002/07/owl#sameAs");
+
 		/*
 		 * Get triples matching input 
 		 * Create
 		 */
-		Collection<Triple> inverseOf_Triples = tripleStore.getbyPredicate(inverseOf);
+		Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 		Collection<Triple> outputTriples = new HashSet<>();
-		
-		for (Triple t1 : inverseOf_Triples) {
+
+		for (Triple t1 : sameAs_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
-			
+
 			for (Triple t2 : tripleStore.getAll()) {
 				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
-				if(s1==p2){
-					Triple result = new TripleImplNaive(o2, o1, s2);
-					logger.trace("PRP_INV1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+
+				if(s1==s2){
+					Triple result = new TripleImplNaive(o1,p2,o2);
+					logger.trace("EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}
 		}
 		tripleStore.addAll(outputTriples);
-		
 	}
 
 }

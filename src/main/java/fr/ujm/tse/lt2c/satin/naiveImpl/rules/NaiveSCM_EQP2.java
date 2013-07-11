@@ -11,12 +11,20 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RuleSCM_EQP2 implements Rule {
+public class NaiveSCM_EQP2 implements Rule {
 	
-	private static Logger logger = Logger.getLogger(RuleSCM_EQP2.class);
+	private static Logger logger = Logger.getLogger(NaiveSCM_EQP2.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaiveSCM_EQP2(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 		
 		
 		/**

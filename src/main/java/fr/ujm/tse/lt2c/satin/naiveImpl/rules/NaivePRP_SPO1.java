@@ -11,12 +11,20 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RulePRP_SPO1 implements Rule {
+public class NaivePRP_SPO1 implements Rule {
 	
-	private static Logger logger = Logger.getLogger(RulePRP_SPO1.class);
+	private static Logger logger = Logger.getLogger(NaivePRP_SPO1.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaivePRP_SPO1(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 		
 		
 		/**

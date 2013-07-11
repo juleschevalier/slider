@@ -11,12 +11,20 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RuleEQ_SYM implements Rule {
+public class NaiveEQ_SYM implements Rule {
 
-	private static Logger logger = Logger.getLogger(RuleEQ_SYM.class);
+	private static Logger logger = Logger.getLogger(NaiveEQ_SYM.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaiveEQ_SYM(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 
 
 		/**

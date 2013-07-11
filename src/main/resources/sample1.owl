@@ -44,7 +44,8 @@
 
     <owl:ObjectProperty rdf:about="&sample1;estIdiot">
         <rdfs:subPropertyOf rdf:resource="&sample1;estStupide"/>
-    </owl:ObjectProperty>    
+    </owl:ObjectProperty>
+    
 
 
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estMangePar -->
@@ -96,17 +97,88 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
 
-    <owl:Class rdf:about="&sample1;A">
-        <owl:sameAs rdf:resource="&sample1;B"/>
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1 -->
+
+    <owl:Class rdf:about="&sample1;1"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#2 -->
+
+    <owl:Class rdf:about="&sample1;2">
+        <rdfs:subClassOf rdf:resource="&sample1;1"/>
     </owl:Class>
-    <owl:Class rdf:about="&sample1;Z">
-        <owl:differentFrom rdf:resource="&sample1;B"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#3 -->
+
+    <owl:Class rdf:about="&sample1;3">
+        <rdfs:subClassOf rdf:resource="&sample1;2"/>
     </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#4 -->
+
+    <owl:Class rdf:about="&sample1;4">
+        <rdfs:subClassOf rdf:resource="&sample1;3"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#5 -->
+
+    <owl:Class rdf:about="&sample1;5">
+        <rdfs:subClassOf rdf:resource="&sample1;4"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#6 -->
+
+    <owl:Class rdf:about="&sample1;6">
+        <rdfs:subClassOf rdf:resource="&sample1;5"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#7 -->
+
+    <owl:Class rdf:about="&sample1;7">
+        <rdfs:subClassOf rdf:resource="&sample1;6"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#9 -->
+
+    <owl:Class rdf:about="&sample1;9">
+        <rdfs:subClassOf rdf:resource="&sample1;7"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#A -->
+
+    <owl:Class rdf:about="&sample1;A"/>
+    
+
 
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal -->
 
     <owl:Class rdf:about="&sample1;Animal"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Chartreux -->
+
+    <owl:Class rdf:about="&sample1;Chartreux">
+        <rdfs:subClassOf rdf:resource="&sample1;Chat"/>
+    </owl:Class>
     
 
 
@@ -182,6 +254,14 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Siamois -->
+
+    <owl:Class rdf:about="&sample1;Siamois">
+        <rdfs:subClassOf rdf:resource="&sample1;Chat"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Souris -->
 
     <owl:Class rdf:about="&sample1;Souris">
@@ -198,6 +278,12 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Z -->
+
+    <owl:Class rdf:about="&sample1;Z"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -209,15 +295,15 @@
     
 
 
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Edward -->
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#A -->
 
-    <owl:NamedIndividual rdf:about="&sample1;Edward">
-        <mange rdf:resource="&sample1;Oscar"/>
+    <owl:NamedIndividual rdf:about="&sample1;A">
+        <owl:sameAs rdf:resource="&sample1;B"/>
     </owl:NamedIndividual>
+    
 
-    <owl:NamedIndividual rdf:about="&sample1;Bob">
-        <mange rdf:resource="&sample1;Alice"/>
-    </owl:NamedIndividual>
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Alice -->
 
     <owl:NamedIndividual rdf:about="&sample1;Alice">
         <mange rdf:resource="&sample1;Bob"/>
@@ -225,9 +311,55 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#B -->
+
+    <owl:NamedIndividual rdf:about="&sample1;B"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Bob -->
+
+    <owl:NamedIndividual rdf:about="&sample1;Bob">
+        <mange rdf:resource="&sample1;Alice"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Edward -->
+
+    <owl:NamedIndividual rdf:about="&sample1;Edward">
+        <mange rdf:resource="&sample1;Oscar"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Oscar -->
 
     <owl:NamedIndividual rdf:about="&sample1;Oscar"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Z -->
+
+    <owl:NamedIndividual rdf:about="&sample1;Z"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="&sample1;B"/>
+            <rdf:Description rdf:about="&sample1;Z"/>
+        </owl:distinctMembers>
+    </rdf:Description>
 </rdf:RDF>
 
 

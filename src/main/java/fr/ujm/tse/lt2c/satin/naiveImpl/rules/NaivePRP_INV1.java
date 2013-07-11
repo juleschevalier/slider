@@ -11,20 +11,28 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RulePRP_INV2 implements Rule {
+public class NaivePRP_INV1 implements Rule {
 	
-	private static Logger logger = Logger.getLogger(RulePRP_INV2.class);
+	private static Logger logger = Logger.getLogger(NaivePRP_INV1.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaivePRP_INV1(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 		
 		
 		/**
 		 * 	INPUT
 		 * p1 owl:InverseOf p2
-		 * y p2 x
-		 *  OUPUT
 		 * x p1 y
+		 *  OUPUT
+		 * y p2 x
 		 */
 		
 		/*
@@ -44,9 +52,9 @@ public class RulePRP_INV2 implements Rule {
 			
 			for (Triple t2 : tripleStore.getAll()) {
 				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
-				if(o1==p2){
-					Triple result = new TripleImplNaive(o2, s1, s2);
-					logger.trace("PRP_INV2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+				if(s1==p2){
+					Triple result = new TripleImplNaive(o2, o1, s2);
+					logger.trace("PRP_INV1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}

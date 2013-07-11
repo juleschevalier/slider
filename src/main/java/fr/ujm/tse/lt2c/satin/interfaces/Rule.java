@@ -1,9 +1,9 @@
 package fr.ujm.tse.lt2c.satin.interfaces;
 
 
-public interface Rule {
+public interface Rule extends Runnable{
 	
-	public void process(TripleStore tripleStore, Dictionnary dictionnary);
+	public void run();
 	
 	public int hashCode();
 	

@@ -11,20 +11,28 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class RuleEQ_REP_P implements Rule {
+public class NaiveEQ_REP_O implements Rule {
 
-	private static Logger logger = Logger.getLogger(RuleEQ_REP_P.class);
+	private static Logger logger = Logger.getLogger(NaiveEQ_REP_O.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaiveEQ_REP_O(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 
 
 		/**
 		 * 	INPUT
-		 * p owl:sameAs p'
+		 * o owl:sameAs o'
 		 * s p o
 		 *  OUPUT
-		 * s p' o
+		 * s p o'
 		 */
 
 		/*
@@ -45,9 +53,9 @@ public class RuleEQ_REP_P implements Rule {
 			for (Triple t2 : tripleStore.getAll()) {
 				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
 
-				if(s1==p2){
-					Triple result = new TripleImplNaive(s2,o1,o2);
-					logger.trace("EQ_REP_P "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+				if(s1==o2){
+					Triple result = new TripleImplNaive(s2,p2,o1);
+					logger.trace("EQ_REP_O "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}

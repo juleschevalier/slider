@@ -9,12 +9,20 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
-public class RulePRP_PDW implements Rule {
+public class NaivePRP_PDW implements Rule {
 
-	private static Logger logger = Logger.getLogger(RulePRP_PDW.class);
+	private static Logger logger = Logger.getLogger(NaivePRP_PDW.class);
+	private Dictionnary dictionnary;
+	private TripleStore tripleStore;
+
+	public NaivePRP_PDW(Dictionnary dictionnary, TripleStore tripleStore) {
+		super();
+		this.dictionnary = dictionnary;
+		this.tripleStore = tripleStore;
+	}
 
 	@Override
-	public void process(TripleStore tripleStore, Dictionnary dictionnary) {
+	public void run() {
 
 
 		/**
