@@ -63,6 +63,7 @@ public class ReasonnerMark1 {
 		rules.add(new Mark1EQ_REP_S(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1EQ_REP_P(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1EQ_REP_O(dictionnary, usableTriples, newTriples, tripleStore));
+//		rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples, tripleStore));
 		
 		int old_size, new_size, steps=0;
 		
@@ -77,24 +78,27 @@ public class ReasonnerMark1 {
 			usableTriples.addAll(newTriples);
 			newTriples.clear();
 			
-			logger.debug("Triples utilisables : "+usableTriples.size());
+			logger.debug("Usable triples: "+usableTriples.size());
 			
 			new_size = tripleStore.getAll().size();
 			long step2Time = new Date().getTime();
-			logger.debug((step2Time-stepTime)+"ms pour "+(new_size-old_size)+" triples");
+			logger.debug((step2Time-stepTime)+"ms for "+(new_size-old_size)+" triples");
 			steps++;
 		}while(old_size != new_size);
 		
 		long endTime = new Date().getTime();
 		
-		System.out.println("Entrées dictionnaire : "+dictionnary.size());
-		System.out.println("Triples avant : "+beginNbTriples);
-		System.out.println("Triples après : "+tripleStore.getAll().size());
-		System.out.println("Triples générés : "+(tripleStore.getAll().size()-beginNbTriples));
-		System.out.println("Itérations : "+steps);
-		System.out.println("Temps parsing : "+(parsingTime-startTime)+"ms");
-		System.out.println("Temps inférence : "+(endTime-parsingTime)+"ms");
-		System.out.println("Temps total : "+(endTime-startTime)+"ms");
+		System.out.println("Dictionnary size: "+dictionnary.size());
+		System.out.println("Initial triples: "+beginNbTriples);
+		System.out.println("Triples after inference: "+tripleStore.getAll().size());
+		System.out.println("Generated triples: "+(tripleStore.getAll().size()-beginNbTriples));
+		System.out.println("Iterations: "+steps);
+		System.out.println("Parsing: "+(parsingTime-startTime)+"ms");
+		System.out.println("Inference: "+(endTime-parsingTime)+"ms");
+		System.out.println("Total time: "+(endTime-startTime)+"ms");
+		System.out.print("File writing: ");
+		tripleStore.writeToFile("mark1.out", dictionnary);
+		System.out.println("ok");
 		
 	}
 

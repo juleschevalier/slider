@@ -19,5 +19,7 @@ public interface TripleStore {
 	public int hashCode();
 	
 	public boolean equals(Object obj);
+	
+	public void writeToFile(String file, Dictionnary dictionnary);
 
 }

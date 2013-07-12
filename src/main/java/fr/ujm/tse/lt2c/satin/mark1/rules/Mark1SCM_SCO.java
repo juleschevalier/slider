@@ -43,7 +43,7 @@ public class Mark1SCM_SCO implements Rule {
 		 * Get concepts codes in dictionnary
 		 */
 		long subClassOf = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
-		
+
 		long loops = 0;
 
 		/*
@@ -75,20 +75,23 @@ public class Mark1SCM_SCO implements Rule {
 
 			for (Triple t1 : usableTriples) {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
-				
-				for (Triple t2 : subClassOf_Triples) {
-					long s2 = t2.getSubject(), o2 = t2.getObject();
-					loops++;
-					
-					if(p1==subClassOf && o1==s2){
-						Triple result = new TripleImplNaive(s1, subClassOf, o2);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
-						outputTriples.add(result);
-					}
-					if(p1==subClassOf && o2==s1){
-						Triple result = new TripleImplNaive(s2, subClassOf, o1);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
-						outputTriples.add(result);
+
+				if(p1==subClassOf){
+
+					for (Triple t2 : subClassOf_Triples) {
+						long s2 = t2.getSubject(), o2 = t2.getObject();
+						loops++;
+
+						if(o1==s2){
+							Triple result = new TripleImplNaive(s1, subClassOf, o2);
+							logger.trace("SCM_SCO " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+							outputTriples.add(result);
+						}
+						if(o2==s1){
+							Triple result = new TripleImplNaive(s2, subClassOf, o1);
+							logger.trace("SCM_SCO " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+							outputTriples.add(result);
+						}
 					}
 				}
 			}
@@ -98,12 +101,14 @@ public class Mark1SCM_SCO implements Rule {
 			if(!tripleStore.getAll().contains(triple)){
 				tripleStore.add(triple);
 				newTriples.add(triple);
-				
+
+			}else{
+				logger.debug((usableTriples==null?"F SCM_SCO ":"SCM_SCO") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
-//		tripleStore.addAll(outputTriples);
-//		newTriples.addAll(outputTriples);
-		logger.debug(this.getClass()+" : "+loops+" itérations");
+		//		tripleStore.addAll(outputTriples);
+		//		newTriples.addAll(outputTriples);
+		logger.debug(this.getClass()+" : "+loops+" iterations");
 
 	}
 

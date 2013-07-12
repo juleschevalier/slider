@@ -109,11 +109,13 @@ public class Mark1PRP_DOM implements Rule {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 				
+			}else{
+				logger.debug((usableTriples==null?"F PRP_DOM ":"PRP_DOM") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 //		tripleStore.addAll(outputTriples);
 //		newTriples.addAll(outputTriples);
-		logger.debug(this.getClass()+" : "+loops+" itérations");
+		logger.debug(this.getClass()+" : "+loops+" iterations");
 	}
 
 }

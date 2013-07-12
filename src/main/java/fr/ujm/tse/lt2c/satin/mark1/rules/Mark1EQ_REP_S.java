@@ -89,12 +89,12 @@ public class Mark1EQ_REP_S implements Rule {
 					 */
 					if(p1==sameAs && s1!=o1 && s1==s2){
 						Triple result = new TripleImplNaive(o1, p2, o2);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+						logger.trace("EQ_REP_S " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 					if(p2==sameAs && s2!=o2 && s2==s1){
 						Triple result = new TripleImplNaive(o2, p1, o1);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
+						logger.trace("EQ_REP_S " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);						
 					}
 				}
@@ -106,11 +106,13 @@ public class Mark1EQ_REP_S implements Rule {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 				
+			}else{
+				logger.debug((usableTriples==null?"F EQ_REP_S ":"EQ_REP_S") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 //		tripleStore.addAll(outputTriples);
 //		newTriples.addAll(outputTriples);
-		logger.debug(this.getClass()+" : "+loops+" itérations");
+		logger.debug(this.getClass()+" : "+loops+" iterations");
 	}
 
 }

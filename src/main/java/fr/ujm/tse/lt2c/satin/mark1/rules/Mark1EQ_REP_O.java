@@ -52,7 +52,11 @@ public class Mark1EQ_REP_O implements Rule {
 		Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 		Collection<Triple> outputTriples = new HashSet<>();
 
-		if (usableTriples == null) { // We use the entire triplestore
+		/*
+		 * If usableTriples is null,
+		 * we infere over the entire triplestore 
+		 */
+		if (usableTriples == null) {
 
 			for (Triple t1 : sameAs_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
@@ -66,8 +70,8 @@ public class Mark1EQ_REP_O implements Rule {
 						long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
 
 						loops++;
-						if(s1==p2){
-							Triple result = new TripleImplNaive(s2,o1,o2);
+						if(s1==o2){
+							Triple result = new TripleImplNaive(s2,p2,o1);
 							logger.trace("F EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 							outputTriples.add(result);
 						}
@@ -87,14 +91,14 @@ public class Mark1EQ_REP_O implements Rule {
 					/*
 					 * Optimisation : Don't work on <A sameAs A> triples
 					 */
-					if(p1==sameAs && s1!=o1 && s1==s2){
+					if(p1==sameAs && s1!=o1 && s1==o2){
 						Triple result = new TripleImplNaive(s2, p2, o1);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+						logger.trace("EQ_REP_O " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-					if(p2==sameAs && s2!=o2 && s2==s1){
+					if(p2==sameAs && s2!=o2 && s2==o1){
 						Triple result = new TripleImplNaive(s1, p1, o2);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
+						logger.trace("EQ_REP_O " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);						
 					}
 				}
@@ -106,11 +110,13 @@ public class Mark1EQ_REP_O implements Rule {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 				
+			}else{
+				logger.debug((usableTriples==null?"F EQ_REP_O ":"EQ_REP_O") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 //		tripleStore.addAll(outputTriples);
 //		newTriples.addAll(outputTriples);
-		logger.debug(this.getClass()+" : "+loops+" itérations");
+		logger.debug(this.getClass()+" : "+loops+" iterations");
 	}
 
 }
