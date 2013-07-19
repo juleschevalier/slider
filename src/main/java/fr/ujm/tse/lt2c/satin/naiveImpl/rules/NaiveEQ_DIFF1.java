@@ -9,6 +9,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
+/**
+ * 	INPUT
+ * x owl:sameAs y
+ * x owl:differentFrom y
+ *  OUPUT
+ * false
+ */
 public class NaiveEQ_DIFF1 implements Rule {
 
 	private static Logger logger = Logger.getLogger(NaiveEQ_DIFF1.class);
@@ -25,13 +32,6 @@ public class NaiveEQ_DIFF1 implements Rule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * x owl:sameAs y
-		 * x owl:differentFrom y
-		 *  OUPUT
-		 * false
-		 */
 
 		/*
 		 * Get concepts codes in dictionnary

@@ -49,7 +49,6 @@ public class Mark1EQ_REP_O implements Rule {
 		/*
 		 * Get triples matching input
 		 */
-		Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 		Collection<Triple> outputTriples = new HashSet<>();
 
 		/*
@@ -57,6 +56,8 @@ public class Mark1EQ_REP_O implements Rule {
 		 * we infere over the entire triplestore 
 		 */
 		if (usableTriples == null) {
+			
+			Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 
 			for (Triple t1 : sameAs_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();

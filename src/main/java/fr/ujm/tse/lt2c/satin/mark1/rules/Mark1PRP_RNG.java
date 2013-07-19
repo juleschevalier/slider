@@ -11,15 +11,15 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.TripleImplNaive;
 
-public class Mark1PRP_DOM implements Rule {
+public class Mark1PRP_RNG implements Rule {
 	
-	private static Logger logger = Logger.getLogger(Mark1PRP_DOM.class);
+	private static Logger logger = Logger.getLogger(Mark1PRP_RNG.class);
 	private Dictionnary dictionnary;
 	private TripleStore tripleStore;
 	private Collection<Triple> usableTriples;
 	Collection<Triple> newTriples;
 
-	public Mark1PRP_DOM(Dictionnary dictionnary, Collection<Triple> usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
+	public Mark1PRP_RNG(Dictionnary dictionnary, Collection<Triple> usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
@@ -33,16 +33,16 @@ public class Mark1PRP_DOM implements Rule {
 		
 		/**
 		 * 	INPUT
-		 * p rdfs:domain c
+		 * p rdfs:range c
 		 * x p y
 		 *  OUPUT
-		 * x rdf:type c
+		 * y rdf:type c
 		 */
 		
 		/*
 		 * Get/add concepts codes needed from dictionnary
 		 */
-		long domain = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#domain");
+		long range = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#range");
 		long type = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#type");
 
 		long loops = 0;
@@ -55,18 +55,21 @@ public class Mark1PRP_DOM implements Rule {
 		 */
 		if (usableTriples == null) {
 
-			Collection<Triple> domain_Triples = tripleStore.getbyPredicate(domain);
+			/*
+			 * IS THIS A LOOSE OF PERFORMANCE ??? 
+			 */
+			Collection<Triple> domain_Triples = tripleStore.getbyPredicate(range);
 			
 			for (Triple t1 : domain_Triples) {
 				long s1 = t1.getSubject(), o1 = t1.getObject();
 
 				for (Triple t2 : tripleStore.getAll()) {
-					long s2 = t2.getSubject(), p2 = t2.getPredicate();
+					long p2 = t2.getPredicate(), o2 = t2.getObject();
 					loops++;
 					if (s1 == p2) {
-						Triple result = new TripleImplNaive(s2, type, o1);
+						Triple result = new TripleImplNaive(o2, type, o1);
 
-						logger.trace("F PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+						logger.trace("F PRP_RNG " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 				}
@@ -87,14 +90,14 @@ public class Mark1PRP_DOM implements Rule {
 					long s2 = t2.getSubject(), p2=t2.getPredicate(), o2 = t2.getObject();
 					loops++;
 					
-					if(p1==domain && s1==p2){
-						Triple result = new TripleImplNaive(s2, type, o1);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+					if(p1==range && s1==p2){
+						Triple result = new TripleImplNaive(o2, type, o1);
+						logger.trace("PRP_RNG " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-					if(p2==domain && s2==p1){
-						Triple result = new TripleImplNaive(s1, type, o2);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
+					if(p2==range && s2==p1){
+						Triple result = new TripleImplNaive(o1, type, o2);
+						logger.trace("PRP_RNG " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);						
 					}
 				}

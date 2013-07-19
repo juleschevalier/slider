@@ -51,18 +51,18 @@ public class NaiveSCM_RNG1 implements Rule {
 		
 		for (Triple t1 : range_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
-			
+
 			for (Triple t2 : subClassOf_Triples) {
 				long s2=t2.getSubject(), o2=t2.getObject();
-				
+
 				if(o1==s2){
 					Triple result = new TripleImplNaive(s1, range, o2);
 					logger.trace("SCM_RNG1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
+				}
+
 			}
-				
-			}
-			
+
 		}
 		tripleStore.addAll(outputTriples);
 		

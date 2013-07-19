@@ -1,3 +1,4 @@
+
 package fr.ujm.tse.lt2c.satin.mark1.rules;
 
 import java.util.Collection;

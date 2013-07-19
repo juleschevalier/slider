@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1373467064619" name="http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1373467064619" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1373467064619" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
     </group>
 </catalog>
