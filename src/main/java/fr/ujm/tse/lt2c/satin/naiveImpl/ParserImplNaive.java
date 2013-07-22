@@ -17,6 +17,8 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
 public class ParserImplNaive implements Parser {
 	
+	private static Logger logger = Logger.getLogger(ParserImplNaive.class);
+	
 	Dictionnary dictionnary;
 	TripleStore tripleStore;
 
@@ -59,7 +61,7 @@ public class ParserImplNaive implements Parser {
 		String p = next.getPredicate().toString();
 		String o = next.getObject().toString();
 		
-		Logger.getLogger(ParserImplNaive.class).trace(s+" "+p+" "+o);
+		logger.trace(s+" "+p+" "+o);
 		
 		long si = this.dictionnary.add(s);
 		long pi = this.dictionnary.add(p);

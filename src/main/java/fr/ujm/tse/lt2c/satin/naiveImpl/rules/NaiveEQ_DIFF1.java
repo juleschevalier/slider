@@ -27,7 +27,7 @@ public class NaiveEQ_DIFF1 implements Rule {
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
 	}
-	
+
 	@Override
 	public void run() {
 

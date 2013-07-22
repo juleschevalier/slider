@@ -50,14 +50,11 @@ public class NaiveEQ_REP_S implements Rule {
 		for (Triple t1 : sameAs_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 
-			for (Triple t2 : tripleStore.getAll()) {
-				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
-
-				if(s1==s2){
-					Triple result = new TripleImplNaive(o1,p2,o2);
-					logger.trace("EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
-					outputTriples.add(result);
-				}
+			for (Triple t2 : tripleStore.getbySubject(s1)) {
+				long p2=t2.getPredicate(), o2=t2.getObject();
+				Triple result = new TripleImplNaive(o1,p2,o2);
+				logger.trace("EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+				outputTriples.add(result);
 			}
 		}
 		tripleStore.addAll(outputTriples);

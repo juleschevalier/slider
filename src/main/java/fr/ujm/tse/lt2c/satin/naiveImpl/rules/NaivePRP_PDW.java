@@ -48,13 +48,13 @@ public class NaivePRP_PDW implements Rule {
 		for (Triple t1 : propertyDisjointWith_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 
-			for (Triple t2 : tripleStore.getAll()) {
-				long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
+			for (Triple t2 : tripleStore.getbyPredicate(s1)) {
+				long s2=t2.getSubject(), o2=t2.getObject();
+				
+				for (Triple t3 : tripleStore.getbyPredicate(o1)) {
+					long s3=t3.getSubject(), o3=t3.getObject();
 
-				for (Triple t3 : tripleStore.getAll()) {
-					long s3=t3.getSubject(), p3=t3.getPredicate(), o3=t3.getObject();
-
-					if(s1==p2&&o1==p3&&s2==s3&&o2==o3){
+					if(s2==s3&&o2==o3){
 						logger.trace("PRP_PDW "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" + "+dictionnary.printTriple(t3)+" -> FALSE");
 					}
 				}

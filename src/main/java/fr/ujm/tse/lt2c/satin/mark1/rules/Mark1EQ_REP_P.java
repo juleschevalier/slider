@@ -43,7 +43,7 @@ public class Mark1EQ_REP_P implements Rule {
 		 * Get concepts codes in dictionnary
 		 */
 		long sameAs = dictionnary.add("http://www.w3.org/2002/07/owl#sameAs");
-		
+
 		long loops = 0;
 
 		/*
@@ -56,21 +56,19 @@ public class Mark1EQ_REP_P implements Rule {
 
 			for (Triple t1 : sameAs_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
-				
+
 				/*
 				 * Optimisation : Don't work on <A sameAs A> triples
 				 */
 				if(s1!=o1){
-					
-					for (Triple t2 : tripleStore.getAll()) {
-						long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
+
+					for (Triple t2 : tripleStore.getbyPredicate(s1)) {
+						long s2=t2.getSubject(), o2=t2.getObject();
 
 						loops++;
-						if(s1==p2){
-							Triple result = new TripleImplNaive(s2,o1,o2);
-							logger.trace("F EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
-							outputTriples.add(result);
-						}
+						Triple result = new TripleImplNaive(s2,o1,o2);
+						logger.trace("F EQ_REP_S "+dictionnary.printTriple(t1)+" + "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						outputTriples.add(result);
 					}
 				}
 			}
@@ -79,11 +77,11 @@ public class Mark1EQ_REP_P implements Rule {
 
 			for (Triple t1 : usableTriples) {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
-				
+
 				for (Triple t2 : tripleStore.getAll()) {
 					long s2 = t2.getSubject(), p2=t2.getPredicate(), o2 = t2.getObject();
 					loops++;
-					
+
 					/*
 					 * Optimisation : Don't work on <A sameAs A> triples
 					 */
@@ -105,13 +103,13 @@ public class Mark1EQ_REP_P implements Rule {
 			if(!tripleStore.getAll().contains(triple)){
 				tripleStore.add(triple);
 				newTriples.add(triple);
-				
+
 			}else{
 				logger.debug((usableTriples==null?"F EQ_REP_P ":"EQ_REP_P") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
-//		tripleStore.addAll(outputTriples);
-//		newTriples.addAll(outputTriples);
+		//		tripleStore.addAll(outputTriples);
+		//		newTriples.addAll(outputTriples);
 		logger.debug(this.getClass()+" : "+loops+" iterations");
 	}
 

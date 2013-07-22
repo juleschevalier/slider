@@ -46,11 +46,10 @@ public class ReasonnerMark1 {
 //		parser.parse("twopets.rdf");
 //		parser.parse("geopolitical.owl");
 //		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
-		parser.parse("/home/jules/Téléchargements/wine_indefenced.rdf");
+//		parser.parse("/home/jules/Téléchargements/wine_indefenced.rdf");
+		parser.parse("wine.rdf");
 		
-		logger.debug("Parsing complet");
-		logger.debug("Entrées dictionnaire : "+dictionnary.size());
-		logger.debug("Triples : "+tripleStore.getAll().size());
+		logger.debug("Parsing completed");
 		
 		long parsingTime = System.nanoTime();
 		
@@ -108,7 +107,7 @@ public class ReasonnerMark1 {
 		System.out.println("Inference: "+(endTime-parsingTime)+"ns");
 		System.out.println("Total time: "+(endTime-startTime)+"ns");
 		System.out.print("File writing: ");
-		tripleStore.writeToFile("mark1.out", dictionnary);
+		tripleStore.writeToFile("wine_fulln_new.out", dictionnary);
 		System.out.println("ok");
 		
 	}

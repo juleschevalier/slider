@@ -59,15 +59,12 @@ public class Mark1PRP_SPO1 implements Rule {
 			for (Triple t1 : subProperty_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
 
-				for (Triple t2 : tripleStore.getAll()) {
-					long s2=t2.getSubject(), p2=t2.getPredicate(), o2=t2.getObject();
+				for (Triple t2 : tripleStore.getbyPredicate(s1)) {
+					long s2=t2.getSubject(), o2=t2.getObject();
 
-					if(s1==p2){
-						Triple result = new TripleImplNaive(s2, o1, o2);
-						logger.trace("PRP_SPO1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
-						outputTriples.add(result);
-					}
-
+					Triple result = new TripleImplNaive(s2, o1, o2);
+					logger.trace("PRP_SPO1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+					outputTriples.add(result);
 				}
 
 			}

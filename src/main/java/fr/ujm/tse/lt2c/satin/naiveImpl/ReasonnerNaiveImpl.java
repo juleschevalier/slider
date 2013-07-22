@@ -1,29 +1,34 @@
 package fr.ujm.tse.lt2c.satin.naiveImpl;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.reasoner.rulesys.Node_RuleVariable;
-
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveCAX_SCO;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_DIFF1;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_REF;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_REP_O;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_REP_P;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_REP_S;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_SYM;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveEQ_TRANS;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_DOM;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_EQP1;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_EQP2;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_INV1;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_INV2;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_PDW;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_RNG;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaivePRP_SPO1;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_DOM1;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_DOM2;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_EQC1;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_EQC2;
+import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_EQP1;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_EQP2;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_RNG1;
 import fr.ujm.tse.lt2c.satin.naiveImpl.rules.NaiveSCM_RNG2;
@@ -48,11 +53,10 @@ public class ReasonnerNaiveImpl {
 //		parser.parse("haters.rdf");
 //		parser.parse("twopets.rdf");
 //		parser.parse("geopolitical.owl");
-		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
+//		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
+		parser.parse("wine.rdf");
 		
 		logger.debug("Parsing complet");
-		logger.debug("Entrées dictionnaire : "+dictionnary.size());
-		logger.debug("Triples : "+tripleStore.getAll().size());
 		
 		long parsingTime = System.nanoTime();
 		
@@ -62,20 +66,48 @@ public class ReasonnerNaiveImpl {
 		
 		/*Initialize rules used for inference on RhoDF*/
 //		rules.add(new NaiveEQ_REF(dictionnary, tripleStore));
+//		rules.add(new NaivePRP_DOM(dictionnary, tripleStore));
+//		rules.add(new NaivePRP_RNG(dictionnary, tripleStore));
+//		rules.add(new NaivePRP_SPO1(dictionnary, tripleStore));
+//		rules.add(new NaiveCAX_SCO(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_SCO(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_EQC2(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_SPO(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_EQP2(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_SPO(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_EQP2(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_DOM1(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_DOM2(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_RNG1(dictionnary, tripleStore));
+//		rules.add(new NaiveSCM_RNG2(dictionnary, tripleStore));
+		
+		/*Others*/
+		rules.add(new NaiveCAX_SCO(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_DIFF1(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_REF(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_REP_O(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_REP_P(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_REP_S(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_SYM(dictionnary, tripleStore));
+		rules.add(new NaiveEQ_TRANS(dictionnary, tripleStore));
 		rules.add(new NaivePRP_DOM(dictionnary, tripleStore));
+		rules.add(new NaivePRP_EQP1(dictionnary, tripleStore));
+		rules.add(new NaivePRP_EQP2(dictionnary, tripleStore));
+		rules.add(new NaivePRP_INV1(dictionnary, tripleStore));
+		rules.add(new NaivePRP_INV2(dictionnary, tripleStore));
+		rules.add(new NaivePRP_PDW(dictionnary, tripleStore));
 		rules.add(new NaivePRP_RNG(dictionnary, tripleStore));
 		rules.add(new NaivePRP_SPO1(dictionnary, tripleStore));
-		rules.add(new NaiveCAX_SCO(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_SCO(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_EQC2(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_SPO(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_EQP2(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_SPO(dictionnary, tripleStore));
-		rules.add(new NaiveSCM_EQP2(dictionnary, tripleStore));
 		rules.add(new NaiveSCM_DOM1(dictionnary, tripleStore));
 		rules.add(new NaiveSCM_DOM2(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_EQC1(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_EQC2(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_EQP1(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_EQP2(dictionnary, tripleStore));
 		rules.add(new NaiveSCM_RNG1(dictionnary, tripleStore));
 		rules.add(new NaiveSCM_RNG2(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_SCO(dictionnary, tripleStore));
+		rules.add(new NaiveSCM_SPO(dictionnary, tripleStore));
 		
 		int old_size, new_size, steps=0;
 		do{
@@ -101,27 +133,9 @@ public class ReasonnerNaiveImpl {
 		System.out.println("Inference: "+(endTime-parsingTime)+"ns");
 		System.out.println("Total time: "+(endTime-startTime)+"ns");
 		System.out.print("File writing: ");
+		
 		tripleStore.writeToFile("naive.out", dictionnary);
 		System.out.println("ok");
-		
-
-		Model model = ModelFactory.createDefaultModel();
-		
-		for (Triple triple : tripleStore.getAll()) {
-			Node s = new Node_RuleVariable(dictionnary.get(triple.getSubject()), (int) triple.getSubject());
-			Node p = new Node_RuleVariable(dictionnary.get(triple.getPredicate()), (int) triple.getPredicate());
-			Node o = new Node_RuleVariable(dictionnary.get(triple.getObject()), (int) triple.getObject());
-			model.getGraph().add(new com.hp.hpl.jena.graph.Triple(s,p,o));
-		}
-		OutputStream os;
-		try {
-			os = new FileOutputStream("out.rdf");
-			model.write(os);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("rdf writing ok");
 		
 	}
 
