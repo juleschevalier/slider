@@ -98,7 +98,7 @@ public class ReasonnerMark1 {
 			long step2Time = System.nanoTime();
 			logger.debug((step2Time-stepTime)+"ns for "+(new_size-old_size)+" triples");
 			steps++;
-		}while(usableTriples.isEmpty());
+		}while(!newTriples.isEmpty());
 		
 		long endTime = System.nanoTime();
 		
