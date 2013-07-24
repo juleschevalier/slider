@@ -50,8 +50,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>fr.ujm.tse.lt2c.satin.naiveImpl.ReasonnerNaiveImpl</mainClass>
-					<mainClass>fr.ujm.tse.lt2c.satin.mark1.ReasonnerMark1</mainClass>
 					<executable>maven</executable>
 				</configuration>
 			</plugin>
