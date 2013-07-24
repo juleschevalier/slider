@@ -59,7 +59,7 @@ public class Mark1SCM_DOM2 implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 			Collection<Triple> domain_Triples = tripleStore.getbyPredicate(domain);
 			Collection<Triple> subPropertyOf_Triples = tripleStore.getbyPredicate(subPropertyOf);
 			
@@ -71,7 +71,7 @@ public class Mark1SCM_DOM2 implements Rule {
 
 					if(s1==o2){
 						Triple result = new TripleImplNaive(s2, domain, o1);
-						logger.trace("SCM_DOM2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace("F SCM_DOM2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -119,7 +119,7 @@ public class Mark1SCM_DOM2 implements Rule {
 				newTriples.add(triple);
 				
 			}else{
-				logger.debug((usableTriples==null?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		logger.debug(this.getClass()+" : "+loops+" iterations");

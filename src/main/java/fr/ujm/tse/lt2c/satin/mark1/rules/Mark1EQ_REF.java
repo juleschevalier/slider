@@ -58,7 +58,7 @@ public class Mark1EQ_REF implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			for (Triple t : tripleStore.getAll()) {
 				long s=t.getSubject(), p=t.getPredicate(), o=t.getObject();
@@ -98,7 +98,7 @@ public class Mark1EQ_REF implements Rule {
 				newTriples.add(triple);
 				
 			}else{
-				logger.debug((usableTriples==null?"F EQ_REF ":"EQ_REF") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F EQ_REF ":"EQ_REF") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		logger.debug(this.getClass()+" : "+loops+" iterations");

@@ -44,10 +44,9 @@ public class ReasonnerMark1 {
 //		parser.parse("people+pets.rdf");
 //		parser.parse("haters.rdf");
 //		parser.parse("twopets.rdf");
-//		parser.parse("geopolitical.owl");
+		parser.parse("geopolitical.owl");
 //		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
-//		parser.parse("/home/jules/Téléchargements/wine_indefenced.rdf");
-		parser.parse("wine.rdf");
+//		parser.parse("wine.rdf");
 		
 		logger.debug("Parsing completed");
 		
@@ -56,9 +55,9 @@ public class ReasonnerMark1 {
 		long beginNbTriples = tripleStore.getAll().size();
 		
 		ArrayList<Rule> rules = new ArrayList<>();
-		Collection<Triple> usableTriples = null;
-		Collection<Triple> newTriples = new HashSet<>();
-		
+	Collection<Triple> usableTriples = new HashSet<>();
+		//Collection<Triple> usableTriples = null;
+		Collection<Triple> newTriples = new HashSet<>();		
 
 		/*Initialize rules used for inference on RhoDF*/
 //		rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples, tripleStore));
@@ -68,7 +67,7 @@ public class ReasonnerMark1 {
 		rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples, tripleStore));
-		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples,tripleStore));
+		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples, tripleStore));
@@ -76,15 +75,20 @@ public class ReasonnerMark1 {
 		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples, tripleStore));
 		
 		int old_size, new_size, steps=0;
+//		usableTriples.add(null);
 		
 		do{
 			old_size = tripleStore.getAll().size();
 			long stepTime = System.nanoTime();
-			
+			logger.debug("--------------------STEP "+steps+"--------------------");
+//			logger.debug("RS BF "+usableTriples);
 			for (Rule rule : rules) {
 				rule.run();
 			}
+
+//			logger.debug("RS AT "+usableTriples);
 			usableTriples = new HashSet<>();
+//			usableTriples.clear();
 			usableTriples.addAll(newTriples);
 			newTriples.clear();
 			
@@ -94,7 +98,7 @@ public class ReasonnerMark1 {
 			long step2Time = System.nanoTime();
 			logger.debug((step2Time-stepTime)+"ns for "+(new_size-old_size)+" triples");
 			steps++;
-		}while(old_size != new_size);
+		}while(usableTriples.isEmpty());
 		
 		long endTime = System.nanoTime();
 		
@@ -107,7 +111,7 @@ public class ReasonnerMark1 {
 		System.out.println("Inference: "+(endTime-parsingTime)+"ns");
 		System.out.println("Total time: "+(endTime-startTime)+"ns");
 		System.out.print("File writing: ");
-		tripleStore.writeToFile("wine_fulln_new.out", dictionnary);
+		tripleStore.writeToFile("triplestore.out", dictionnary);
 		System.out.println("ok");
 		
 	}

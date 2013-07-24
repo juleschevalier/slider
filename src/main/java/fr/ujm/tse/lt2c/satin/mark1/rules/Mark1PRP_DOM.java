@@ -18,6 +18,7 @@ public class Mark1PRP_DOM implements Rule {
 	private TripleStore tripleStore;
 	private Collection<Triple> usableTriples;
 	Collection<Triple> newTriples;
+	private static String RuleName = "PRP_DOM";
 
 	public Mark1PRP_DOM(Dictionnary dictionnary, Collection<Triple> usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
@@ -30,6 +31,8 @@ public class Mark1PRP_DOM implements Rule {
 	@Override
 	public void run() {
 
+//		System.out.println("PRP Usable "+usableTriples);
+//		System.out.println("PRP New "+newTriples);
 
 		/**
 		 * 	INPUT
@@ -53,7 +56,9 @@ public class Mark1PRP_DOM implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
+			
+//			logger.debug("PRP "+usableTriples);
 
 			Collection<Triple> domain_Triples = tripleStore.getbyPredicate(domain);
 
@@ -65,7 +70,7 @@ public class Mark1PRP_DOM implements Rule {
 
 					loops++;
 					Triple result = new TripleImplNaive(s2, type, o1);
-					logger.trace("F PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+					logger.trace("F "+RuleName+" " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}
@@ -87,12 +92,12 @@ public class Mark1PRP_DOM implements Rule {
 
 					if(p1==domain && s1==p2){
 						Triple result = new TripleImplNaive(s2, type, o1);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+						logger.trace(RuleName+" " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 					if(p2==domain && s2==p1){
 						Triple result = new TripleImplNaive(s1, type, o2);
-						logger.trace("PRP_DOM " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
+						logger.trace(RuleName+" " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);						
 					}
 				}
@@ -105,7 +110,7 @@ public class Mark1PRP_DOM implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F PRP_DOM ":"PRP_DOM") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" already present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);

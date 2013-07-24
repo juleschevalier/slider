@@ -52,9 +52,9 @@ public class ReasonnerNaiveImpl {
 //		parser.parse("people+pets.rdf");
 //		parser.parse("haters.rdf");
 //		parser.parse("twopets.rdf");
-//		parser.parse("geopolitical.owl");
+		parser.parse("geopolitical.owl");
 //		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
-		parser.parse("wine.rdf");
+//		parser.parse("wine.rdf");
 		
 		logger.debug("Parsing complet");
 		

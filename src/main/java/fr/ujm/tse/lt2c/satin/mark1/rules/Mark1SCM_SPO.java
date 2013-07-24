@@ -58,7 +58,7 @@ public class Mark1SCM_SPO implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			Collection<Triple> subPropertyOf_Triples = tripleStore.getbyPredicate(subPropertyOf);
 
@@ -70,7 +70,7 @@ public class Mark1SCM_SPO implements Rule {
 
 					if(o1==s2){
 						Triple result = new TripleImplNaive(s1, subPropertyOf, o2);
-						logger.trace("SCM_SPO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace("F SCM_SPO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -118,7 +118,7 @@ public class Mark1SCM_SPO implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		logger.debug(this.getClass()+" : "+loops+" iterations");

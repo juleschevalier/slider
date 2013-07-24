@@ -53,7 +53,7 @@ public class Mark1SCM_SCO implements Rule {
 		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 		Collection<Triple> outputTriples = new HashSet<>();
 
-		if (usableTriples == null) { // We use the entire triplestore
+		if (usableTriples.isEmpty()) { // We use the entire triplestore
 
 			for (Triple t1 : subClassOf_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
@@ -103,7 +103,7 @@ public class Mark1SCM_SCO implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F SCM_SCO ":"SCM_SCO") + dictionnary.printTriple(triple)+" already present");
+				logger.trace((usableTriples.isEmpty()?"F SCM_SCO ":"SCM_SCO") + dictionnary.printTriple(triple)+" already present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);

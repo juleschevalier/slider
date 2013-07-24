@@ -55,7 +55,7 @@ public class Mark1EQ_REP_O implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 
@@ -110,7 +110,7 @@ public class Mark1EQ_REP_O implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F EQ_REP_O ":"EQ_REP_O") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F EQ_REP_O ":"EQ_REP_O") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);

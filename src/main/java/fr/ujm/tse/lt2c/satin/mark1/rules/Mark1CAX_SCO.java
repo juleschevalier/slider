@@ -59,7 +59,7 @@ public class Mark1CAX_SCO implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 			Collection<Triple> type_Triples = tripleStore.getbyPredicate(type);
@@ -72,7 +72,7 @@ public class Mark1CAX_SCO implements Rule {
 
 					if(s1==o2){
 						Triple result = new TripleImplNaive(s2, type, o1);
-						logger.trace("CAX_SCO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace("F "+RuleName+" "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -88,8 +88,6 @@ public class Mark1CAX_SCO implements Rule {
 		 */
 		else{
 
-
-
 			for (Triple t1 : usableTriples) {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
 				
@@ -99,20 +97,19 @@ public class Mark1CAX_SCO implements Rule {
 					
 					if(p1==subClassOf && p2==type && s1==o2){
 						Triple result = new TripleImplNaive(s2, type, o1);
-						logger.trace("CAX_SCO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace(RuleName+" "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 					
 					if(p2==subClassOf && p1==type && s2==o1){
 						Triple result = new TripleImplNaive(s1, type, o2);
-						logger.trace("CAX_SCO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace(RuleName+" "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 					
 				}
 
 			}
-
 
 		}
 		for (Triple triple : outputTriples) {
@@ -121,7 +118,7 @@ public class Mark1CAX_SCO implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		logger.debug(this.getClass()+" : "+loops+" iterations");

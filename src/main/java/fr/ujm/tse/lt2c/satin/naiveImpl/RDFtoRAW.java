@@ -10,7 +10,7 @@ public class RDFtoRAW {
 		TripleStore tripleStore = new TripleStoreImplNaive();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary , tripleStore);
-		String in = "wine.rdf", out = "wine_.rdf";
+		String in = "geopolitical_by_jena.owl", out = "geopolitical_by_jena_.owl";
 		
 		parser.parse(in);
 		tripleStore.writeToFile(out, dictionnary);

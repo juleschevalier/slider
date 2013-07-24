@@ -53,7 +53,7 @@ public class Mark1PRP_RNG implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			/*
 			 * IS THIS A LOOSE OF PERFORMANCE ??? 
@@ -108,7 +108,7 @@ public class Mark1PRP_RNG implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F PRP_DOM ":"PRP_DOM") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F PRP_RNG ":"PRP_RNG") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);

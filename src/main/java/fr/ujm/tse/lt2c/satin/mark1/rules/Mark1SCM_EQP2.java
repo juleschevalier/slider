@@ -59,7 +59,7 @@ public class Mark1SCM_EQP2 implements Rule {
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 
@@ -72,7 +72,7 @@ public class Mark1SCM_EQP2 implements Rule {
 					if(s1!=o1&&o1==s2&&s1==o2){
 						Triple result = new TripleImplNaive(s1, equivalentClass, o1);
 
-						logger.trace("SCM_EQC2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logger.trace("F SCM_EQC2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -117,7 +117,7 @@ public class Mark1SCM_EQP2 implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		logger.debug(this.getClass()+" : "+loops+" iterations");

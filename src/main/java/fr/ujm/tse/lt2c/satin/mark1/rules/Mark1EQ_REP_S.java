@@ -52,7 +52,7 @@ public class Mark1EQ_REP_S implements Rule {
 		Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 		Collection<Triple> outputTriples = new HashSet<>();
 
-		if (usableTriples == null) { // We use the entire triplestore
+		if (usableTriples.isEmpty()) { // We use the entire triplestore
 
 			for (Triple t1 : sameAs_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
@@ -105,7 +105,7 @@ public class Mark1EQ_REP_S implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F EQ_REP_S ":"EQ_REP_S") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F EQ_REP_S ":"EQ_REP_S") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);

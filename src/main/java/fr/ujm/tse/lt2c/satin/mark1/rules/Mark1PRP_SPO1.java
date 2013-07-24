@@ -52,7 +52,7 @@ public class Mark1PRP_SPO1 implements Rule {
 		 * If usableTriples is null,
 		 * we infer over the entire triplestore 
 		 */
-		if (usableTriples == null) {
+		if (usableTriples.isEmpty()) {
 
 			Collection<Triple> subProperty_Triples = tripleStore.getbyPredicate(subPropertyOf);
 
@@ -63,7 +63,7 @@ public class Mark1PRP_SPO1 implements Rule {
 					long s2=t2.getSubject(), o2=t2.getObject();
 
 					Triple result = new TripleImplNaive(s2, o1, o2);
-					logger.trace("PRP_SPO1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+					logger.trace("F PRP_SPO1 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 
@@ -104,7 +104,7 @@ public class Mark1PRP_SPO1 implements Rule {
 				newTriples.add(triple);
 
 			}else{
-				logger.debug((usableTriples==null?"F PRP_SPO1 ":"PRP_SPO1") + dictionnary.printTriple(triple)+" allready present");
+				logger.trace((usableTriples.isEmpty()?"F PRP_SPO1 ":"PRP_SPO1") + dictionnary.printTriple(triple)+" allready present");
 			}
 		}
 		//		tripleStore.addAll(outputTriples);
