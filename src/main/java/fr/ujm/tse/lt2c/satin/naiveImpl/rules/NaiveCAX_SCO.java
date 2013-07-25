@@ -48,7 +48,6 @@ public class NaiveCAX_SCO implements Rule {
 		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 		Collection<Triple> type_Triples = tripleStore.getbyPredicate(type);
 		Collection<Triple> outputTriples = new HashSet<>();
-
 		for (Triple t1 : subClassOf_Triples) {
 			long s1=t1.getSubject(), o1=t1.getObject();
 

@@ -53,7 +53,7 @@ public class Mark1SCM_EQC2 implements Rule {
 		long subClassOf = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
 		long equivalentClass = dictionnary.add("http://www.w3.org/2002/07/owl#equivalentClass");
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 

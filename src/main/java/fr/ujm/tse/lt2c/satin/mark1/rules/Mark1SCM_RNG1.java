@@ -54,7 +54,7 @@ public class Mark1SCM_RNG1 implements Rule {
 		 * Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 

@@ -51,7 +51,7 @@ public class Mark1EQ_REP_S implements Rule {
 		 */
 		Collection<Triple> sameAs_Triples = tripleStore.getbyPredicate(sameAs);
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		if (usableTriples.isEmpty()) { // We use the entire triplestore
 
 			for (Triple t1 : sameAs_Triples) {

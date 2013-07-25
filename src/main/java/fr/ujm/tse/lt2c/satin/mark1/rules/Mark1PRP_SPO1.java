@@ -47,7 +47,7 @@ public class Mark1PRP_SPO1 implements Rule {
 		long loops = 0;
 
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infer over the entire triplestore 

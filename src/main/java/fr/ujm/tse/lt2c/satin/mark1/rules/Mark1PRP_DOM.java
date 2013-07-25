@@ -51,7 +51,7 @@ public class Mark1PRP_DOM implements Rule {
 		long loops = 0;
 
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 

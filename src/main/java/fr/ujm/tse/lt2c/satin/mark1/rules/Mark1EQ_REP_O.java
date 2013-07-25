@@ -50,7 +50,7 @@ public class Mark1EQ_REP_O implements Rule {
 		 * Get triples matching input
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 

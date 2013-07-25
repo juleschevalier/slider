@@ -52,7 +52,7 @@ public class Mark1SCM_SCO implements Rule {
 		 */
 		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		if (usableTriples.isEmpty()) { // We use the entire triplestore
 
 			for (Triple t1 : subClassOf_Triples) {

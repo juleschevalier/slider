@@ -53,7 +53,7 @@ public class Mark1SCM_SPO implements Rule {
 		 * Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
-
+		
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
