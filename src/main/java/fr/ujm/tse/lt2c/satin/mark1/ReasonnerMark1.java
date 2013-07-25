@@ -25,7 +25,7 @@ import fr.ujm.tse.lt2c.satin.mark1.rules.Mark1SCM_SCO;
 import fr.ujm.tse.lt2c.satin.mark1.rules.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.naiveImpl.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.naiveImpl.ParserImplNaive;
-import fr.ujm.tse.lt2c.satin.naiveImpl.TripleStoreImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.impl.VerticalPartioningTripleStore;
 
 public class ReasonnerMark1 {
 	
@@ -33,7 +33,7 @@ public class ReasonnerMark1 {
 	
 	public static void main(String[] args) {
 		
-		TripleStore tripleStore = new TripleStoreImplNaive();
+		TripleStore tripleStore = new VerticalPartioningTripleStore();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary, tripleStore);
 		
