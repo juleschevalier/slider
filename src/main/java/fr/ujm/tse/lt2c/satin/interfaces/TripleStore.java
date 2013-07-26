@@ -16,10 +16,14 @@ public interface TripleStore {
 	
 	public Collection<Triple> getbyObject(long o);
 	
+	public long size();
+	
 	public int hashCode();
 	
 	public boolean equals(Object obj);
 	
 	public void writeToFile(String file, Dictionnary dictionnary);
+
+	public boolean isEmpty();
 
 }

@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.interfaces;
 
+import org.apache.log4j.Logger;
+
 
 public interface Rule extends Runnable{
 	
@@ -8,5 +10,7 @@ public interface Rule extends Runnable{
 	public int hashCode();
 	
 	public boolean equals(Object obj);
+	
+	public Logger getLogger();
 
 }

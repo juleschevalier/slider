@@ -2,7 +2,8 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.naiveImpl.DictionnaryImplNaive;
+import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
+
 
 public class TestDictionnary {
 
