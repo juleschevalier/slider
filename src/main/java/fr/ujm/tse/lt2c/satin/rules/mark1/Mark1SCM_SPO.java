@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
@@ -40,7 +41,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long subPropertyOf = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#subPropertyOf");
+		long subPropertyOf = AbstractDictionnary.subPropertyOf;
 
 		long loops = 0;
 

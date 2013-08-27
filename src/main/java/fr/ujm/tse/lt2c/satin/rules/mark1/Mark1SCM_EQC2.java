@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
@@ -46,8 +47,8 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 		 * Get triples matching input 
 		 * Create
 		 */
-		long subClassOf = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
-		long equivalentClass = dictionnary.add("http://www.w3.org/2002/07/owl#equivalentClass");
+		long subClassOf = AbstractDictionnary.subClassOf;
+		long equivalentClass = AbstractDictionnary.equivalentClass;
 
 		Collection<Triple> outputTriples = new HashSet<>();
 
