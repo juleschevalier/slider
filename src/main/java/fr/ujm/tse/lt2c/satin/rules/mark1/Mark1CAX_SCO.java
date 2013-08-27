@@ -6,7 +6,6 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-
 import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;

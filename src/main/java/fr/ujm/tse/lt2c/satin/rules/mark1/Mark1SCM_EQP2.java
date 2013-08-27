@@ -6,28 +6,23 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
-import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
-public class Mark1SCM_EQP2 implements Rule {
+public class Mark1SCM_EQP2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQP2.class);
-	private Dictionnary dictionnary;
-	private TripleStore tripleStore;
-	private Collection<Triple> usableTriples;
-	Collection<Triple> newTriples;
-	private static String RuleName = "SCM_EQP2";
 
-	public Mark1SCM_EQP2(Dictionnary dictionnary, Collection<Triple> usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
+	public Mark1SCM_EQP2(Dictionnary dictionnary, TripleStore usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
 		this.usableTriples = usableTriples;
 		this.newTriples = newTriples;
+		this.ruleName = "SCM_EQP2";
 	}
 
 	@Override
@@ -55,14 +50,14 @@ public class Mark1SCM_EQP2 implements Rule {
 		 * Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
-		
+
+		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
+
 		/*
 		 * If usableTriples is null,
 		 * we infere over the entire triplestore 
 		 */
 		if (usableTriples.isEmpty()) {
-
-			Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
 
 			for (Triple t1 : subClassOf_Triples) {
 				long s1=t1.getSubject(), o1=t1.getObject();
@@ -73,7 +68,7 @@ public class Mark1SCM_EQP2 implements Rule {
 					if(s1!=o1&&o1==s2&&s1==o2){
 						Triple result = new TripleImplNaive(s1, equivalentClass, o1);
 
-						logger.trace("F SCM_EQC2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -89,22 +84,21 @@ public class Mark1SCM_EQP2 implements Rule {
 		 */
 		else{
 
-			for (Triple t1 : usableTriples) {
+			for (Triple t1 : usableTriples.getAll()) {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
 
-				for (Triple t2 : tripleStore.getAll()) {
-					long s2 = t2.getSubject(), p2=t2.getPredicate(), o2 = t2.getObject();
+				if(p1!=subClassOf)
+					continue;
+
+				for (Triple t2 : subClassOf_Triples) {
+					long s2 = t2.getSubject(), o2 = t2.getObject();
 					loops++;
 
-					if(p1 == subClassOf && p2 == subClassOf){
-						
-						if(s1!=o1&&o1==s2&&s1==o2){
-							Triple result = new TripleImplNaive(s1, equivalentClass, o1);
+					if(s1!=o1&&o1==s2&&s1==o2){
+						Triple result = new TripleImplNaive(s1, equivalentClass, o1);
 
-							logger.trace("SCM_EQC2 "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
-							outputTriples.add(result);
-						}
-
+						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						outputTriples.add(result);
 					}
 
 				}
@@ -112,16 +106,15 @@ public class Mark1SCM_EQP2 implements Rule {
 			}
 
 		}
-		for (Triple triple : outputTriples) {
-			if(!tripleStore.getAll().contains(triple)){
-				tripleStore.add(triple);
-				newTriples.add(triple);
 
-			}else{
-				logger.trace((usableTriples.isEmpty()?"F "+RuleName+" ":RuleName) + dictionnary.printTriple(triple)+" allready present");
-			}
-		}
-		logger.debug(this.getClass()+" : "+loops+" iterations");
+		addNewTriples(outputTriples);
+
+		logDebug(this.getClass()+" : "+loops+" iterations");
+	}
+
+	@Override
+	public Logger getLogger() {
+		return logger;
 	}
 
 }

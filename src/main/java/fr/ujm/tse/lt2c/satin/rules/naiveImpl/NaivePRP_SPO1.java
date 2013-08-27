@@ -64,4 +64,9 @@ public class NaivePRP_SPO1 implements Rule {
 
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

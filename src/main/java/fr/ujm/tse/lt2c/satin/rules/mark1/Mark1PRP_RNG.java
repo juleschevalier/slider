@@ -5,27 +5,24 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-
+import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
-import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
-public class Mark1PRP_RNG implements Rule {
+public class Mark1PRP_RNG extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_RNG.class);
-	private Dictionnary dictionnary;
-	private TripleStore tripleStore;
-	private Collection<Triple> usableTriples;
-	Collection<Triple> newTriples;
 
-	public Mark1PRP_RNG(Dictionnary dictionnary, Collection<Triple> usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
+	public Mark1PRP_RNG(Dictionnary dictionnary, TripleStore usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
 		this.usableTriples = usableTriples;
 		this.newTriples = newTriples;
+		this.ruleName = "PRP_RNG";
 	}
 
 	@Override
@@ -41,80 +38,66 @@ public class Mark1PRP_RNG implements Rule {
 		 */
 
 		/*
-		 * Get/add concepts codes needed from dictionnary
+		 * Get concepts codes needed from dictionnary
 		 */
-		long range = dictionnary.add("http://www.w3.org/2000/01/rdf-schema#range");
-		long type = dictionnary.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		long range = AbstractDictionnary.range;
+		long type = AbstractDictionnary.type;
 
 		long loops = 0;
 
 		Collection<Triple> outputTriples = new HashSet<>();
 		
-		/*
-		 * If usableTriples is null,
-		 * we infere over the entire triplestore 
-		 */
-		if (usableTriples.isEmpty()) {
-
-			/*
-			 * IS THIS A LOOSE OF PERFORMANCE ??? 
-			 */
-			Collection<Triple> domain_Triples = tripleStore.getbyPredicate(range);
-
-			for (Triple t1 : domain_Triples) {
+		Collection<Triple> range_Triples = tripleStore.getbyPredicate(range);
+		Collection<Triple> predicate_Triples;
+		
+		/*Use all the triplestore*/
+		if(usableTriples.isEmpty()){
+			for (Triple t1 : range_Triples) {
 				long s1 = t1.getSubject(), o1 = t1.getObject();
-
-				for (Triple t2 : tripleStore.getbyPredicate(s1)) {
+				predicate_Triples = tripleStore.getbyPredicate(s1);
+				
+				for (Triple t2 : predicate_Triples) {
 					long o2 = t2.getObject();
-
-					loops++;
+					
 					Triple result = new TripleImplNaive(o2, type, o1);
-					logger.trace("F PRP_RNG " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+					logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
 					outputTriples.add(result);
+					
 				}
+
 			}
-
 		}
-		/*
-		 * If usableTriples is not null,
-		 * we infere over the matching triples
-		 * containing at least one from usableTriples
-		 */
+		/*Use usableTriples*/
 		else{
-
-			for (Triple t1 : usableTriples) {
+			for (Triple t1 : usableTriples.getAll()) {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
 
-				for (Triple t2 : tripleStore.getAll()) {
+				for (Triple t2 : p1==type?tripleStore.getAll():range_Triples) {
 					long s2 = t2.getSubject(), p2=t2.getPredicate(), o2 = t2.getObject();
 					loops++;
 
-					if(p1==range && s1==p2){
+					if(p1==type && s1==p2){
 						Triple result = new TripleImplNaive(o2, type, o1);
-						logger.trace("PRP_RNG " + dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
+						logTrace(dictionnary.printTriple(t1)+ " & " + dictionnary.printTriple(t2) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-					if(p2==range && s2==p1){
+					if(p2==type && s2==p1){
 						Triple result = new TripleImplNaive(o1, type, o2);
-						logger.trace("PRP_RNG " + dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
+						logTrace(dictionnary.printTriple(t2)+ " & " + dictionnary.printTriple(t1) + " -> "+ dictionnary.printTriple(result));
 						outputTriples.add(result);						
 					}
 				}
 			}
-
 		}
-		for (Triple triple : outputTriples) {
-			if(!tripleStore.getAll().contains(triple)){
-				tripleStore.add(triple);
-				newTriples.add(triple);
 
-			}else{
-				logger.trace((usableTriples.isEmpty()?"F PRP_RNG ":"PRP_RNG") + dictionnary.printTriple(triple)+" allready present");
-			}
-		}
-		//		tripleStore.addAll(outputTriples);
-		//		newTriples.addAll(outputTriples);
-		logger.debug(this.getClass()+" : "+loops+" iterations");
+		addNewTriples(outputTriples);
+
+		logDebug(this.getClass()+" : "+loops+" iterations");
+	}
+
+	@Override
+	public Logger getLogger() {
+		return logger;
 	}
 
 }

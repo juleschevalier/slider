@@ -14,7 +14,7 @@ public abstract class AbstractRule implements Rule {
 	protected TripleStore usableTriples;
 	protected Collection<Triple> newTriples;
 	protected String ruleName = "";
-
+	
 	protected void addNewTriples(Collection<Triple> outputTriples) {
 		for (Triple triple : outputTriples) {
 			if(!tripleStore.getAll().contains(triple)){

@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-
 import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -37,7 +36,7 @@ public class Mark1PRP_DOM extends AbstractRule {
 	public void run() {
 
 		/*
-		 * Get/add concepts codes needed from dictionnary
+		 * Get concepts codes needed from dictionnary
 		 */
 		long domain = AbstractDictionnary.domain;
 		long type = AbstractDictionnary.type;
@@ -45,7 +44,6 @@ public class Mark1PRP_DOM extends AbstractRule {
 		long loops = 0;
 
 		Collection<Triple> outputTriples = new HashSet<>();
-
 
 		Collection<Triple> domain_Triples = tripleStore.getbyPredicate(domain);
 		Collection<Triple> predicate_Triples;

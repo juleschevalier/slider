@@ -64,4 +64,9 @@ public class NaivePRP_DOM implements Rule {
 
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

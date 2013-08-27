@@ -68,4 +68,9 @@ public class NaiveSCM_EQP2 implements Rule {
 		
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

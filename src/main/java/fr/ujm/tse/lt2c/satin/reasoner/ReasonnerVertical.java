@@ -1,12 +1,10 @@
-package fr.ujm.tse.lt2c.satin.triplestore;
+package fr.ujm.tse.lt2c.satin.reasoner;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-
-
 
 import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
@@ -15,7 +13,20 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStore;
+import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStore;
 
 public class ReasonnerVertical {
 	
@@ -50,18 +61,18 @@ public class ReasonnerVertical {
 
 		/*Initialize rules used for inference on RhoDF*/
 //		rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1PRP_DOM(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1PRP_RNG(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1PRP_SPO1(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1PRP_DOM(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1PRP_RNG(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1PRP_SPO1(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples, tripleStore));
-//		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples, tripleStore));
+		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples, tripleStore));
 		
 		int old_size, new_size, steps=0;
 //		usableTriples.add(null);

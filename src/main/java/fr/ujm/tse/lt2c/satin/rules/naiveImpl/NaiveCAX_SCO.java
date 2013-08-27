@@ -68,4 +68,9 @@ public class NaiveCAX_SCO implements Rule {
 
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

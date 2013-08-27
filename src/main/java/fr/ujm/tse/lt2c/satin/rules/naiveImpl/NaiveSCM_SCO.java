@@ -67,4 +67,9 @@ public class NaiveSCM_SCO implements Rule {
 		
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

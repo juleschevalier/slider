@@ -69,4 +69,9 @@ public class NaiveSCM_DOM1 implements Rule {
 
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

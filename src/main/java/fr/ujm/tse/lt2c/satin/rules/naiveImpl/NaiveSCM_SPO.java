@@ -64,4 +64,9 @@ public class NaiveSCM_SPO implements Rule {
 
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }

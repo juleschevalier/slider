@@ -69,4 +69,9 @@ public class NaiveSCM_RNG1 implements Rule {
 		
 	}
 
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
 }
