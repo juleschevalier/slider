@@ -29,38 +29,74 @@ import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStore;
 
 public class ReasonnerVertical {
-	
+
 	private static Logger logger = Logger.getLogger(ReasonnerVertical.class);
-	
+
 	public static void main(String[] args) {
-		
+
+		for(int i=0; i<10; i++){
+
+			System.out.println("subclassof.owl 5618 bits");
+			infere("subclassof.owl");
+			System.out.println();
+
+			System.out.println("sample1.owl 9714 bits");
+			infere("sample1.owl");
+			System.out.println();
+
+			System.out.println("univ-bench.owl 13840 bits");
+			infere("univ-bench.owl");
+			System.out.println();
+
+			System.out.println("sweetAll.owl 17538 bits");
+			infere("sweetAll.owl");
+			System.out.println();
+
+			System.out.println("wine.rdf 78225 bits");
+			infere("wine.rdf");
+			System.out.println();
+
+			System.out.println("geopolitical.owl 1780714 bits");
+			infere("geopolitical.owl");
+			System.out.println();
+
+
+			System.out.println("efo.owl 26095973 bits");
+			infere("efo.owl");
+			System.out.println();
+
+
+			System.out.println("opencyc.owl 252122090 bits");
+			infere("opencyc.owl");
+			System.out.println();
+
+		}
+
+	}
+
+	private static void infere(String input) {
 		TripleStore tripleStore = new VerticalPartioningTripleStore();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary, tripleStore);
-		
+
 		long startTime = System.nanoTime();
-		
-//		parser.parse("subclassof.owl");
-//		parser.parse("sample1.owl");
-//		parser.parse("people+pets.rdf");
-//		parser.parse("haters.rdf");
-//		parser.parse("twopets.rdf");
-//		parser.parse("geopolitical.owl");
-//		parser.parse("http://www.w3.org/TR/owl-guide/wine.rdf");
-		parser.parse("wine.rdf");
-		
+
+		parser.parse("input");
+
 		logger.debug("Parsing completed");
-		
+
 		long parsingTime = System.nanoTime();
-		
+
 		long beginNbTriples = tripleStore.getAll().size();
-		
+
+		System.out.println(beginNbTriples);
+
 		ArrayList<Rule> rules = new ArrayList<>();
 		TemporaryVerticalPartioningTripleStore usableTriples = new TemporaryVerticalPartioningTripleStore();
 		Collection<Triple> newTriples = new HashSet<>();		
 
 		/*Initialize rules used for inference on RhoDF*/
-//		rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples, tripleStore));
+		//		rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1PRP_DOM(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1PRP_RNG(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1PRP_SPO1(dictionnary, usableTriples, newTriples, tripleStore));
@@ -73,35 +109,35 @@ public class ReasonnerVertical {
 		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples, tripleStore));
 		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples, tripleStore));
-		
+
 		int old_size, new_size, steps=0;
-//		usableTriples.add(null);
-		
+		//		usableTriples.add(null);
+
 		do{
 			old_size = tripleStore.getAll().size();
 			long stepTime = System.nanoTime();
 			logger.debug("--------------------STEP "+steps+"--------------------");
-//			logger.debug("RS BF "+usableTriples);
+			//			logger.debug("RS BF "+usableTriples);
 			for (Rule rule : rules) {
 				rule.run();
 			}
 
-//			logger.debug("RS AT "+usableTriples);
-//			usableTriples = new HashSet<>();
+			//			logger.debug("RS AT "+usableTriples);
+			//			usableTriples = new HashSet<>();
 			usableTriples.clear();
 			usableTriples.addAll(newTriples);
 			newTriples.clear();
-			
+
 			logger.debug("Usable triples: "+usableTriples.size());
-			
+
 			new_size = tripleStore.getAll().size();
 			long step2Time = System.nanoTime();
 			logger.debug((step2Time-stepTime)+"ns for "+(new_size-old_size)+" triples");
 			steps++;
 		}while(!usableTriples.isEmpty());
-		
+
 		long endTime = System.nanoTime();
-		
+
 		System.out.println("Dictionnary size: "+dictionnary.size());
 		System.out.println("Initial triples: "+beginNbTriples);
 		System.out.println("Triples after inference: "+tripleStore.getAll().size());
@@ -111,9 +147,8 @@ public class ReasonnerVertical {
 		System.out.println("Inference: "+(endTime-parsingTime)+"ns");
 		System.out.println("Total time: "+(endTime-startTime)+"ns");
 		System.out.print("File writing: ");
-		tripleStore.writeToFile("triplestore.out", dictionnary);
+		tripleStore.writeToFile("infered"+input+".out", dictionnary);
 		System.out.println("ok");
-		
 	}
 
 }
