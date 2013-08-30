@@ -12,6 +12,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
+/**
+ * 	INPUT
+ * p1 rdfs:subPropertyOf p2
+ * x p1 y
+ *  OUPUT
+ * x p2 y
+ */
 public class Mark1PRP_SPO1 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_SPO1.class);
@@ -29,13 +36,6 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * p1 rdfs:subPropertyOf p2
-		 * x p1 y
-		 *  OUPUT
-		 * x p2 y
-		 */
 
 		/*
 		 * Get/add concepts codes needed from dictionnary

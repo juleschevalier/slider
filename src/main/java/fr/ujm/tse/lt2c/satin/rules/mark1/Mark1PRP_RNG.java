@@ -12,6 +12,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
+/**
+ * 	INPUT
+ * p rdfs:range c
+ * x p y
+ *  OUPUT
+ * y rdf:type c
+ */
 public class Mark1PRP_RNG extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_RNG.class);
@@ -29,13 +36,6 @@ public class Mark1PRP_RNG extends AbstractRule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * p rdfs:range c
-		 * x p y
-		 *  OUPUT
-		 * y rdf:type c
-		 */
 
 		/*
 		 * Get concepts codes needed from dictionnary

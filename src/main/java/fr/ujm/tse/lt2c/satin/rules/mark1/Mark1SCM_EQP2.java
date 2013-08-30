@@ -13,6 +13,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
+/**
+ * 	INPUT
+ * c1 rdfs:subClassOf c2
+ * c2 rdfs:subClassOf c1
+ *  OUPUT
+ * c1 owl:equivalentClass c2
+ */
 public class Mark1SCM_EQP2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQP2.class);
@@ -30,13 +37,6 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * c1 rdfs:subClassOf c2
-		 * c2 rdfs:subClassOf c1
-		 *  OUPUT
-		 * c1 owl:equivalentClass c2
-		 */
 
 		/*
 		 * Get concepts codes in dictionnary

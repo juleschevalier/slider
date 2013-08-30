@@ -13,6 +13,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
+/**
+ * 	INPUT
+ * p1 rdfs:subPropertyOf p2
+ * p2 rdfs:subPropertyOf p3
+ *  OUPUT
+ * p1 rdfs:subPropertyOf p3
+ */
 public class Mark1SCM_SPO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_SPO.class);
@@ -30,13 +37,6 @@ public class Mark1SCM_SPO extends AbstractRule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * p1 rdfs:subPropertyOf p2
-		 * p2 rdfs:subPropertyOf p3
-		 *  OUPUT
-		 * p1 rdfs:subPropertyOf p3
-		 */
 
 		/*
 		 * Get concepts codes in dictionnary

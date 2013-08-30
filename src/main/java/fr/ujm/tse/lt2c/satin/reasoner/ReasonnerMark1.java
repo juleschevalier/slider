@@ -6,28 +6,13 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-
-
 import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
-import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleStoreImplNaive;
 
 public class ReasonnerMark1 {

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1373987675676" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://sw.opencyc.org/concept/" uri="opencyc.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://swat.cse.lehigh.edu/onto/univ-bench.owl" uri="univ-bench.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://sweet.jpl.nasa.gov/2.2/sweetAll.owl" uri="sweetAll.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://www.ebi.ac.uk/efo/" uri="efo.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1377763588549" name="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" uri="wine.rdf"/>
     </group>
 </catalog>

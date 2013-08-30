@@ -13,6 +13,13 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
+/**
+ * 	INPUT
+ * p rdfs:range c1
+ * c1 rdfs:subClassOf c2
+ *  OUPUT
+ * p rdfs:range c2
+ */
 public class Mark1SCM_RNG1 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_RNG1.class);
@@ -30,13 +37,6 @@ public class Mark1SCM_RNG1 extends AbstractRule {
 	public void run() {
 
 
-		/**
-		 * 	INPUT
-		 * p rdfs:range c1
-		 * c1 rdfs:subClassOf c2
-		 *  OUPUT
-		 * p rdfs:range c2
-		 */
 
 		/*
 		 * Get concepts codes in dictionnary
