@@ -1,0 +1,35 @@
+[16:18:44] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=Context
+[16:18:44] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=Engine
+[16:18:44] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=SystemInfo
+[16:18:44] [DEBUG] Register MBean: org.apache.jena.riot.system:type=SystemInfo
+[16:18:44] [DEBUG] open(geopolitical.owl)
+[16:18:44] [DEBUG] Found: geopolitical.owl (ClassLoaderLocator)
+[16:18:44] [DEBUG] Found: geopolitical.owl
+[16:18:46] [DEBUG] Parsing completed
+[16:18:46] [DEBUG] --------------------STEP 0--------------------
+[16:18:46] [DEBUG] F PRP_RNG class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtPRP_RNG : 0 iterations
+[16:18:46] [DEBUG] F SCM_SPO class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_SPO : 0 iterations
+[16:18:46] [DEBUG] F SCM_RNG2 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_RNG2 : 0 iterations
+[16:18:46] [DEBUG] F SCM_EQC2 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_EQC2 : 0 iterations
+[16:18:46] [DEBUG] F PRP_SPO1 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtPRP_SPO1 : 0 iterations
+[16:18:46] [DEBUG] F SCM_DOM2 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_DOM2 : 0 iterations
+[16:18:46] [DEBUG] F SCM_EQP2 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_EQP2 : 0 iterations
+[16:18:46] [DEBUG] F SCM_RNG1 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_RNG1 : 0 iterations
+[16:18:46] [DEBUG] F SCM_SCO class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_SCO : 7744 iterations
+[16:18:47] [DEBUG] F SCM_DOM1 class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_DOM1 : 0 iterations
+[16:18:47] [DEBUG] F CAX_SCO class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtCAX_SCO : 44440 iterations
+[16:18:52] [DEBUG] F PRP_DOM class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtPRP_DOM : 0 iterations
+[16:18:52] [DEBUG] Usable triples: 1475
+[16:18:52] [DEBUG] 6222747600ns for 1475 triples
+[16:18:52] [DEBUG] --------------------STEP 1--------------------
+[16:18:52] [DEBUG] PRP_RNGclass fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtPRP_RNG : 0 iterations
+[16:18:52] [DEBUG] PRP_SPO1class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtPRP_SPO1 : 0 iterations
+[16:18:52] [DEBUG] SCM_DOM2class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_DOM2 : 0 iterations
+[16:18:52] [DEBUG] SCM_SPOclass fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_SPO : 0 iterations
+[16:18:52] [DEBUG] SCM_RNG1class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_RNG1 : 0 iterations
+[16:18:52] [DEBUG] SCM_EQC2class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_EQC2 : 79860 iterations
+[16:18:52] [DEBUG] SCM_EQP2class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_EQP2 : 79860 iterations
+[16:18:52] [DEBUG] SCM_RNG2class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_RNG2 : 0 iterations
+[16:18:53] [DEBUG] SCM_DOM1class fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_DOM1 : 305316 iterations
+[16:18:53] [DEBUG] SCM_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_SCO : 79860 iterations
+[16:19:47] [DEBUG] CAX_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtCAX_SCO : 526042 iterations

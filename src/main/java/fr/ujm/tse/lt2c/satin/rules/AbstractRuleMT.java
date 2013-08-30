@@ -17,31 +17,33 @@ public abstract class AbstractRuleMT implements Rule {
 
 	protected void addNewTriples(Collection<Triple> outputTriples) {
 		for (Triple triple : outputTriples) {
-
-			synchronized (tripleStore) {
-				if(!tripleStore.getAll().contains(triple)){
-					tripleStore.add(triple);
-					synchronized (triple) {						
-						newTriples.add(triple);
-					}
-
-				}else{
-					logTrace(dictionnary.printTriple(triple)+" allready present");
+			if (!tripleStore.contains(triple)) {
+				tripleStore.add(triple);
+				synchronized (newTriples) {
+					newTriples.add(triple);
 				}
-
+			} else {
+				logTrace(dictionnary.printTriple(triple) + " allready present");
 			}
+
+		}
+
+	}
+
+	protected void logDebug(String message) {
+		if (getLogger().isDebugEnabled()) {
+			getLogger()
+					.debug((usableTriples.isEmpty() ? "F " + ruleName + " "
+							: ruleName) + message);
 		}
 	}
 
-	protected void logDebug(String message){
-		if(getLogger().isDebugEnabled()){
-			getLogger().debug((usableTriples.isEmpty()?"F "+ruleName+" ":ruleName) + message);
-		}
-	}
-
-	protected void logTrace(String message){
-		if(getLogger().isTraceEnabled()){
-			getLogger().trace((usableTriples.isEmpty()?"F "+ruleName+" ":ruleName+" ") + message);
+	protected void logTrace(String message) {
+		if (getLogger().isTraceEnabled()) {
+			getLogger().trace(
+					(usableTriples.isEmpty() ? "F " + ruleName + " " : ruleName
+							+ " ")
+							+ message);
 		}
 	}
 

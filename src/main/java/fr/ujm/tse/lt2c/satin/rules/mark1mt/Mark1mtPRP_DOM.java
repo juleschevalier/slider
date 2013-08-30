@@ -71,9 +71,7 @@ public class Mark1mtPRP_DOM extends AbstractRuleMT {
 				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
 
 				if(p1==domain){
-					synchronized (tripleStore) {
 						predicate_Triples=tripleStore.getAll();
-					}
 				}
 				else
 					predicate_Triples=domain_Triples;

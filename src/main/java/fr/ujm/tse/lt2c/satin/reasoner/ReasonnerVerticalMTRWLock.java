@@ -31,10 +31,11 @@ import fr.ujm.tse.lt2c.satin.rules.mark1mt.Mark1mtSCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStore;
+import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
-public class ReasonnerVerticalMT {
+public class ReasonnerVerticalMTRWLock {
 
-	private static Logger logger = Logger.getLogger(ReasonnerVerticalMT.class);
+	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 
 	public static void main(String[] args) {
 
@@ -68,17 +69,17 @@ public class ReasonnerVerticalMT {
 //			infere("geopolitical_300Ko.owl");
 //			System.out.println();
 //
-			System.out.println("geopolitical_500Ko.owl 497095 bits");
-			infere("geopolitical_500Ko.owl");
-			System.out.println();
+//			System.out.println("geopolitical_500Ko.owl 497095 bits");
+//			infere("geopolitical_500Ko.owl");
+//			System.out.println();
 //
 //			System.out.println("geopolitical_1Mo.owl 1047485 bits");
 //			infere("geopolitical_1Mo.owl");
 //			System.out.println();
 //
-//			System.out.println("geopolitical.owl 1780714 bits");
-//			infere("geopolitical.owl");
-//			System.out.println();
+			System.out.println("geopolitical.owl 1780714 bits");
+			infere("geopolitical.owl");
+			System.out.println();
 //
 //			System.out.println("efo.owl 26095973 bits");
 //			infere("efo.owl");
@@ -94,7 +95,7 @@ public class ReasonnerVerticalMT {
 
 	private static void infere(String input) {
 
-		TripleStore tripleStore = new VerticalPartioningTripleStore();
+		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary, tripleStore);
 

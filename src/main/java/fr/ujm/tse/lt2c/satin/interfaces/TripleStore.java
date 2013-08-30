@@ -15,7 +15,6 @@ public interface TripleStore {
 	public Collection<Triple> getbyPredicate(long p);
 	
 	public Collection<Triple> getbyObject(long o);
-	
 	public long size();
 	
 	public int hashCode();
@@ -25,5 +24,7 @@ public interface TripleStore {
 	public void writeToFile(String file, Dictionnary dictionnary);
 
 	public boolean isEmpty();
+
+	public boolean contains(Triple triple);
 
 }

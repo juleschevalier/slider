@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
@@ -22,7 +21,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 public class VerticalPartioningTripleStore implements TripleStore {
 
 	HashMap<Long, Multimap<Long, Long>> internalstore;
-	
+
 	int triples;
 
 	public VerticalPartioningTripleStore() {
@@ -37,7 +36,6 @@ public class VerticalPartioningTripleStore implements TripleStore {
 			newmap.put(t.getSubject(), t.getObject());
 			internalstore.put(t.getPredicate(), newmap);
 			triples++;
-
 
 		} else {
 			if (internalstore.get(t.getPredicate()).put(t.getSubject(),
@@ -76,7 +74,7 @@ public class VerticalPartioningTripleStore implements TripleStore {
 		Collection<Triple> result = new ArrayList<>(triples);
 		for (Long predicate : internalstore.keySet()) {
 			Multimap<Long, Long> multimap = internalstore.get(predicate);
-			if(multimap==null)
+			if (multimap == null)
 				continue;
 			for (Entry<Long, Long> entry : multimap.entries()) {
 				if (entry.getKey() == s)
@@ -91,9 +89,10 @@ public class VerticalPartioningTripleStore implements TripleStore {
 	public Collection<Triple> getbyPredicate(long p) {
 		Multimap<Long, Long> multimap = internalstore.get(p);
 		Collection<Triple> result = new ArrayList<>(triples);
-		if(multimap!=null){
+		if (multimap != null) {
 			for (Entry<Long, Long> entry : multimap.entries()) {
-				result.add(new TripleImplNaive(entry.getKey(), p, entry.getValue()));
+				result.add(new TripleImplNaive(entry.getKey(), p, entry
+						.getValue()));
 			}
 		}
 		return result;
@@ -104,7 +103,7 @@ public class VerticalPartioningTripleStore implements TripleStore {
 		Collection<Triple> result = new ArrayList<>(triples);
 		for (Long predicate : internalstore.keySet()) {
 			Multimap<Long, Long> multimap = internalstore.get(predicate);
-			if(multimap==null)
+			if (multimap == null)
 				continue;
 			for (Entry<Long, Long> entry : multimap.entries()) {
 				if (entry.getValue() == o)
@@ -116,13 +115,13 @@ public class VerticalPartioningTripleStore implements TripleStore {
 	}
 
 	@Override
-	public long size(){
+	public long size() {
 		return triples;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return triples==0;
+		return triples == 0;
 	}
 
 	/**
@@ -134,4 +133,12 @@ public class VerticalPartioningTripleStore implements TripleStore {
 
 	}
 
+	@Override
+	public boolean contains(Triple triple) {
+		if (!internalstore.containsKey(triple.getPredicate()))
+			return false;
+		return (internalstore.get(triple.getPredicate()).containsEntry(
+				triple.getSubject(), triple.getObject()));
+
+	}
 }

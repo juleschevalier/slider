@@ -37,7 +37,7 @@ public class TripleStoreImplNaive implements TripleStore {
 	public Collection<Triple> getbySubject(long s) {
 		HashSet<Triple> result = new HashSet<>();
 		for (Triple t : this.triples) {
-			if(t.getSubject()==s){
+			if (t.getSubject() == s) {
 				result.add(t);
 			}
 		}
@@ -48,7 +48,7 @@ public class TripleStoreImplNaive implements TripleStore {
 	public Collection<Triple> getbyPredicate(long p) {
 		HashSet<Triple> result = new HashSet<>();
 		for (Triple t : this.triples) {
-			if(t.getPredicate()==p){
+			if (t.getPredicate() == p) {
 				result.add(t);
 			}
 		}
@@ -59,15 +59,15 @@ public class TripleStoreImplNaive implements TripleStore {
 	public Collection<Triple> getbyObject(long o) {
 		HashSet<Triple> result = new HashSet<>();
 		for (Triple t : this.triples) {
-			if(t.getObject()==o){
+			if (t.getObject() == o) {
 				result.add(t);
 			}
 		}
 		return result;
 	}
-	
+
 	@Override
-	public long size(){
+	public long size() {
 		return triples.size();
 	}
 
@@ -79,16 +79,16 @@ public class TripleStoreImplNaive implements TripleStore {
 	@Override
 	public void writeToFile(String file, Dictionnary dictionnary) {
 
-		try{
-			// Create file 
-			FileWriter fstream = new FileWriter(file,false);
+		try {
+			// Create file
+			FileWriter fstream = new FileWriter(file, false);
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (Triple triple : this.triples) {
-				out.write(dictionnary.printTriple(triple)+"\n");
+				out.write(dictionnary.printTriple(triple) + "\n");
 			}
-			//Close the output stream
+			// Close the output stream
 			out.close();
-		}catch (Exception e){//Catch exception if any
+		} catch (Exception e) {// Catch exception if any
 			System.err.println("Error: " + e.getMessage());
 		}
 	}
@@ -116,5 +116,11 @@ public class TripleStoreImplNaive implements TripleStore {
 		} else if (!triples.equals(other.triples))
 			return false;
 		return true;
+	}
+
+	@Override
+	public boolean contains(Triple triple) {
+
+		return triples.contains(triple);
 	}
 }
