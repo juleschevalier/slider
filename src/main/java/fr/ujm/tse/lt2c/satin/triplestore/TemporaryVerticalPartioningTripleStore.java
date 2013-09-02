@@ -1,11 +1,9 @@
 package fr.ujm.tse.lt2c.satin.triplestore;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map.Entry;
-
-import com.google.common.collect.Multimap;
-
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -44,61 +42,23 @@ public class TemporaryVerticalPartioningTripleStore extends VerticalPartioningTr
 		return this.triplesCollection;
 	}
 
-	@Override
-	public Collection<Triple> getbySubject(long s) {
-		Collection<Triple> result = new ArrayList<>(triples);
-		for (Long predicate : internalstore.keySet()) {
-			Multimap<Long, Long> multimap = internalstore.get(predicate);
-			if(multimap==null)
-				continue;
-			for (Entry<Long, Long> entry : multimap.entries()) {
-				if (entry.getKey() == s)
-					result.add(new TripleImplNaive(entry.getKey(), predicate,
-							entry.getValue()));
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public Collection<Triple> getbyPredicate(long p) {
-		Multimap<Long, Long> multimap = internalstore.get(p);
-		Collection<Triple> result = new ArrayList<>(triples);
-		if(multimap!=null){
-			for (Entry<Long, Long> entry : multimap.entries()) {
-				result.add(new TripleImplNaive(entry.getKey(), p, entry.getValue()));
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public Collection<Triple> getbyObject(long o) {
-		Collection<Triple> result = new ArrayList<>(triples);
-		for (Long predicate : internalstore.keySet()) {
-			Multimap<Long, Long> multimap = internalstore.get(predicate);
-			if(multimap==null)
-				continue;
-			for (Entry<Long, Long> entry : multimap.entries()) {
-				if (entry.getValue() == o)
-					result.add(new TripleImplNaive(entry.getKey(), predicate,
-							entry.getValue()));
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public long size(){
-		return triples;
-	}
-
 	/**
 	 * Unimplemented
 	 */
 	@Override
 	public void writeToFile(String file, Dictionnary dictionnary) {
-		// TODO Auto-generated method stub
+		try {
+			// Create file
+			FileWriter fstream = new FileWriter(file, false);
+			BufferedWriter out = new BufferedWriter(fstream);
+			for (Triple triple : this.triplesCollection) {
+				out.write(dictionnary.printTriple(triple) + "\n");
+			}
+			// Close the output stream
+			out.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
 
 	}
 

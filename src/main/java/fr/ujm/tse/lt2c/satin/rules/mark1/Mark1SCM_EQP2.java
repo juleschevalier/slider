@@ -1,4 +1,3 @@
-
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
@@ -14,17 +13,18 @@ import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
- * 	INPUT
+ * INPUT
  * c1 rdfs:subClassOf c2
  * c2 rdfs:subClassOf c1
- *  OUPUT
+ * OUPUT
  * c1 owl:equivalentClass c2
  */
 public class Mark1SCM_EQP2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQP2.class);
 
-	public Mark1SCM_EQP2(Dictionnary dictionnary, TripleStore usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
+	public Mark1SCM_EQP2(Dictionnary dictionnary, TripleStore usableTriples,
+			Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
@@ -36,8 +36,6 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 	@Override
 	public void run() {
 
-
-
 		/*
 		 * Get concepts codes in dictionnary
 		 */
@@ -47,29 +45,33 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 		long loops = 0;
 
 		/*
-		 * Get triples matching input 
+		 * Get triples matching input
 		 * Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
 
-		Collection<Triple> subClassOf_Triples = tripleStore.getbyPredicate(subClassOf);
+		Collection<Triple> subClassOf_Triples = tripleStore
+				.getbyPredicate(subClassOf);
 
 		/*
 		 * If usableTriples is null,
-		 * we infere over the entire triplestore 
+		 * we infere over the entire triplestore
 		 */
 		if (usableTriples.isEmpty()) {
 
 			for (Triple t1 : subClassOf_Triples) {
-				long s1=t1.getSubject(), o1=t1.getObject();
+				long s1 = t1.getSubject(), o1 = t1.getObject();
 
 				for (Triple t2 : subClassOf_Triples) {
-					long s2=t2.getSubject(), o2=t2.getObject();
+					long s2 = t2.getSubject(), o2 = t2.getObject();
 
-					if(s1!=o1&&o1==s2&&s1==o2){
-						Triple result = new TripleImplNaive(s1, equivalentClass, o1);
+					if (s1 != o1 && o1 == s2 && s1 == o2) {
+						Triple result = new TripleImplNaive(s1,
+								equivalentClass, o1);
 
-						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logTrace(dictionnary.printTriple(t1) + " & "
+								+ dictionnary.printTriple(t2) + " -> "
+								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -83,22 +85,26 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 		 * we infere over the matching triples
 		 * containing at least one from usableTriples
 		 */
-		else{
+		else {
 
 			for (Triple t1 : usableTriples.getAll()) {
-				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
+				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
+						.getObject();
 
-				if(p1!=subClassOf)
+				if (p1 != subClassOf)
 					continue;
 
 				for (Triple t2 : subClassOf_Triples) {
 					long s2 = t2.getSubject(), o2 = t2.getObject();
 					loops++;
 
-					if(s1!=o1&&o1==s2&&s1==o2){
-						Triple result = new TripleImplNaive(s1, equivalentClass, o1);
+					if (s1 != o1 && o1 == s2 && s1 == o2) {
+						Triple result = new TripleImplNaive(s1,
+								equivalentClass, o1);
 
-						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+						logTrace(dictionnary.printTriple(t1) + " & "
+								+ dictionnary.printTriple(t2) + " -> "
+								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -110,7 +116,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 
 		addNewTriples(outputTriples);
 
-		logDebug(this.getClass()+" : "+loops+" iterations");
+		logDebug(this.getClass() + " : " + loops + " iterations");
 	}
 
 	@Override

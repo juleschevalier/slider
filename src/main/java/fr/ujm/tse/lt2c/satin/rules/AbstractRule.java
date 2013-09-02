@@ -15,29 +15,31 @@ public abstract class AbstractRule implements Rule {
 	protected Collection<Triple> newTriples;
 	protected String ruleName = "";
 
-	protected synchronized void addNewTriples(Collection<Triple> outputTriples) {
+	protected void addNewTriples(Collection<Triple> outputTriples) {
 		for (Triple triple : outputTriples) {
-
-			if(!tripleStore.getAll().contains(triple)){
+			if (!tripleStore.contains(triple)) {
 				tripleStore.add(triple);
 				newTriples.add(triple);
-
-			}else{
-				logTrace(dictionnary.printTriple(triple)+" allready present");
+			} else {
+				logTrace(dictionnary.printTriple(triple) + " allready present");
 			}
-			
 		}
 	}
 
-	protected void logDebug(String message){
-		if(getLogger().isDebugEnabled()){
-			getLogger().debug((usableTriples.isEmpty()?"F "+ruleName+" ":ruleName) + message);
+	protected void logDebug(String message) {
+		if (getLogger().isDebugEnabled()) {
+			getLogger()
+					.debug((usableTriples.isEmpty() ? "F " + ruleName + " "
+							: ruleName) + message);
 		}
 	}
 
-	protected void logTrace(String message){
-		if(getLogger().isTraceEnabled()){
-			getLogger().trace((usableTriples.isEmpty()?"F "+ruleName+" ":ruleName+" ") + message);
+	protected void logTrace(String message) {
+		if (getLogger().isTraceEnabled()) {
+			getLogger().trace(
+					(usableTriples.isEmpty() ? "F " + ruleName + " " : ruleName
+							+ " ")
+							+ message);
 		}
 	}
 

@@ -1,4 +1,3 @@
-
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
@@ -14,17 +13,18 @@ import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
- * 	INPUT
+ * INPUT
  * p1 rdfs:subPropertyOf p2
  * p2 rdfs:subPropertyOf p3
- *  OUPUT
+ * OUPUT
  * p1 rdfs:subPropertyOf p3
  */
 public class Mark1SCM_SPO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_SPO.class);
 
-	public Mark1SCM_SPO(Dictionnary dictionnary, TripleStore usableTriples,  Collection<Triple> newTriples, TripleStore tripleStore) {
+	public Mark1SCM_SPO(Dictionnary dictionnary, TripleStore usableTriples,
+			Collection<Triple> newTriples, TripleStore tripleStore) {
 		super();
 		this.dictionnary = dictionnary;
 		this.tripleStore = tripleStore;
@@ -36,8 +36,6 @@ public class Mark1SCM_SPO extends AbstractRule {
 	@Override
 	public void run() {
 
-
-
 		/*
 		 * Get concepts codes in dictionnary
 		 */
@@ -46,29 +44,32 @@ public class Mark1SCM_SPO extends AbstractRule {
 		long loops = 0;
 
 		/*
-		 * Get triples matching input 
+		 * Get triples matching input
 		 * Create
 		 */
-		Collection<Triple> subPropertyOf_Triples = tripleStore.getbyPredicate(subPropertyOf);
+		Collection<Triple> subPropertyOf_Triples = tripleStore
+				.getbyPredicate(subPropertyOf);
 
 		Collection<Triple> outputTriples = new HashSet<>();
 
 		/*
 		 * If usableTriples is null,
-		 * we infere over the entire triplestore 
+		 * we infere over the entire triplestore
 		 */
 		if (usableTriples.isEmpty()) {
 
-
 			for (Triple t1 : subPropertyOf_Triples) {
-				long s1=t1.getSubject(), o1=t1.getObject();
+				long s1 = t1.getSubject(), o1 = t1.getObject();
 
 				for (Triple t2 : subPropertyOf_Triples) {
-					long s2=t2.getSubject(), o2=t2.getObject();
+					long s2 = t2.getSubject(), o2 = t2.getObject();
 
-					if(o1==s2){
-						Triple result = new TripleImplNaive(s1, subPropertyOf, o2);
-						logTrace("F SCM_SPO "+dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+					if (o1 == s2) {
+						Triple result = new TripleImplNaive(s1, subPropertyOf,
+								o2);
+						logTrace("F SCM_SPO " + dictionnary.printTriple(t1)
+								+ " & " + dictionnary.printTriple(t2) + " -> "
+								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -82,29 +83,35 @@ public class Mark1SCM_SPO extends AbstractRule {
 		 * we infere over the matching triples
 		 * containing at least one from usableTriples
 		 */
-		else{
+		else {
 
 			for (Triple t1 : usableTriples.getAll()) {
-				long s1 = t1.getSubject(), p1=t1.getPredicate(), o1 = t1.getObject();
+				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
+						.getObject();
 
-				if(p1!=subPropertyOf)
+				if (p1 != subPropertyOf)
 					continue;
 
 				for (Triple t2 : subPropertyOf_Triples) {
 					long s2 = t2.getSubject(), o2 = t2.getObject();
 					loops++;
 
-					if(o1==s2){
-						Triple result = new TripleImplNaive(s1, subPropertyOf, o2);
-						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+					if (o1 == s2) {
+						Triple result = new TripleImplNaive(s1, subPropertyOf,
+								o2);
+						logTrace(dictionnary.printTriple(t1) + " & "
+								+ dictionnary.printTriple(t2) + " -> "
+								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-					if(o2==s1){
-						Triple result = new TripleImplNaive(s2, subPropertyOf, o1);
-						logTrace(dictionnary.printTriple(t1)+" & "+dictionnary.printTriple(t2)+" -> "+dictionnary.printTriple(result));
+					if (o2 == s1) {
+						Triple result = new TripleImplNaive(s2, subPropertyOf,
+								o1);
+						logTrace(dictionnary.printTriple(t1) + " & "
+								+ dictionnary.printTriple(t2) + " -> "
+								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-
 
 				}
 
@@ -114,7 +121,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 
 		addNewTriples(outputTriples);
 
-		logDebug(this.getClass()+" : "+loops+" iterations");
+		logDebug(this.getClass() + " : " + loops + " iterations");
 
 	}
 
