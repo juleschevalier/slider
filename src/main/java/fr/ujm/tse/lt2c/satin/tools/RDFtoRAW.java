@@ -12,10 +12,12 @@ public class RDFtoRAW {
 		TripleStore tripleStore = new TripleStoreImplNaive();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary , tripleStore);
-		String in = "geopolitical_by_jena.owl", out = "geopolitical_by_jena_.owl";
+		String in = "sample1.owl", out = "sample1.out";
 		
 		parser.parse(in);
 		tripleStore.writeToFile(out, dictionnary);
+		
+		System.out.println("ok");
 	}
 
 }

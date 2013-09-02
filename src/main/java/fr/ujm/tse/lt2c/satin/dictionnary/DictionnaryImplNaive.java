@@ -22,49 +22,50 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 		super();
 		this.triples = new HashMap<>();
 		this.counter = 0;
-		allDifferent = add("");
+		//RhoDF
+		domain = add("http://www.w3.org/2000/01/rdf-schema#domain");
+		range = add("http://www.w3.org/2000/01/rdf-schema#range");
+		type = add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		subClassOf = add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
+		subPropertyOf = add("http://www.w3.org/2000/01/rdf-schema#subPropertyOf");
+		equivalentClass = add("http://www.w3.org/2002/07/owl#equivalentClass");
+		equivalentProperty = add("http://www.w3.org/2002/07/owl#equivalentProperty");
+		sameAs = add("http://www.w3.org/2002/07/owl#sameAs");
+		
+		inverseOf = add("http://www.w3.org/2002/07/owl#inverseOf");
+		propertyDisjointWith = add("");
+		differentFrom = add("");
+		allDifferent = add("http://www.w3.org/2002/07/owl#AllDifferent");
 		allDisjointClasses = add("");
-		allValuesFrom = add("");
-		annotationProperty = add("");
+		allValuesFrom = add("http://www.w3.org/2002/07/owl#allValuesFrom");
+		annotationProperty = add("http://www.w3.org/2002/07/owl#AnnotationProperty");
 		assertionProperty = add("");
 		asymetricProperty = add("");
-		clazz = add("");
+		clazz = add("http://www.w3.org/2002/07/owl#Class");
 		complementOf = add("");
-		differentFrom = add("");
-		disjoinWith = add("");
-		distinctmembers = add("");
-		domain = add("http://www.w3.org/2000/01/rdf-schema#domain");
-		equivalentClass = add("");
-		equivalentProperty = add("");
+		disjoinWith = add("http://www.w3.org/2002/07/owl#disjointWith");
+		distinctmembers = add("http://www.w3.org/2002/07/owl#distinctMembers");
 		functionalProperty = add("");
 		hasKey = add("");
 		hasValue = add("");
 		intersectionOf = add("");
 		inverseFunctionalProperty = add("");
-		inverseOf = add("");
 		irreflexiveProperty = add("");
-		maxCardinality = add("");
+		maxCardinality = add("http://www.w3.org/2002/07/owl#maxCardinality");
 		maxQualifiedCardinality = add("");
 		members = add("");
 		nothing = add("");
 		onClass = add("");
-		onProperty = add("");
+		onProperty = add("http://www.w3.org/2002/07/owl#onProperty");
 		oneOf = add("");
 		propertyChainAxiom = add("");
-		propertyDisjointWith = add("");
-		range = add("");
-		sameAs = add("");
 		someValuesFrom = add("");
 		sourceIndividual = add("");
-		subClassOf = add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
-		subProperty = add("");
-		subPropertyOf = add("");
 		symetricProperty = add("");
 		targetIndividual = add("");
 		targetValue = add("");
-		thing = add("");
-		transitiveProperty = add("");
-		type = add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		thing = add("http://www.w3.org/2002/07/owl#Thing");
+		transitiveProperty = add("http://www.w3.org/2002/07/owl#TransitiveProperty");
 		unionOf = add("");
 	}
 
@@ -132,12 +133,12 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 			   p = this.get(t.getPredicate()),
 			   o = this.get(t.getObject());
 		
-		if(s.split("#").length>1)
-			s=s.split("#")[1];
-		if(p.split("#").length>1)
-			p=p.split("#")[1];
-		if(o.split("#").length>1)
-			o=o.split("#")[1];
+//		if(s.split("#").length>1)
+//			s=s.split("#")[1];
+//		if(p.split("#").length>1)
+//			p=p.split("#")[1];
+//		if(o.split("#").length>1)
+//			o=o.split("#")[1];
 		
 		return s+" "+p+" "+o;
 	}

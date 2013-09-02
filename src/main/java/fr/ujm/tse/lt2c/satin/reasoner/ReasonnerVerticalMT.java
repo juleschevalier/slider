@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -37,67 +40,81 @@ public class ReasonnerVerticalMT {
 
 	public static void main(String[] args) {
 
-		for(int i=0; i<10; i++){
-//
-//			System.out.println("subclassof.owl 5618 bits");
-//			infere("subclassof.owl");
-//			System.out.println();
-//
-//			System.out.println("sample1.owl 9714 bits");
-//			infere("sample1.owl");
-//			System.out.println();
-//
-//			System.out.println("univ-bench.owl 13840 bits");
-//			infere("univ-bench.owl");
-//			System.out.println();
-//
-//			System.out.println("sweetAll.owl 17538 bits");
-//			infere("sweetAll.owl");
-//			System.out.println();
-//
-//			System.out.println("wine.rdf 78225 bits");
-//			infere("wine.rdf");
-//			System.out.println();
-//
-//			System.out.println("geopolitical_200Ko.owl 199105 bits");
-//			infere("geopolitical_200Ko.owl");
-//			System.out.println();
-//
-//			System.out.println("geopolitical_300Ko.owl 306377 bits");
-//			infere("geopolitical_300Ko.owl");
-//			System.out.println();
-//
-//			System.out.println("geopolitical_500Ko.owl 497095 bits");
-			infere("geopolitical_500Ko.owl");
-//			System.out.println();
-//
-//			System.out.println("geopolitical_1Mo.owl 1047485 bits");
-//			infere("geopolitical_1Mo.owl");
-//			System.out.println();
-//
-//			System.out.println("geopolitical.owl 1780714 bits");
-//			infere("geopolitical.owl");
-//			System.out.println();
-//
-//			System.out.println("efo.owl 26095973 bits");
-//			infere("efo.owl");
-//			System.out.println();
-//
-//			System.out.println("opencyc.owl 252122090 bits");
-//			infere("opencyc.owl");
-//			System.out.println();
-//
+		CSVWriter writer=null;
+		try {
+			writer = new CSVWriter(new FileWriter("resultsMT.csv"), ';');
+
+			String[] headers = {"File","i","Initial triples","Infered triples","Loops","Time"};
+			writer.writeNext(headers);
+
+			for(int i=0; i<100; i++){
+
+				System.out.println("subclassof.owl 5618 bits");
+				infere("subclassof.owl",i,writer);
+				System.out.println();
+
+				System.out.println("sample1.owl 9714 bits");
+				infere("sample1.owl",i,writer);
+				System.out.println();
+
+				System.out.println("univ-bench.owl 13840 bits");
+				infere("univ-bench.owl",i,writer);
+				System.out.println();
+	
+				System.out.println("sweetAll.owl 17538 bits");
+				infere("sweetAll.owl",i,writer);
+				System.out.println();
+	
+				System.out.println("wine.rdf 78225 bits");
+				infere("wine.rdf",i,writer);
+				System.out.println();
+	
+				System.out.println("geopolitical_200Ko.owl 199105 bits");
+				infere("geopolitical_200Ko.owl",i,writer);
+				System.out.println();
+	
+				System.out.println("geopolitical_300Ko.owl 306377 bits");
+				infere("geopolitical_300Ko.owl",i,writer);
+				System.out.println();
+	
+				System.out.println("geopolitical_500Ko.owl 497095 bits");
+				infere("geopolitical_500Ko.owl",i,writer);
+				System.out.println();
+	
+				System.out.println("geopolitical_1Mo.owl 1047485 bits");
+				infere("geopolitical_1Mo.owl",i,writer);
+				System.out.println();
+	//
+	//			System.out.println("geopolitical.owl 1780714 bits");
+	//			infere("geopolitical.owl",i,writer);
+	//			System.out.println();
+	//
+	//			System.out.println("efo.owl 26095973 bits");
+	//			infere("efo.owl",i,writer);
+	//			System.out.println();
+	//
+	//			System.out.println("opencyc.owl 252122090 bits");
+	//			infere("opencyc.owl",i,writer);
+	//			System.out.println();
+	
+			}
+			
+			writer.close();
+			System.out.println("Work finished");
+		} catch (IOException e) {
+			System.out.print("I/O error : ");
+			e.printStackTrace();
 		}
 
 	}
 
-	private static void infere(String input) {
+	private static void infere(String input, int i, CSVWriter writer) {
 
 		TripleStore tripleStore = new VerticalPartioningTripleStore();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary, tripleStore);
 
-		long startTime = System.nanoTime();
+		//		long startTime = System.nanoTime();
 
 		parser.parse(input);
 
@@ -133,7 +150,7 @@ public class ReasonnerVerticalMT {
 			old_size = tripleStore.getAll().size();
 			long stepTime = System.nanoTime();
 			logger.debug("--------------------STEP "+steps+"--------------------");
-			
+
 			ExecutorService executor = Executors.newFixedThreadPool(rules.size());
 
 			for (Rule rule : rules) {
@@ -157,21 +174,26 @@ public class ReasonnerVerticalMT {
 			long step2Time = System.nanoTime();
 			logger.debug((step2Time-stepTime)+"ns for "+(new_size-old_size)+" triples");
 			steps++;
-			
+
 		}while(!usableTriples.isEmpty());
 
 		long endTime = System.nanoTime();
-//		System.out.println("Dictionnary size: "+dictionnary.size());
-//		System.out.println("Initial triples: "+beginNbTriples);
-//		System.out.println("Triples after inference: "+tripleStore.getAll().size());
-//		System.out.println("Generated triples: "+(tripleStore.getAll().size()-beginNbTriples));
-//		System.out.println("Iterations: "+steps);
-//		System.out.println("Parsing: "+(parsingTime-startTime)/1000000.0+"ns");
-		System.out.println("Inference: "+(endTime-parsingTime)/1000000.0+"ns");
-//		System.out.println("Total time: "+(endTime-startTime)/1000000.0+"ns");
-//		System.out.print("File writing: ");
-//		tripleStore.writeToFile("infered"+input+".out", dictionnary);
-//		System.out.println("ok");
+		//		System.out.println("Dictionary size: "+dictionnary.size());
+		//		System.out.println("Initial triples: "+beginNbTriples);
+		//		System.out.println("Triples after inference: "+tripleStore.size());
+		//		System.out.println("Generated triples: "+(tripleStore.size()-beginNbTriples));
+		//		System.out.println("Iterations: "+steps);
+		//		System.out.println("Parsing: "+(parsingTime-startTime)/1000000.0+"ns");
+		//		System.out.println("Inference: "+(endTime-parsingTime)/1000000.0+"ns");
+		//		System.out.println("Total time: "+(endTime-startTime)/1000000.0+"ns");
+		//		System.out.print("File writing: ");
+		//		tripleStore.writeToFile("inferred"+input+".out", dictionary);
+		//		System.out.println("ok");
+
+		//		String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time"};
+		String[] datas = {input,""+i,""+beginNbTriples,""+(tripleStore.size()-beginNbTriples),""+steps,""+(endTime-parsingTime)};
+		writer.writeNext(datas);
+
 	}
 
 }

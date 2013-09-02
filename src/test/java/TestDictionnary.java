@@ -7,19 +7,19 @@ import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 
 public class TestDictionnary {
 
-	@Test
-	public void testSize(){
-		
-		DictionnaryImplNaive dico = new DictionnaryImplNaive();
-
-		Assert.assertEquals(0, dico.size());
-		
-		String s = "Hello world";
-		dico.add(s);
-		
-		Assert.assertEquals(1, dico.size());
-		
-	}
+//	@Test
+//	public void testSize(){
+//		
+//		DictionnaryImplNaive dico = new DictionnaryImplNaive();
+//
+//		Assert.assertEquals(0, dico.size());
+//		
+//		String s = "Hello world";
+//		dico.add(s);
+//		
+//		Assert.assertEquals(1, dico.size());
+//		
+//	}
 
 	@Test
 	public void testAddGet(){

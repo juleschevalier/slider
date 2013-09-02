@@ -40,6 +40,14 @@
     
 
 
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estCretin -->
+
+    <owl:ObjectProperty rdf:about="&sample1;estCretin">
+        <owl:equivalentProperty rdf:resource="&sample1;estIdiot"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estIdiot -->
 
     <owl:ObjectProperty rdf:about="&sample1;estIdiot">
@@ -274,6 +282,14 @@
 
     <owl:Class rdf:about="&sample1;Tigre">
         <rdfs:subClassOf rdf:resource="&sample1;Felin"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Y -->
+
+    <owl:Class rdf:about="&sample1;Y">
+        <owl:equivalentClass rdf:resource="&sample1;Z"/>
     </owl:Class>
     
 
