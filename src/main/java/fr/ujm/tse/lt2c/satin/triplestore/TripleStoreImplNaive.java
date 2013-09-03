@@ -120,7 +120,7 @@ public class TripleStoreImplNaive implements TripleStore {
 
 	@Override
 	public boolean contains(Triple triple) {
-
 		return triples.contains(triple);
 	}
+	
 }

@@ -42,9 +42,6 @@ public class TemporaryVerticalPartioningTripleStore extends VerticalPartioningTr
 		return this.triplesCollection;
 	}
 
-	/**
-	 * Unimplemented
-	 */
 	@Override
 	public void writeToFile(String file, Dictionnary dictionnary) {
 		try {

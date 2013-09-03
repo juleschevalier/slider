@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVWriter;
-
 import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -31,6 +30,7 @@ import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
+import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
@@ -43,9 +43,9 @@ public class ReasonnerVerticalMTRWLock {
 
 		CSVWriter writer=null;
 		try {
-			writer = new CSVWriter(new FileWriter("resultsMT.csv"), ';');
+			writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
 
-			String[] headers = {"File","i","Initial triples","Infered triples","Loops","Time"};
+			String[] headers = {"File","i","Initial triples","Infered triples","Loops","Time","Left over"};
 			writer.writeNext(headers);
 
 			for(int i=0; i<10; i++){
@@ -177,6 +177,10 @@ public class ReasonnerVerticalMTRWLock {
 			steps++;
 
 		}while(!usableTriples.isEmpty());
+		
+		Comparator comparator = new Comparator("jena_"+input);
+		
+		long size = comparator.compare(tripleStore, dictionnary);
 
 		long endTime = System.nanoTime();
 		//		System.out.println("Dictionary size: "+dictionnary.size());
@@ -190,9 +194,9 @@ public class ReasonnerVerticalMTRWLock {
 		//		System.out.print("File writing: ");
 		//		tripleStore.writeToFile("Inferred"+input+".out", dictionnary);
 		//		System.out.println("ok");
-		
-		//		String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time"};
-		String[] datas = {input,""+i,""+beginNbTriples,""+(tripleStore.size()-beginNbTriples),""+steps,""+(endTime-parsingTime)};
+
+		//		String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time","Correctness"};
+		String[] datas = {input,""+i,""+beginNbTriples,""+(tripleStore.size()-beginNbTriples),""+steps,""+(endTime-parsingTime),""+size};
 		writer.writeNext(datas);
 
 	}

@@ -133,12 +133,12 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 			   p = this.get(t.getPredicate()),
 			   o = this.get(t.getObject());
 		
-//		if(s.split("#").length>1)
-//			s=s.split("#")[1];
-//		if(p.split("#").length>1)
-//			p=p.split("#")[1];
-//		if(o.split("#").length>1)
-//			o=o.split("#")[1];
+		if(s.split("#").length>1)
+			s=s.split("#")[1];
+		if(p.split("#").length>1)
+			p=p.split("#")[1];
+		if(o.split("#").length>1)
+			o=o.split("#")[1];
 		
 		return s+" "+p+" "+o;
 	}

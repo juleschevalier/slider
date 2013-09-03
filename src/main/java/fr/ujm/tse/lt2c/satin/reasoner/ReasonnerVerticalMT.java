@@ -30,6 +30,7 @@ import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
+import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStore;
@@ -44,10 +45,10 @@ public class ReasonnerVerticalMT {
 		try {
 			writer = new CSVWriter(new FileWriter("resultsMT.csv"), ';');
 
-			String[] headers = {"File","i","Initial triples","Infered triples","Loops","Time"};
+			String[] headers = {"File","i","Initial triples","Infered triples","Loops","Time","Left over"};
 			writer.writeNext(headers);
 
-			for(int i=0; i<100; i++){
+			for(int i=0; i<10; i++){
 
 				System.out.println("subclassof.owl 5618 bits");
 				infere("subclassof.owl",i,writer);
@@ -84,7 +85,7 @@ public class ReasonnerVerticalMT {
 				System.out.println("geopolitical_1Mo.owl 1047485 bits");
 				infere("geopolitical_1Mo.owl",i,writer);
 				System.out.println();
-	//
+	
 	//			System.out.println("geopolitical.owl 1780714 bits");
 	//			infere("geopolitical.owl",i,writer);
 	//			System.out.println();
@@ -176,7 +177,11 @@ public class ReasonnerVerticalMT {
 			steps++;
 
 		}while(!usableTriples.isEmpty());
-
+		
+		Comparator comparator = new Comparator("jena_"+input);
+		
+		long size = comparator.compare(tripleStore, dictionnary);
+			
 		long endTime = System.nanoTime();
 		//		System.out.println("Dictionary size: "+dictionnary.size());
 		//		System.out.println("Initial triples: "+beginNbTriples);
@@ -190,8 +195,8 @@ public class ReasonnerVerticalMT {
 		//		tripleStore.writeToFile("inferred"+input+".out", dictionary);
 		//		System.out.println("ok");
 
-		//		String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time"};
-		String[] datas = {input,""+i,""+beginNbTriples,""+(tripleStore.size()-beginNbTriples),""+steps,""+(endTime-parsingTime)};
+		//		String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time","Correctness"};
+		String[] datas = {input,""+i,""+beginNbTriples,""+(tripleStore.size()-beginNbTriples),""+steps,""+(endTime-parsingTime),""+size};
 		writer.writeNext(datas);
 
 	}

@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.triplestore;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -124,12 +126,21 @@ public class VerticalPartioningTripleStore implements TripleStore {
 		return triples == 0;
 	}
 
-	/**
-	 * Unimplemented
-	 */
+
 	@Override
 	public void writeToFile(String file, Dictionnary dictionnary) {
-		// TODO Auto-generated method stub
+		try {
+			// Create file
+			FileWriter fstream = new FileWriter(file, false);
+			BufferedWriter out = new BufferedWriter(fstream);
+			for (Triple triple : this.getAll()) {
+				out.write(dictionnary.printTriple(triple) + "\n");
+			}
+			// Close the output stream
+			out.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
 
 	}
 
