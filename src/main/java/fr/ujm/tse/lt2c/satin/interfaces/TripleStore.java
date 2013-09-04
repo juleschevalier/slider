@@ -15,6 +15,7 @@ public interface TripleStore {
 	public Collection<Triple> getbyPredicate(long p);
 	
 	public Collection<Triple> getbyObject(long o);
+	
 	public long size();
 	
 	public int hashCode();
