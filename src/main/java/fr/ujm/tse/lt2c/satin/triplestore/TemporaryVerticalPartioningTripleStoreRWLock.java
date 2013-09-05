@@ -3,8 +3,12 @@ package fr.ujm.tse.lt2c.satin.triplestore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -12,6 +16,7 @@ import com.google.common.collect.Multimap;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
 
 /**
  * 
@@ -19,16 +24,18 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
  * 
  *         Triple Store that implements vertical partioning approach
  */
-public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore {
-
+public class TemporaryVerticalPartioningTripleStoreRWLock implements
+		TripleStore {
+	private static Logger logger = Logger
+			.getLogger(TemporaryVerticalPartioningTripleStoreRWLock.class);
 	HashMap<Long, Multimap<Long, Long>> internalstore;
-	ArrayList<Triple> triplesCollection;
+	Set<Triple> triplesCollection;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	int triples;
 
 	public TemporaryVerticalPartioningTripleStoreRWLock() {
 		internalstore = new HashMap<>();
-		triplesCollection = new ArrayList<>();
+		triplesCollection = new HashSet<>();
 		triples = 0;
 	}
 
@@ -43,13 +50,16 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 				triples++;
 
 			} else {
-				if (internalstore.get(t.getPredicate()).put(t.getSubject(),
-						t.getObject()))
-					triples++;
+				if (!(internalstore.get(t.getPredicate()).containsEntry(
+						t.getSubject(), t.getObject()))) {
+					if (internalstore.get(t.getPredicate()).put(t.getSubject(),
+							t.getObject()))
+						triples++;
+				}
 			}
 			triplesCollection.add(t);
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.writeLock().unlock();
 		}
@@ -67,6 +77,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 	@Override
 	public Collection<Triple> getAll() {
 		return triplesCollection;
+		// return triplesCollection;
 	}
 
 	@Override
@@ -85,7 +96,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -105,11 +116,24 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
 		return result;
+	}
+
+	public Multimap<Long, Long> getMultiMapForPredicate(long p) {
+		Multimap<Long, Long> multimap = null;
+		rwlock.readLock().lock();
+		try {
+			multimap = internalstore.get(p);
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return multimap;
 	}
 
 	@Override
@@ -128,7 +152,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -137,12 +161,32 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 
 	@Override
 	public long size() {
-		return triples;
+		long result = 0;
+		rwlock.readLock().lock();
+		try {
+			result = triples;
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return triples == 0;
+		boolean result = false;
+		rwlock.readLock().lock();
+		try {
+			result = triples == 0;
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
 	}
 
 	/**
@@ -156,17 +200,35 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements TripleStore
 
 	@Override
 	public boolean contains(Triple triple) {
-		if (!internalstore.containsKey(triple.getPredicate()))
-			return false;
-		return (internalstore.get(triple.getPredicate()).containsEntry(
-				triple.getSubject(), triple.getObject()));
+		boolean result = false;
+		rwlock.readLock().lock();
+		try {
+			if (!internalstore.containsKey(triple.getPredicate())) {
 
+			} else {
+				result = (internalstore.get(triple.getPredicate())
+						.containsEntry(triple.getSubject(), triple.getObject()));
+			}
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
 	}
-	
+
 	public void clear() {
-		this.internalstore.clear();
-		this.triples = 0;
-		this.triplesCollection.clear();
-		
+		rwlock.writeLock().lock();
+		try {
+			this.internalstore.clear();
+			this.triples = 0;
+			this.triplesCollection.clear();
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.writeLock().unlock();
+		}
+
 	}
 }

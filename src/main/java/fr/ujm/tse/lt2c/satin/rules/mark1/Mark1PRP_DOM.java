@@ -1,9 +1,13 @@
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
+
+import com.google.common.collect.Multimap;
 
 import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
@@ -14,23 +18,21 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
  * INPUT
- * p rdfs:domain c
- * x p y
- * OUPUT
- * x rdf:type c
+ *  p rdfs:domain c 
+ *  x p y
+ * OUPUT 
+ *  x rdf:type c
  */
 public class Mark1PRP_DOM extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_DOM.class);
 
 	public Mark1PRP_DOM(Dictionnary dictionnary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore) {
-		super();
-		this.dictionnary = dictionnary;
-		this.tripleStore = tripleStore;
-		this.usableTriples = usableTriples;
-		this.newTriples = newTriples;
-		this.ruleName = "PRP_DOM";
+			Collection<Triple> newTriples, TripleStore tripleStore,
+			CountDownLatch doneSignal) {
+		super(dictionnary, tripleStore, usableTriples, newTriples, "PRP_DOM",
+				doneSignal);
+
 	}
 
 	@Override
@@ -70,36 +72,48 @@ public class Mark1PRP_DOM extends AbstractRule {
 		}
 		/* Use usableTriples */
 		else {
-			for (Triple t1 : usableTriples.getAll()) {
-				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
-						.getObject();
 
-				for (Triple t2 : (p1 == domain)?tripleStore.getAll():domain_Triples) {
-					long s2 = t2.getSubject(), p2 = t2.getPredicate(), o2 = t2
-							.getObject();
-					loops++;
+			HashMap<Long, Collection<Triple>> cache = new HashMap<>();
+			// Case 1, all p of rdfs:domain in usabletriple
+			for (Triple t1 : usableTriples.getbyPredicate(domain)) {
+				long p = t1.getSubject();
+				long c = t1.getObject();
 
-					if (p1 == domain && s1 == p2) {
-						Triple result = new TripleImplNaive(s2, type, o1);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
-						outputTriples.add(result);
-					}
-					if (p2 == domain && s2 == p1) {
-						Triple result = new TripleImplNaive(s1, type, o2);
-						logTrace(dictionnary.printTriple(t2) + " & "
-								+ dictionnary.printTriple(t1) + " -> "
-								+ dictionnary.printTriple(result));
-						outputTriples.add(result);
-					}
+				Collection<Triple> triples = null;
+				if (!cache.containsKey(p)) {
+					triples = tripleStore.getbyPredicate(p);
+					cache.put(p, triples);
+				} else {
+					triples = cache.get(p);
+				}
+
+				for (Triple triple : triples) {
+					Triple result = new TripleImplNaive(triple.getSubject(),
+							type, c);
+					outputTriples.add(result);
 				}
 			}
+			// Case 2, all x p y in usable triple
+			// Set up a cache for multimaps
+			Multimap<Long, Long> map = tripleStore
+					.getMultiMapForPredicate(domain);
+			for (Triple t1 : usableTriples.getAll()) {
+				long x = t1.getSubject();
+				long p = t1.getPredicate();
+				Collection<Long> listofc = map.get(p);
+				for (Long c : listofc) {
+					Triple result = new TripleImplNaive(x, type, c);
+					outputTriples.add(result);
+				}
+
+			}
+
 		}
 
 		addNewTriples(outputTriples);
 
-		logDebug(this.getClass() + " : " + loops + " iterations");
+		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
+		finish();
 	}
 
 	@Override

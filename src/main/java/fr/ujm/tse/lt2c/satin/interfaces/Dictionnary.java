@@ -7,7 +7,7 @@ package fr.ujm.tse.lt2c.satin.interfaces;
  */
 public interface Dictionnary {
 	
-	public abstract long add(String s);
+	public  abstract long add(String s);
 	
 	public abstract String get(long index);
 	

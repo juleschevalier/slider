@@ -70,7 +70,7 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 	}
 
 	@Override
-	public long add(String s) {
+	public synchronized long add(String s) {
 		if(this.triples.containsKey(s)){
 			return this.get(s);
 		}
@@ -79,7 +79,7 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 	}
 
 	@Override
-	public String get(long index) {
+	public synchronized String get(long index) {
 		Iterator<Entry<String, Long>> it = this.triples.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, Long> pairs = (Entry<String, Long>) it.next();
@@ -90,7 +90,7 @@ public class DictionnaryImplNaive extends AbstractDictionnary{
 	}
 
 	@Override
-	public long get(String s) {
+	public synchronized long get(String s) {
 		return this.triples.get(s);
 	}
 

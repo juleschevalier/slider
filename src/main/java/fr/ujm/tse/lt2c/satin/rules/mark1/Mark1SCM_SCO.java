@@ -2,6 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
@@ -13,24 +14,18 @@ import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
- * INPUT
- * c1 rdfs:subClassOf c2
- * c2 rdfs:subClassOf c3
- * OUPUT
- * c1 rdfs:subClassOf c3
+ * INPUT c1 rdfs:subClassOf c2 c2 rdfs:subClassOf c3 OUPUT c1 rdfs:subClassOf c3
  */
 public class Mark1SCM_SCO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_SCO.class);
 
 	public Mark1SCM_SCO(Dictionnary dictionnary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore) {
-		super();
-		this.dictionnary = dictionnary;
-		this.tripleStore = tripleStore;
-		this.usableTriples = usableTriples;
-		this.newTriples = newTriples;
-		this.ruleName = "SCM_SCO";
+			Collection<Triple> newTriples, TripleStore tripleStore,
+			CountDownLatch doneSignal) {
+		super(dictionnary, tripleStore, usableTriples, newTriples, "SCM_SCO",
+				doneSignal);
+
 	}
 
 	@Override
@@ -44,8 +39,7 @@ public class Mark1SCM_SCO extends AbstractRule {
 		long loops = 0;
 
 		/*
-		 * Get triples matching input
-		 * Create
+		 * Get triples matching input Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
 
@@ -53,11 +47,12 @@ public class Mark1SCM_SCO extends AbstractRule {
 				.getbyPredicate(subClassOf);
 
 		if (usableTriples.isEmpty()) { // We use the entire triplestore
-
+			
 			for (Triple t1 : subClassOf_Triples) {
 				long s1 = t1.getSubject(), o1 = t1.getObject();
 
 				for (Triple t2 : subClassOf_Triples) {
+					
 					long s2 = t2.getSubject(), o2 = t2.getObject();
 
 					loops++;
@@ -106,7 +101,8 @@ public class Mark1SCM_SCO extends AbstractRule {
 
 		addNewTriples(outputTriples);
 
-		logDebug(this.getClass() + " : " + loops + " iterations");
+		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
+		finish();
 
 	}
 

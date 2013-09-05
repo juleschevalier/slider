@@ -1,0 +1,168 @@
+[17:53:58] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=Context
+[17:53:58] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=Engine
+[17:53:58] [DEBUG] Register MBean: com.hp.hpl.jena.sparql.system:type=SystemInfo
+[17:53:58] [DEBUG] Register MBean: org.apache.jena.riot.system:type=SystemInfo
+[17:53:58] [DEBUG] open(sample1.owl)
+[17:53:58] [DEBUG] Found: sample1.owl (ClassLoaderLocator)
+[17:53:58] [DEBUG] Found: sample1.owl
+[17:53:59] [DEBUG] Parsing completed
+[17:53:59] [DEBUG] --------------------STEP 0--------------------12
+[17:53:59] [DEBUG] F PRP_RNG class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] F PRP_RNG PRP_RNG unlatching 12
+[17:53:59] [DEBUG] F PRP_RNG PRP_RNG unlatched11
+[17:53:59] [DEBUG] F PRP_DOM class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] F PRP_DOM PRP_DOM unlatching 11
+[17:53:59] [DEBUG] F PRP_DOM PRP_DOM unlatched10
+[17:53:59] [DEBUG] F SCM_DOM1 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1 : 0 iterations  - outputTriples  1
+[17:53:59] [DEBUG] F SCM_DOM1 SCM_DOM1 unlatching 10
+[17:53:59] [DEBUG] F SCM_DOM1 SCM_DOM1 unlatched9
+[17:53:59] [DEBUG] F SCM_SPO class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] F SCM_SPO SCM_SPO unlatching 9
+[17:53:59] [DEBUG] F SCM_SPO SCM_SPO unlatched8
+[17:53:59] [DEBUG] F CAX_SCO class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO : 48 iterations - outputTriples  6
+[17:53:59] [DEBUG] F CAX_SCO CAX_SCO unlatching 8
+[17:53:59] [DEBUG] F CAX_SCO CAX_SCO unlatched7
+[17:53:59] [DEBUG] F PRP_SPO1 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1 : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] F PRP_SPO1 PRP_SPO1 unlatching 7
+[17:53:59] [DEBUG] F PRP_SPO1 PRP_SPO1 unlatched6
+[17:53:59] [DEBUG] F SCM_EQC2 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2 : 0 iterations  - outputTriples  2
+[17:53:59] [DEBUG] F SCM_EQC2 SCM_EQC2 unlatching 6
+[17:53:59] [DEBUG] F SCM_EQC2 SCM_EQC2 unlatched5
+[17:53:59] [DEBUG] F SCM_RNG1 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1 : 0 iterations  - outputTriples  1
+[17:53:59] [DEBUG] F SCM_RNG1 SCM_RNG1 unlatching 5
+[17:53:59] [DEBUG] F SCM_RNG1 SCM_RNG1 unlatched4
+[17:53:59] [DEBUG] F SCM_DOM2 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2 : 0 iterations  - outputTriples  1
+[17:53:59] [DEBUG] F SCM_DOM2 SCM_DOM2 unlatching 4
+[17:53:59] [DEBUG] F SCM_DOM2 SCM_DOM2 unlatched3
+[17:53:59] [DEBUG] F SCM_EQP2 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2 : 0 iterations  - outputTriples  2
+[17:53:59] [DEBUG] F SCM_RNG2 class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2 : 0 iterations  - outputTriples  1
+[17:53:59] [DEBUG] F SCM_RNG2 SCM_RNG2 unlatching 3
+[17:53:59] [DEBUG] F SCM_EQP2 SCM_EQP2 unlatching 3
+[17:53:59] [DEBUG] F SCM_EQP2 SCM_EQP2 unlatched1
+[17:53:59] [DEBUG] F SCM_RNG2 SCM_RNG2 unlatched2
+[17:53:59] [DEBUG] F SCM_SCO class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO : 400 iterations  - outputTriples  16
+[17:53:59] [DEBUG] F SCM_SCO SCM_SCO unlatching 1
+[17:53:59] [DEBUG] F SCM_SCO SCM_SCO unlatched0
+[17:53:59] [DEBUG] End of iteration - Latch : 12
+[17:53:59] [DEBUG] Usable triples: 40
+[17:53:59] [DEBUG] 32830659ns for 40 triples
+[17:53:59] [DEBUG] --------------------STEP 1--------------------12
+[17:53:59] [DEBUG] CAX_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO : 0 iterations - outputTriples  0
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatching 12
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatched11
+[17:53:59] [DEBUG] SCM_EQC2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2 : 576 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatching 11
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatched10
+[17:53:59] [DEBUG] SCM_EQP2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2 : 576 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatching 10
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatched9
+[17:53:59] [DEBUG] PRP_RNGclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG : 358 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatching 9
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatched8
+[17:53:59] [DEBUG] PRP_SPO1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1 : 625 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatching 8
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatched7
+[17:53:59] [DEBUG] SCM_RNG2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2 : 23 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatching 7
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatched6
+[17:53:59] [DEBUG] PRP_DOMclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatching 6
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatched5
+[17:53:59] [DEBUG] SCM_DOM2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2 : 23 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatching 5
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatched4
+[17:53:59] [DEBUG] SCM_SPOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO : 21 iterations  - outputTriples  4
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatching 4
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatched3
+[17:53:59] [DEBUG] SCM_DOM1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1 : 120 iterations  - outputTriples  3
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatching 3
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatched2
+[17:53:59] [DEBUG] SCM_RNG1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1 : 120 iterations  - outputTriples  3
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatching 2
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatched1
+[17:53:59] [DEBUG] SCM_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO : 576 iterations  - outputTriples  15
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatching 1
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatched0
+[17:53:59] [DEBUG] End of iteration - Latch : 12
+[17:53:59] [DEBUG] Usable triples: 17
+[17:53:59] [DEBUG] 22810614ns for 17 triples
+[17:53:59] [DEBUG] --------------------STEP 2--------------------12
+[17:53:59] [DEBUG] CAX_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO : 0 iterations - outputTriples  0
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatching 12
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatched11
+[17:53:59] [DEBUG] PRP_DOMclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM : 0 iterations  - outputTriples  3
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatching 11
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatched10
+[17:53:59] [DEBUG] SCM_EQP2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2 : 517 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatching 10
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatched9
+[17:53:59] [DEBUG] SCM_RNG1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1 : 207 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatching 9
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatched8
+[17:53:59] [DEBUG] SCM_RNG2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2 : 21 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatching 8
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatched7
+[17:53:59] [DEBUG] SCM_DOM1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1 : 207 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_SPOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO : 0 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatching 7
+[17:53:59] [DEBUG] SCM_EQC2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2 : 517 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatching 6
+[17:53:59] [DEBUG] SCM_DOM2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2 : 21 iterations  - outputTriples  1
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatching 5
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatched4
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatching 7
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatched3
+[17:53:59] [DEBUG] PRP_SPO1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1 : 119 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatching 3
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatched5
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatched6
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatched2
+[17:53:59] [DEBUG] PRP_RNGclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG : 507 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatching 2
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatched1
+[17:53:59] [DEBUG] SCM_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO : 517 iterations  - outputTriples  10
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatching 1
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatched0
+[17:53:59] [DEBUG] End of iteration - Latch : 12
+[17:53:59] [DEBUG] Usable triples: 9
+[17:53:59] [DEBUG] 10295833ns for 9 triples
+[17:53:59] [DEBUG] --------------------STEP 3--------------------12
+[17:53:59] [DEBUG] CAX_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO : 0 iterations - outputTriples  0
+[17:53:59] [DEBUG] PRP_SPO1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1 : 63 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_RNGclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG : 54 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatching 12
+[17:53:59] [DEBUG] PRP_RNGPRP_RNG unlatched11
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatching 12
+[17:53:59] [DEBUG] PRP_SPO1PRP_SPO1 unlatched10
+[17:53:59] [DEBUG] SCM_DOM2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2 : 0 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatching 10
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatching 12
+[17:53:59] [DEBUG] CAX_SCOCAX_SCO unlatched8
+[17:53:59] [DEBUG] SCM_DOM2SCM_DOM2 unlatched9
+[17:53:59] [DEBUG] SCM_EQC2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2 : 318 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_EQP2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2 : 318 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_DOM1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1 : 36 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_SPOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO : 0 iterations  - outputTriples  0
+[17:53:59] [DEBUG] PRP_DOMclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM : 0 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatching 8
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatching 8
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatching 8
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatching 8
+[17:53:59] [DEBUG] SCM_RNG1class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1 : 36 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_RNG2class fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2 : 0 iterations  - outputTriples  0
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatching 4
+[17:53:59] [DEBUG] SCM_RNG1SCM_RNG1 unlatched3
+[17:53:59] [DEBUG] SCM_EQC2SCM_EQC2 unlatched4
+[17:53:59] [DEBUG] SCM_EQP2SCM_EQP2 unlatched5
+[17:53:59] [DEBUG] SCM_DOM1SCM_DOM1 unlatched6
+[17:53:59] [DEBUG] SCM_SPOSCM_SPO unlatched7
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatching 8
+[17:53:59] [DEBUG] SCM_SCOclass fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO : 318 iterations  - outputTriples  3
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatching 4
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatching 2
+[17:53:59] [DEBUG] PRP_DOMPRP_DOM unlatched2
+[17:53:59] [DEBUG] SCM_SCOSCM_SCO unlatched0
+[17:53:59] [DEBUG] SCM_RNG2SCM_RNG2 unlatched1
+[17:53:59] [DEBUG] End of iteration - Latch : 12
+[17:53:59] [DEBUG] Usable triples: 0
+[17:53:59] [DEBUG] 4428021ns for 0 triples

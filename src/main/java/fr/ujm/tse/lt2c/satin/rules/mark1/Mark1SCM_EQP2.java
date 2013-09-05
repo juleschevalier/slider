@@ -2,6 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
@@ -13,24 +14,18 @@ import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
- * INPUT
- * c1 rdfs:subClassOf c2
- * c2 rdfs:subClassOf c1
- * OUPUT
- * c1 owl:equivalentClass c2
+ * INPUT c1 rdfs:subClassOf c2 c2 rdfs:subClassOf c1 OUPUT c1
+ * owl:equivalentClass c2
  */
 public class Mark1SCM_EQP2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQP2.class);
 
 	public Mark1SCM_EQP2(Dictionnary dictionnary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore) {
-		super();
-		this.dictionnary = dictionnary;
-		this.tripleStore = tripleStore;
-		this.usableTriples = usableTriples;
-		this.newTriples = newTriples;
-		this.ruleName = "SCM_EQP2";
+			Collection<Triple> newTriples, TripleStore tripleStore,
+			CountDownLatch doneSignal) {
+		super(dictionnary, tripleStore, usableTriples, newTriples, "SCM_EQP2",
+				doneSignal);
 	}
 
 	@Override
@@ -45,8 +40,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 		long loops = 0;
 
 		/*
-		 * Get triples matching input
-		 * Create
+		 * Get triples matching input Create
 		 */
 		Collection<Triple> outputTriples = new HashSet<>();
 
@@ -54,8 +48,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 				.getbyPredicate(subClassOf);
 
 		/*
-		 * If usableTriples is null,
-		 * we infere over the entire triplestore
+		 * If usableTriples is null, we infere over the entire triplestore
 		 */
 		if (usableTriples.isEmpty()) {
 
@@ -81,8 +74,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 
 		}
 		/*
-		 * If usableTriples is not null,
-		 * we infere over the matching triples
+		 * If usableTriples is not null, we infere over the matching triples
 		 * containing at least one from usableTriples
 		 */
 		else {
@@ -116,7 +108,8 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 
 		addNewTriples(outputTriples);
 
-		logDebug(this.getClass() + " : " + loops + " iterations");
+		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
+		finish();
 	}
 
 	@Override

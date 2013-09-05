@@ -1,10 +1,14 @@
 package fr.ujm.tse.lt2c.satin.triplestore;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -20,7 +24,8 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
  *         Triple Store that implements vertical partioning approach
  */
 public class VerticalPartioningTripleStoreRWLock implements TripleStore {
-
+	private static Logger logger = Logger
+			.getLogger(VerticalPartioningTripleStoreRWLock.class);
 	HashMap<Long, Multimap<Long, Long>> internalstore;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	int triples;
@@ -41,12 +46,15 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				triples++;
 
 			} else {
-				if (internalstore.get(t.getPredicate()).put(t.getSubject(),
-						t.getObject()))
-					triples++;
+				if (!(internalstore.get(t.getPredicate()).containsEntry(
+						t.getSubject(), t.getObject()))) {
+					if (internalstore.get(t.getPredicate()).put(t.getSubject(),
+							t.getObject()))
+						triples++;
+				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.writeLock().unlock();
 		}
@@ -77,7 +85,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -100,7 +108,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -120,7 +128,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -143,7 +151,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				}
 			}
 		} catch (Exception e) {
-
+			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -152,12 +160,32 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public long size() {
-		return triples;
+		long result = 0;
+		rwlock.readLock().lock();
+		try {
+			result = triples;
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return triples == 0;
+		boolean result = false;
+		rwlock.readLock().lock();
+		try {
+			result = triples == 0;
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
 	}
 
 	/**
@@ -165,16 +193,53 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 	 */
 	@Override
 	public void writeToFile(String file, Dictionnary dictionnary) {
-		// TODO Auto-generated method stub
+		try {
+			// Create file
+			FileWriter fstream = new FileWriter(file, false);
+			BufferedWriter out = new BufferedWriter(fstream);
+			for (Triple triple : this.getAll()) {
+				out.write(dictionnary.printTriple(triple) + "\n");
+			}
+			// Close the output stream
+			out.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
 
 	}
 
 	@Override
 	public boolean contains(Triple triple) {
-		if (!internalstore.containsKey(triple.getPredicate()))
-			return false;
-		return (internalstore.get(triple.getPredicate()).containsEntry(
-				triple.getSubject(), triple.getObject()));
+		boolean result = false;
+		rwlock.readLock().lock();
+		try {
+			if (!internalstore.containsKey(triple.getPredicate())) {
 
+			} else {
+				result = (internalstore.get(triple.getPredicate())
+						.containsEntry(triple.getSubject(), triple.getObject()));
+			}
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return result;
+	}
+
+	@Override
+	public Multimap<Long, Long> getMultiMapForPredicate(long p) {
+		rwlock.readLock().lock();
+		Multimap<Long, Long> multimap = null;
+		try {
+			multimap = internalstore.get(p);
+
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return multimap;
 	}
 }
