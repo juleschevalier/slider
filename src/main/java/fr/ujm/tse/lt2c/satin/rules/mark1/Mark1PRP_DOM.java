@@ -90,6 +90,9 @@ public class Mark1PRP_DOM extends AbstractRule {
 				for (Triple triple : triples) {
 					Triple result = new TripleImplNaive(triple.getSubject(),
 							type, c);
+					logTrace(dictionnary.printTriple(t1) + " & "
+							+ dictionnary.printTriple(triple) + " -> "
+							+ dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 			}
@@ -103,6 +106,9 @@ public class Mark1PRP_DOM extends AbstractRule {
 				Collection<Long> listofc = map.get(p);
 				for (Long c : listofc) {
 					Triple result = new TripleImplNaive(x, type, c);
+					logTrace(dictionnary.printTriple(t1) + " & "
+							+ dictionnary.printTriple(new TripleImplNaive(p, domain, c)) + " -> "
+							+ dictionnary.printTriple(result));
 					outputTriples.add(result);
 				}
 

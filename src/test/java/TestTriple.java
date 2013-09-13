@@ -2,7 +2,6 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 

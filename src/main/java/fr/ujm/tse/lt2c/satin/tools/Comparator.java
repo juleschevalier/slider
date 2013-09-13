@@ -3,7 +3,6 @@ package fr.ujm.tse.lt2c.satin.tools;
 import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 

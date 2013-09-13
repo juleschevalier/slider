@@ -16,7 +16,6 @@ import com.google.common.collect.Multimap;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
 
 /**
  * 
@@ -124,14 +123,16 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 	}
 
 	public Multimap<Long, Long> getMultiMapForPredicate(long p) {
-		Multimap<Long, Long> multimap = null;
+//		System.out.println("multiget 1");
 		rwlock.readLock().lock();
+		Multimap<Long, Long> multimap = null;
 		try {
 			multimap = internalstore.get(p);
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
+//			System.out.println("multiget 2");
 		}
 		return multimap;
 	}
@@ -165,7 +166,6 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 		rwlock.readLock().lock();
 		try {
 			result = triples;
-
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		} finally {

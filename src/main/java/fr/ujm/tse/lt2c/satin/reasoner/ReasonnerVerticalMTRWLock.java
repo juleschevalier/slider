@@ -1,11 +1,8 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -23,19 +20,9 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
-import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
@@ -51,21 +38,21 @@ public class ReasonnerVerticalMTRWLock {
 
 		CSVWriter writer = null;
 		try {
-			writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
+			// writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
+			//
+			// String[] headers = { "File", "i", "Initial triples",
+			// "Infered triples", "Loops", "Time", "Left over" };
+			// writer.writeNext(headers);
 
-			String[] headers = { "File", "i", "Initial triples",
-					"Infered triples", "Loops", "Time", "Left over" };
-			writer.writeNext(headers);
-
-			for (int i = 0; i < 1; i++) {
+			for (int i = 0; i < 1000; i++) {
 
 				// System.out.println("subclassof.owl 5618 bits");
 				// infere("subclassof.owl", i, writer);
 				// System.out.println();
 
-				System.out.println("sample1.owl 9714 bits");
-				infere("sample1.owl", i, writer);
-				System.out.println();
+				// System.out.println("sample1.owl 9714 bits");
+				// infere("sample1.owl", i, writer);
+				// System.out.println();
 
 				// System.out.println("univ-bench.owl 13840 bits");
 				// infere("univ-bench.owl", i, writer);
@@ -75,8 +62,8 @@ public class ReasonnerVerticalMTRWLock {
 				// infere("sweetAll.owl", i, writer);
 				// System.out.println();
 				//
-				// System.out.println("wine.rdf 78225 bits");
-				// infere("wine.rdf", i, writer);
+				// System.out.println("wine.rdf 78225 bits ("+i+")");
+				infere("wine.rdf", i, writer);
 				// System.out.println();
 				//
 				// System.out.println("geopolitical_200Ko.owl 199105 bits");
@@ -109,19 +96,24 @@ public class ReasonnerVerticalMTRWLock {
 				//
 			}
 
-			writer.close();
-			System.out.println("Work finished");
+			// writer.close();
+			// System.out.println("Work finished");
+
+			Runtime.getRuntime().exec("text2speech \"The computation is over.\"");
 
 			shutdownAndAwaitTermination(executor);
 
 		} catch (IOException e) {
-			System.out.print("I/O error : ");
 			e.printStackTrace();
 		}
 
 	}
 
 	private static void infere(String input, int i, CSVWriter writer) {
+
+		logger.debug("***************************************************************************************************************************************************************");
+		logger.debug("****************************************************************************NEW RUN****************************************************************************");
+		logger.debug("***************************************************************************************************************************************************************");
 
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 		Dictionnary dictionnary = new DictionnaryImplNaive();
@@ -131,9 +123,9 @@ public class ReasonnerVerticalMTRWLock {
 
 		parser.parse(input);
 
-		logger.debug("Parsing completed");
+		// logger.debug("Parsing completed");
 
-		long parsingTime = System.nanoTime();
+		// long parsingTime = System.nanoTime();
 
 		long beginNbTriples = tripleStore.size();
 
@@ -142,9 +134,11 @@ public class ReasonnerVerticalMTRWLock {
 		Set<Triple> newTriples = Collections
 				.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
 
-		/* Initialize rules used for inference on RhoDF */
 		CountDownLatch doneSignal = null;
-		// rules.add(new Mark1EQ_REF(dictionnary, usableTriples, newTriples,
+
+		/* Initialize rules used for inference on RhoDF */
+
+		// rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples,
 		// tripleStore, doneSignal));
 		rules.add(new Mark1PRP_DOM(dictionnary, usableTriples, newTriples,
 				tripleStore, doneSignal));
@@ -152,33 +146,37 @@ public class ReasonnerVerticalMTRWLock {
 				tripleStore, doneSignal));
 		rules.add(new Mark1PRP_SPO1(dictionnary, usableTriples, newTriples,
 				tripleStore, doneSignal));
-		rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples,
-				tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+		// rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples,
+		// tripleStore, doneSignal));
+
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
+
 		for (AbstractRule r : rules)
 			r.setDoneSignal(doneSignal);
-		int old_size, new_size, steps = 0;
+
+		long old_size;
+		long new_size;
+		int steps = 0;
+
 		executor = Executors.newFixedThreadPool(rules.size());
 
 		do {
-			old_size = tripleStore.getAll().size();
+			old_size = tripleStore.size();
 			long stepTime = System.nanoTime();
 			logger.debug("--------------------STEP " + steps
 					+ "--------------------" + doneSignal.getCount());
@@ -187,19 +185,20 @@ public class ReasonnerVerticalMTRWLock {
 				executor.submit(rule);
 			}
 			// Wait all rules to finish
-			System.out.println("Waiting for latch");
+			// System.out.println("Waiting for latch");
 			try {
 
-				for (AbstractRule r : rules) {
-					System.out.println(r.getRuleName() + " " + r.isFinished());
-				}
-				System.out.println(doneSignal.getCount());
+				// for (AbstractRule r : rules) {
+				// System.out.println(r.getRuleName() + " " + r.isFinished());
+				// }
+				// System.out.println(doneSignal.getCount());
 				doneSignal.await();
-				System.out.println("######################################");
-				for (AbstractRule r : rules) {
-					System.out.println(r.getRuleName() + " " + r.isFinished());
-				}
-				System.out.println("Fire in the hole");
+				// System.out.println("######################################");
+				// for (AbstractRule r : rules) {
+				// System.out.println(r.getRuleName() + " " + r.isFinished());
+				// }
+				// System.out.println("Fire in the hole");
+				// System.out.println("***************************************");
 				doneSignal = new CountDownLatch(rules.size());
 				cdlWriter = new CountDownLatch(rules.size());
 				for (AbstractRule r : rules) {
@@ -217,12 +216,16 @@ public class ReasonnerVerticalMTRWLock {
 
 			logger.debug("Usable triples: " + usableTriples.size());
 
-			new_size = tripleStore.getAll().size();
+			new_size = tripleStore.size();
 			long step2Time = System.nanoTime();
 			logger.debug((step2Time - stepTime) + "ns for "
 					+ (new_size - old_size) + " triples");
 			steps++;
+			for (Triple triple : usableTriples.getAll()) {
+				logger.trace(dictionnary.printTriple(triple));
+			}
 		} while (!usableTriples.isEmpty());
+
 		//
 		// Comparator comparator = new Comparator("jena_" + input);
 		//
@@ -232,14 +235,19 @@ public class ReasonnerVerticalMTRWLock {
 		// System.out.println("Dictionary size: "+dictionnary.size());
 		// System.out.println("Initial triples: "+beginNbTriples);
 		// System.out.println("Triples after inference: "+tripleStore.size());
-		System.out.println("Generated triples: "
+		// System.out.println("Generated triples: "
+		// + (tripleStore.size() - beginNbTriples));
+		System.out.println((tripleStore.size() - beginNbTriples));
+		logger.debug("Generated triples: "
 				+ (tripleStore.size() - beginNbTriples));
 		// System.out.println("Iterations: "+steps);
 		// System.out.println("Parsing: "+(parsingTime-startTime)/1000000.0+"ns");
 		// System.out.println("Inference: "+(endTime-parsingTime)/1000000.0+"ns");
 		// System.out.println("Total time: "+(endTime-startTime)/1000000.0+"ns");
-		System.out.print("File writing: ");
-		tripleStore.writeToFile("Inferred" + input + ".out", dictionnary);
+		// System.out.print("File writing: ");
+		tripleStore.writeToFile("Inferred"
+				+ (tripleStore.size() - beginNbTriples) + input + ".out",
+				dictionnary);
 		// System.out.println("ok");
 
 		// String[] headers =
@@ -252,7 +260,7 @@ public class ReasonnerVerticalMTRWLock {
 	}
 
 	static void shutdownAndAwaitTermination(ExecutorService pool) {
-		System.out.println("finishing");
+		// System.out.println("finishing");
 		System.exit(-1);
 		pool.shutdown(); // Disable new tasks from being submitted
 		try {

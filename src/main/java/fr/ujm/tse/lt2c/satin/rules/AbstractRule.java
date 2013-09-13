@@ -31,13 +31,13 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	protected void addNewTriples(Collection<Triple> outputTriples) {
-//		ReasonnerVerticalMTRWLock.cdlWriter.countDown();
-//		try {
-//			ReasonnerVerticalMTRWLock.cdlWriter.await();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		ReasonnerVerticalMTRWLock.cdlWriter.countDown();
+		try {
+			ReasonnerVerticalMTRWLock.cdlWriter.await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		for (Triple triple : outputTriples) {
 			if (!tripleStore.contains(triple)) {
 				tripleStore.add(triple);
@@ -67,9 +67,9 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	protected void finish() {
-		logDebug(this.ruleName + " unlatching " + doneSignal.getCount());
+		logDebug(" unlatching " + doneSignal.getCount());
 		doneSignal.countDown();
-		logDebug(this.ruleName + " unlatched" + doneSignal.getCount());
+		logDebug(" unlatched" + doneSignal.getCount());
 		this.finished = true;
 	}
 

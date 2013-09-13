@@ -234,7 +234,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		Multimap<Long, Long> multimap = null;
 		try {
 			multimap = internalstore.get(p);
-
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		} finally {

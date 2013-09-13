@@ -333,14 +333,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Bob -->
-
-    <owl:NamedIndividual rdf:about="&sample1;Bob">
-        <mange rdf:resource="&sample1;Alice"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Edward -->
 
     <owl:NamedIndividual rdf:about="&sample1;Edward">
