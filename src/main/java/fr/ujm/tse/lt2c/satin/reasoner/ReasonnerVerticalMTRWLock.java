@@ -1,5 +1,6 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,9 +21,19 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
+import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
@@ -38,38 +49,38 @@ public class ReasonnerVerticalMTRWLock {
 
 		CSVWriter writer = null;
 		try {
-			// writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
-			//
-			// String[] headers = { "File", "i", "Initial triples",
-			// "Infered triples", "Loops", "Time", "Left over" };
-			// writer.writeNext(headers);
+			 writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
+			
+			 String[] headers = { "File", "i", "Initial triples",
+			 "Infered triples", "Loops", "Time", "Left over" };
+			 writer.writeNext(headers);
 
-			for (int i = 0; i < 1000; i++) {
+			for (int i = 0; i < 10; i++) {
 
-				// System.out.println("subclassof.owl 5618 bits");
-				// infere("subclassof.owl", i, writer);
-				// System.out.println();
+				System.out.println("subclassof.owl 5618 bits");
+				infere("subclassof.owl", i, writer);
+				 System.out.println();
 
-				// System.out.println("sample1.owl 9714 bits");
-				// infere("sample1.owl", i, writer);
-				// System.out.println();
+				 System.out.println("sample1.owl 9714 bits");
+				 infere("sample1.owl", i, writer);
+				 System.out.println();
 
-				// System.out.println("univ-bench.owl 13840 bits");
-				// infere("univ-bench.owl", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("sweetAll.owl 17538 bits");
-				// infere("sweetAll.owl", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("wine.rdf 78225 bits ("+i+")");
-				infere("wine.rdf", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical_200Ko.owl 199105 bits");
-				// infere("geopolitical_200Ko.owl", i, writer);
-				// System.out.println();
-				//
+				 System.out.println("univ-bench.owl 13840 bits");
+				 infere("univ-bench.owl", i, writer);
+				 System.out.println();
+				
+				 System.out.println("sweetAll.owl 17538 bits");
+				 infere("sweetAll.owl", i, writer);
+				 System.out.println();
+				
+				 System.out.println("wine.rdf 78225 bits ("+i+")");
+				 infere("wine.rdf", i, writer);
+				 System.out.println();
+				
+				 System.out.println("geopolitical_200Ko.owl 199105 bits");
+				 infere("geopolitical_200Ko.owl", i, writer);
+				 System.out.println();
+				
 				// System.out.println("geopolitical_300Ko.owl 306377 bits");
 				// infere("geopolitical_300Ko.owl",i,writer);
 				// System.out.println();
@@ -96,10 +107,11 @@ public class ReasonnerVerticalMTRWLock {
 				//
 			}
 
-			// writer.close();
-			// System.out.println("Work finished");
+			 writer.close();
+			 System.out.println("Work finished");
 
-			Runtime.getRuntime().exec("text2speech \"The computation is over.\"");
+			Runtime.getRuntime().exec(
+					"text2speech \"The computation is over.\"");
 
 			shutdownAndAwaitTermination(executor);
 
@@ -119,13 +131,13 @@ public class ReasonnerVerticalMTRWLock {
 		Dictionnary dictionnary = new DictionnaryImplNaive();
 		Parser parser = new ParserImplNaive(dictionnary, tripleStore);
 
-		// long startTime = System.nanoTime();
+//		 long startTime = System.nanoTime();
 
 		parser.parse(input);
 
 		// logger.debug("Parsing completed");
 
-		// long parsingTime = System.nanoTime();
+		 long parsingTime = System.nanoTime();
 
 		long beginNbTriples = tripleStore.size();
 
@@ -138,30 +150,30 @@ public class ReasonnerVerticalMTRWLock {
 
 		/* Initialize rules used for inference on RhoDF */
 
-		// rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
+		 rules.add(new Mark1CAX_SCO(dictionnary, usableTriples, newTriples,
+		 tripleStore, doneSignal));
 		rules.add(new Mark1PRP_DOM(dictionnary, usableTriples, newTriples,
 				tripleStore, doneSignal));
 		rules.add(new Mark1PRP_RNG(dictionnary, usableTriples, newTriples,
 				tripleStore, doneSignal));
 		rules.add(new Mark1PRP_SPO1(dictionnary, usableTriples, newTriples,
 				tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
-		// rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples,
-		// tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SCO(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQC2(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SPO(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQP2(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM1(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM2(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG1(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG2(dictionnary, usableTriples, newTriples,
+				tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
@@ -224,14 +236,17 @@ public class ReasonnerVerticalMTRWLock {
 			for (Triple triple : usableTriples.getAll()) {
 				logger.trace(dictionnary.printTriple(triple));
 			}
+			System.out.println("Step " + steps + " : " + usableTriples.size()
+					+ " usable triples");
 		} while (!usableTriples.isEmpty());
+		
+		 long endTime = System.nanoTime();
 
 		//
-		// Comparator comparator = new Comparator("jena_" + input);
+		 Comparator comparator = new Comparator("jena_" + input);
 		//
-		// long size = comparator.compare(tripleStore, dictionnary);
+		 long size = comparator.compare(tripleStore, dictionnary);
 		//
-		// long endTime = System.nanoTime();
 		// System.out.println("Dictionary size: "+dictionnary.size());
 		// System.out.println("Initial triples: "+beginNbTriples);
 		// System.out.println("Triples after inference: "+tripleStore.size());
@@ -250,12 +265,11 @@ public class ReasonnerVerticalMTRWLock {
 				dictionnary);
 		// System.out.println("ok");
 
-		// String[] headers =
-		// {"File","Size","i","Initial triples","Infered triples","Loops","Time","Correctness"};
-		// String[] datas = { input, "" + i, "" + beginNbTriples,
-		// "" + (tripleStore.size() - beginNbTriples), "" + steps,
-		// "" + (endTime - parsingTime), "" + size };
-		// writer.writeNext(datas);
+//		 String[] headers = {"File","Size","i","Initial triples","Infered triples","Loops","Time","Correctness"};
+		 String[] datas = { input, "" + i, "" + beginNbTriples,
+		 "" + (tripleStore.size() - beginNbTriples), "" + steps,
+		 "" + (endTime - parsingTime), "" + size };
+		 writer.writeNext(datas);
 
 	}
 

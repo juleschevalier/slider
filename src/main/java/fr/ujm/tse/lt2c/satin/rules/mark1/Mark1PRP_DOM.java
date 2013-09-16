@@ -72,7 +72,6 @@ public class Mark1PRP_DOM extends AbstractRule {
 		}
 		/* Use usableTriples */
 		else {
-
 			HashMap<Long, Collection<Triple>> cache = new HashMap<>();
 			// Case 1, all p of rdfs:domain in usabletriple
 			for (Triple t1 : usableTriples.getbyPredicate(domain)) {
@@ -100,6 +99,10 @@ public class Mark1PRP_DOM extends AbstractRule {
 			// Set up a cache for multimaps
 			Multimap<Long, Long> map = tripleStore
 					.getMultiMapForPredicate(domain);
+			if(map==null){
+				finish();
+				return;
+			}
 			for (Triple t1 : usableTriples.getAll()) {
 				long x = t1.getSubject();
 				long p = t1.getPredicate();
@@ -115,7 +118,6 @@ public class Mark1PRP_DOM extends AbstractRule {
 			}
 
 		}
-
 		addNewTriples(outputTriples);
 
 		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());

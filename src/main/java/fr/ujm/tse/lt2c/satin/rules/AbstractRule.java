@@ -7,7 +7,6 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerVerticalMTRWLock;
 
 public abstract class AbstractRule implements Rule {
 
@@ -31,13 +30,13 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	protected void addNewTriples(Collection<Triple> outputTriples) {
-		ReasonnerVerticalMTRWLock.cdlWriter.countDown();
-		try {
-			ReasonnerVerticalMTRWLock.cdlWriter.await();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		ReasonnerVerticalMTRWLock.cdlWriter.countDown();
+//		try {
+//			ReasonnerVerticalMTRWLock.cdlWriter.await();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		for (Triple triple : outputTriples) {
 			if (!tripleStore.contains(triple)) {
 				tripleStore.add(triple);

@@ -68,7 +68,7 @@ public class Mark1SCM_SCO extends AbstractRule {
 
 			}
 		} else { // There are usable triples, so we just manage with them
-
+			
 			for (Triple t1 : usableTriples.getAll()) {
 				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
 						.getObject();

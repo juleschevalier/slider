@@ -76,14 +76,14 @@ public class Mark1PRP_RNG extends AbstractRule {
 							.getObject();
 					loops++;
 
-					if (p1 == type && s1 == p2) {
+					if (p1 == range && s1 == p2) {
 						Triple result = new TripleImplNaive(o2, type, o1);
 						logTrace(dictionnary.printTriple(t1) + " & "
 								+ dictionnary.printTriple(t2) + " -> "
 								+ dictionnary.printTriple(result));
 						outputTriples.add(result);
 					}
-					if (p2 == type && s2 == p1) {
+					if (p2 == range && s2 == p1) {
 						Triple result = new TripleImplNaive(o1, type, o2);
 						logTrace(dictionnary.printTriple(t2) + " & "
 								+ dictionnary.printTriple(t1) + " -> "

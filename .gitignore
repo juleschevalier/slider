@@ -2,6 +2,9 @@
 /build/
 /bin/
 target/
+# Output files #
+*.out
+*.cvs
 # OS Files #
 .DS_Store
 *.class
