@@ -2,7 +2,7 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.dictionnary.DictionnaryImplNaive;
+import fr.ujm.tse.lt2c.satin.dictionary.DictionaryImplNaive;
 
 
 public class TestDictionnary {
@@ -24,7 +24,7 @@ public class TestDictionnary {
 	@Test
 	public void testAddGet(){
 		
-		DictionnaryImplNaive dico = new DictionnaryImplNaive();
+		DictionaryImplNaive dico = new DictionaryImplNaive();
 		
 		String s1 = "Hello world";
 		long l1 = dico.add(s1);

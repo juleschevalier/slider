@@ -6,9 +6,9 @@
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#19">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#14"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#7"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#15"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#16"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#7"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#17"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#10"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#11"/>
@@ -45,10 +45,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#9">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#1"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#5"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#6"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#7"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
@@ -58,10 +58,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#10">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#1"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#5"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#6"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#7"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#9"/>
@@ -69,10 +69,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#11">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#1"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#5"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#6"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#7"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#9"/>
@@ -103,10 +103,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#12">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#1"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#5"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#6"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#10"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#9"/>

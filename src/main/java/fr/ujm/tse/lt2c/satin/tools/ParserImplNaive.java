@@ -10,7 +10,7 @@ import org.apache.jena.riot.lang.PipedTriplesStream;
 
 import com.hp.hpl.jena.graph.Triple;
 
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -19,14 +19,14 @@ public class ParserImplNaive implements Parser {
 	
 //	private static Logger logger = Logger.getLogger(ParserImplNaive.class);
 	
-	Dictionnary dictionnary;
+	Dictionary dictionary;
 	TripleStore tripleStore;
 
 	/**
 	 * @param f the file to parse
 	 */
-	public ParserImplNaive(Dictionnary dictionnary, TripleStore tripleStore) {
-		this.dictionnary = dictionnary;
+	public ParserImplNaive(Dictionary dictionary, TripleStore tripleStore) {
+		this.dictionary = dictionary;
 		this.tripleStore = tripleStore;
 	}
 
@@ -63,9 +63,9 @@ public class ParserImplNaive implements Parser {
 		
 //		logger.trace(s+" "+p+" "+o);
 		
-		long si = this.dictionnary.add(s);
-		long pi = this.dictionnary.add(p);
-		long oi = this.dictionnary.add(o);
+		long si = this.dictionary.add(s);
+		long pi = this.dictionary.add(p);
+		long oi = this.dictionary.add(o);
 		
 		this.tripleStore.add(new TripleImplNaive(si, pi, oi));
 	}
@@ -75,7 +75,7 @@ public class ParserImplNaive implements Parser {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((dictionnary == null) ? 0 : dictionnary.hashCode());
+				+ ((dictionary == null) ? 0 : dictionary.hashCode());
 		result = prime * result
 				+ ((tripleStore == null) ? 0 : tripleStore.hashCode());
 		return result;
@@ -90,10 +90,10 @@ public class ParserImplNaive implements Parser {
 		if (getClass() != obj.getClass())
 			return false;
 		ParserImplNaive other = (ParserImplNaive) obj;
-		if (dictionnary == null) {
-			if (other.dictionnary != null)
+		if (dictionary == null) {
+			if (other.dictionary != null)
 				return false;
-		} else if (!dictionnary.equals(other.dictionnary))
+		} else if (!dictionary.equals(other.dictionary))
 			return false;
 		if (tripleStore == null) {
 			if (other.tripleStore != null)

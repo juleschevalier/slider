@@ -3,14 +3,14 @@ package fr.ujm.tse.lt2c.satin.rules;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
 public abstract class AbstractRule implements Rule {
 
-	protected Dictionnary dictionnary;
+	protected Dictionary dictionary;
 	protected TripleStore tripleStore;
 	protected TripleStore usableTriples;
 	protected Collection<Triple> newTriples;
@@ -18,10 +18,10 @@ public abstract class AbstractRule implements Rule {
 	protected CountDownLatch doneSignal;
 	protected boolean finished = false;
 
-	public AbstractRule(Dictionnary dictionnary, TripleStore tripleStore,
+	public AbstractRule(Dictionary dictionary, TripleStore tripleStore,
 			TripleStore usableTriples, Collection<Triple> newTriples,
 			String ruleName, CountDownLatch doneSignal) {
-		this.dictionnary = dictionnary;
+		this.dictionary = dictionary;
 		this.tripleStore = tripleStore;
 		this.usableTriples = usableTriples;
 		this.newTriples = newTriples;
@@ -43,7 +43,7 @@ public abstract class AbstractRule implements Rule {
 				newTriples.add(triple);
 			} else {
 				
-				logTrace(dictionnary.printTriple(triple) + " already present");
+				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
 	}

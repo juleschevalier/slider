@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical2.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_1Mo.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_300Ko.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_200Ko.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_500Ko.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://swat.cse.lehigh.edu/onto/univ-bench.owl" uri="univ-bench.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://sweet.jpl.nasa.gov/2.2/sweetAll.owl" uri="sweetAll.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://www.ebi.ac.uk/efo/" uri="efo.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1378458107070" name="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" uri="wine.rdf"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_1Mo.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_300Ko.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_200Ko.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical_500Ko.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="duplicate:http://aims.fao.org/aos/geopolitical.owl" uri="geopolitical.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="http://swat.cse.lehigh.edu/onto/univ-bench.owl" uri="univ-bench.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="http://sweet.jpl.nasa.gov/2.2/sweetAll.owl" uri="sweetAll.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="http://www.semanticweb.org/jules/ontologies/2013/6/sample1" uri="sample1.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof" uri="subclassof.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1379423353311" name="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" uri="wine.rdf"/>
     </group>
 </catalog>

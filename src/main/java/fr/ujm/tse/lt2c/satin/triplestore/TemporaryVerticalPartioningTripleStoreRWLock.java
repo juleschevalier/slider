@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
@@ -76,7 +76,6 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 	@Override
 	public Collection<Triple> getAll() {
 		return triplesCollection;
-		// return triplesCollection;
 	}
 
 	@Override
@@ -123,7 +122,6 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 	}
 
 	public Multimap<Long, Long> getMultiMapForPredicate(long p) {
-//		System.out.println("multiget 1");
 		rwlock.readLock().lock();
 		Multimap<Long, Long> multimap = null;
 		try {
@@ -132,7 +130,6 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
-//			System.out.println("multiget 2");
 		}
 		return multimap;
 	}
@@ -193,7 +190,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 	 * Unimplemented
 	 */
 	@Override
-	public void writeToFile(String file, Dictionnary dictionnary) {
+	public void writeToFile(String file, Dictionary dictionary) {
 		// TODO Auto-generated method stub
 
 	}

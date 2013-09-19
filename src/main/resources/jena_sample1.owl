@@ -4,10 +4,14 @@
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+  <rdf:Description rdf:nodeID="A0">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Z"/>
+  </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot">
     <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot"/>
-    <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot"/>
+    <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
@@ -26,9 +30,9 @@
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Humain"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A0">
-    <rdf:rest rdf:nodeID="A1"/>
-    <rdf:first rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#B"/>
+  <rdf:Description rdf:nodeID="A1">
+    <owl:distinctMembers rdf:nodeID="A2"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Felin">
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal"/>
@@ -44,8 +48,6 @@
     <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Chat"/>
     <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Felin"/>
     <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal"/>
-    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Rongeur"/>
-    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Souris"/>
     <sample1:mange rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Bob"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   </rdf:Description>
@@ -62,8 +64,8 @@
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile">
     <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile"/>
-    <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Imbecile"/>
+    <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Idiot"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
@@ -105,10 +107,6 @@
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A1">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Z"/>
-  </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Z">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
@@ -124,17 +122,17 @@
     <rdfs:domain rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Chat"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
   </rdf:Description>
+  <rdf:Description rdf:nodeID="A2">
+    <rdf:rest rdf:nodeID="A0"/>
+    <rdf:first rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#B"/>
+  </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A2">
-    <owl:distinctMembers rdf:nodeID="A0"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
-  </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#7">
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#3"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#2"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#5"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#6"/>
@@ -188,14 +186,9 @@
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Bob">
+    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal"/>
     <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Souris"/>
     <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Rongeur"/>
-    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Animal"/>
-    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Felin"/>
-    <sample1:tue rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Alice"/>
-    <rdf:type rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Chat"/>
-    <sample1:mange rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#Alice"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estStupide">
     <owl:equivalentClass rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#estStupide"/>
@@ -210,9 +203,9 @@
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#6">
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1"/>
-    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#3"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#2"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#3"/>
+    <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#1"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#4"/>
     <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2013/6/sample1#5"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>

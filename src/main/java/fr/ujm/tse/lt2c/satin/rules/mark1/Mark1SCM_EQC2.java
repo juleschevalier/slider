@@ -6,8 +6,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
@@ -23,16 +23,18 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQC2.class);
 
-	public Mark1SCM_EQC2(Dictionnary dictionnary, TripleStore usableTriples,
+	public Mark1SCM_EQC2(Dictionary dictionary, TripleStore usableTriples,
 			Collection<Triple> newTriples, TripleStore tripleStore,
 			CountDownLatch doneSignal) {
-		super(dictionnary, tripleStore, usableTriples, newTriples, "SCM_EQC2",
+		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_EQC2",
 				doneSignal);
 	
 	}
 
 	@Override
 	public void run() {
+
+		try{
 
 		/*
 		 * Get concepts codes in dictionnary
@@ -44,8 +46,8 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 		 * Get triples matching input
 		 * Create
 		 */
-		long subClassOf = AbstractDictionnary.subClassOf;
-		long equivalentClass = AbstractDictionnary.equivalentClass;
+		long subClassOf = AbstractDictionary.subClassOf;
+		long equivalentClass = AbstractDictionary.equivalentClass;
 
 		Collection<Triple> outputTriples = new HashSet<>();
 
@@ -68,9 +70,9 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 						Triple result = new TripleImplNaive(s1,
 								equivalentClass, o1);
 
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -101,9 +103,9 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 						Triple result = new TripleImplNaive(s1,
 								equivalentClass, o1);
 
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -116,7 +118,14 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 		addNewTriples(outputTriples);
 
 		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
-		finish();
+
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			finish();
+
+		}
 	}
 
 	@Override

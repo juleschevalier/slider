@@ -6,8 +6,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
@@ -21,10 +21,10 @@ public class Mark1SCM_SPO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_SPO.class);
 
-	public Mark1SCM_SPO(Dictionnary dictionnary, TripleStore usableTriples,
+	public Mark1SCM_SPO(Dictionary dictionary, TripleStore usableTriples,
 			Collection<Triple> newTriples, TripleStore tripleStore,
 			CountDownLatch doneSignal) {
-		super(dictionnary, tripleStore, usableTriples, newTriples, "SCM_SPO",
+		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_SPO",
 				doneSignal);
 
 	}
@@ -35,7 +35,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long subPropertyOf = AbstractDictionnary.subPropertyOf;
+		long subPropertyOf = AbstractDictionary.subPropertyOf;
 
 		long loops = 0;
 
@@ -61,9 +61,9 @@ public class Mark1SCM_SPO extends AbstractRule {
 					if (o1 == s2) {
 						Triple result = new TripleImplNaive(s1, subPropertyOf,
 								o2);
-						logTrace("F SCM_SPO " + dictionnary.printTriple(t1)
-								+ " & " + dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace("F SCM_SPO " + dictionary.printTriple(t1)
+								+ " & " + dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -92,17 +92,17 @@ public class Mark1SCM_SPO extends AbstractRule {
 					if (o1 == s2) {
 						Triple result = new TripleImplNaive(s1, subPropertyOf,
 								o2);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 					if (o2 == s1) {
 						Triple result = new TripleImplNaive(s2, subPropertyOf,
 								o1);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 

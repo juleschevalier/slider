@@ -24,7 +24,7 @@ public interface TripleStore {
 
 	public boolean equals(Object obj);
 
-	public void writeToFile(String file, Dictionnary dictionnary);
+	public void writeToFile(String file, Dictionary dictionary);
 
 	public boolean isEmpty();
 

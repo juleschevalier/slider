@@ -6,8 +6,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.dictionnary.AbstractDictionnary;
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
@@ -24,10 +24,10 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_DOM1.class);
 
-	public Mark1SCM_DOM1(Dictionnary dictionnary, TripleStore usableTriples,
+	public Mark1SCM_DOM1(Dictionary dictionary, TripleStore usableTriples,
 			Collection<Triple> newTriples, TripleStore tripleStore,
 			CountDownLatch doneSignal) {
-		super(dictionnary, tripleStore, usableTriples, newTriples, "SCM_DOM1",
+		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_DOM1",
 				doneSignal);
 		
 	}
@@ -35,11 +35,13 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 	@Override
 	public void run() {
 
+		try{
+
 		/*
 		 * Get concepts codes in dictionnary
 		 */
-		long domain = AbstractDictionnary.domain;
-		long subClassOf = AbstractDictionnary.subClassOf;
+		long domain = AbstractDictionary.domain;
+		long subClassOf = AbstractDictionary.subClassOf;
 
 		long loops = 0;
 
@@ -68,9 +70,9 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 
 					if (o1 == s2) {
 						Triple result = new TripleImplNaive(s1, domain, o2);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -103,17 +105,17 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 
 					if (p1 == domain && p2 == subClassOf && o1 == s2) {
 						Triple result = new TripleImplNaive(s1, domain, o2);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
 					if (p2 == domain && p1 == subClassOf && o2 == s1) {
 						Triple result = new TripleImplNaive(s2, domain, o1);
-						logTrace(dictionnary.printTriple(t1) + " & "
-								+ dictionnary.printTriple(t2) + " -> "
-								+ dictionnary.printTriple(result));
+						logTrace(dictionary.printTriple(t1) + " & "
+								+ dictionary.printTriple(t2) + " -> "
+								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 
@@ -126,7 +128,14 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 		addNewTriples(outputTriples);
 
 		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
-		finish();
+
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			finish();
+
+		}
 	}
 
 	@Override

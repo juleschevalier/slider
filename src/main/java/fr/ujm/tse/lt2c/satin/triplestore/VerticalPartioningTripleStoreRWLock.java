@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionnary;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
@@ -192,13 +192,13 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 	 * Unimplemented
 	 */
 	@Override
-	public void writeToFile(String file, Dictionnary dictionnary) {
+	public void writeToFile(String file, Dictionary dictionary) {
 		try {
 			// Create file
 			FileWriter fstream = new FileWriter(file, false);
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (Triple triple : this.getAll()) {
-				out.write(dictionnary.printTriple(triple) + "\n");
+				out.write(dictionary.printTriple(triple) + "\n");
 			}
 			// Close the output stream
 			out.close();
