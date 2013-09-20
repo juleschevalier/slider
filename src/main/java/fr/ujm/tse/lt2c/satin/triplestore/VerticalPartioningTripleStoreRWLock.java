@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -74,14 +75,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		Collection<Triple> result = new ArrayList<>(triples);
 		rwlock.readLock().lock();
 		try {
-
 			for (Long predicate : internalstore.keySet()) {
-
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
 				for (Entry<Long, Long> entry : multimap.entries()) {
 					result.add(new TripleImplNaive(entry.getKey(), predicate,
 							entry.getValue()));
-
 				}
 			}
 		} catch (Exception e) {
@@ -239,6 +237,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		} finally {
 			rwlock.readLock().unlock();
 		}
-		return multimap;
+		return ImmutableMultimap.copyOf(multimap);
 	}
 }

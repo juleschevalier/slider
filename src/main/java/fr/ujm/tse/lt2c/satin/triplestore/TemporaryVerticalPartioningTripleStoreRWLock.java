@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -75,7 +77,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 
 	@Override
 	public Collection<Triple> getAll() {
-		return triplesCollection;
+		return ImmutableSet.copyOf(triplesCollection);//Avoid concurrent modification
 	}
 
 	@Override
@@ -131,7 +133,7 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 		} finally {
 			rwlock.readLock().unlock();
 		}
-		return multimap;
+		return ImmutableMultimap.copyOf(multimap);
 	}
 
 	@Override
