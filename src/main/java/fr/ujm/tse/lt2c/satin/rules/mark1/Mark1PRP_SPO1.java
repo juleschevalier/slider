@@ -47,30 +47,24 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 			/* Use all the triplestore */
 			if (usableTriples.isEmpty()) {
 
-				/* Get all matching triples */
-				Collection<Triple> subPropertyOfs = tripleStore.getbyPredicate(subPropertyOf);
-				if (subPropertyOfs == null || subPropertyOfs.size() == 0){
+				Multimap<Long, Long> subPropertyOfMultiMap = tripleStore.getMultiMapForPredicate(subPropertyOf);
+				if (subPropertyOfMultiMap == null || subPropertyOfMultiMap.size() == 0) {
 					finish();
 					return;
 				}
+				for (Long p1 : subPropertyOfMultiMap.keySet()) {
+					Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p1);
+					for (Triple triple : matchingTriples) {
+						for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+							Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
+							logTrace(dictionary.printTriple(triple)
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
+									+ " -> " 
+									+ dictionary.printTriple(result));
+							outputTriples.add(result);
+						}
 
-				/* For each triple p1 subPropertyOf p2 */
-				for (Triple spoTriple : subPropertyOfs) {
-					/*
-					 * Get all triples x p1 y
-					 */
-					Collection<Triple> matchingTriples = tripleStore.getbyPredicate(spoTriple.getSubject());
-					loops++;
-					for (Triple matchingTriple : matchingTriples) {
-
-						Triple result = new TripleImplNaive(matchingTriple.getSubject(),spoTriple.getObject(), matchingTriple.getObject());
-						outputTriples.add(result);
-
-						logTrace(dictionary.printTriple(spoTriple)
-								+ " & "
-								+ dictionary.printTriple(matchingTriple)
-								+ " -> "
-								+ dictionary.printTriple(result));
 					}
 				}
 			}
@@ -78,50 +72,41 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 			else {
 				// HashMap<Long, Collection<Triple>> cache = new HashMap<>();
 				// Case 1, all p of rdfs:subPropertyOf in usabletriple
-				Collection<Triple> subPropertyOfs = usableTriples.getbyPredicate(subPropertyOf);
-				if (subPropertyOfs != null && subPropertyOfs.size() != 0){
+				Multimap<Long, Long> subPropertyOfMultiMap = usableTriples.getMultiMapForPredicate(subPropertyOf);
+				if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
+					for (Long p1 : subPropertyOfMultiMap.keySet()) {
+						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p1);
+						for (Triple triple : matchingTriples) {
+							for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+								Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
+								logTrace(dictionary.printTriple(triple)
+										+ " & "
+										+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
+										+ " -> " 
+										+ dictionary.printTriple(result));
+								outputTriples.add(result);
+							}
 
-					/* For each triple p1 subPropertyOf p2 */
-					for (Triple spoTriple : subPropertyOfs) {
-						/*
-						 * Get all triples x p1 y
-						 */
-						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(spoTriple.getSubject());
-						loops++;
-						for (Triple matchingTriple : matchingTriples) {
-
-							Triple result = new TripleImplNaive(matchingTriple.getSubject(),spoTriple.getObject(), matchingTriple.getObject());
-							outputTriples.add(result);
-
-							logTrace(dictionary.printTriple(spoTriple)
-									+ " & "
-									+ dictionary.printTriple(matchingTriple)
-									+ " -> "
-									+ dictionary.printTriple(result));
 						}
 					}
 				}
 				// Case 2, all x p y in usable triple
 				// Set up a cache for multimaps
-				subPropertyOfs = usableTriples.getbyPredicate(subPropertyOf);
-				if (subPropertyOfs != null && subPropertyOfs.size() != 0){
-					/* For each triple p1 subPropertyOf p2 */
-					for (Triple spoTriple : subPropertyOfs) {
-						/*
-						 * Get all triples x p1 y
-						 */
-						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(spoTriple.getSubject());
-						loops++;
-						for (Triple matchingTriple : matchingTriples) {
+				subPropertyOfMultiMap = tripleStore.getMultiMapForPredicate(subPropertyOf);
+				if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
+					for (Long p1 : subPropertyOfMultiMap.keySet()) {
+						Collection<Triple> matchingTriples = usableTriples.getbyPredicate(p1);
+						for (Triple triple : matchingTriples) {
+							for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+								Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
+								logTrace(dictionary.printTriple(triple)
+										+ " & "
+										+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
+										+ " -> " 
+										+ dictionary.printTriple(result));
+								outputTriples.add(result);
+							}
 
-							Triple result = new TripleImplNaive(matchingTriple.getSubject(),spoTriple.getObject(), matchingTriple.getObject());
-							outputTriples.add(result);
-
-							logTrace(dictionary.printTriple(spoTriple)
-									+ " & "
-									+ dictionary.printTriple(matchingTriple)
-									+ " -> "
-									+ dictionary.printTriple(result));
 						}
 					}
 				}

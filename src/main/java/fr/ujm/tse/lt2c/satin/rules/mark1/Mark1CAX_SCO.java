@@ -50,17 +50,17 @@ public class Mark1CAX_SCO extends AbstractRule {
 			Collection<Triple> outputTriples = new HashSet<>();
 
 			if (usableTriples.isEmpty()) {
-				
+
 				/* Get all subClassOf triples */
 				Multimap<Long, Long> subclassMultimap = tripleStore.getMultiMapForPredicate(subClassOf);
 				if (subclassMultimap == null || subclassMultimap.size() == 0){
 					finish();
 					return;
 				}
-				
+
 				/* Get all type triples */
 				Collection<Triple> types = tripleStore.getbyPredicate(type);
-				
+
 				/* For each type triple */
 				for (Triple triple : types) {
 					/*
@@ -107,29 +107,26 @@ public class Mark1CAX_SCO extends AbstractRule {
 
 				/* subClassOf from tripleStore */
 				subclassMultimap = tripleStore.getMultiMapForPredicate(subClassOf);
-				if (subclassMultimap == null || subclassMultimap.size() == 0){
-					logTrace("No subClassOf from tripleStore-0");
-					finish();
-					return;
-				}
-				
-				Collection<Triple> types = usableTriples.getbyPredicate(type);
-				for (Triple type_triple : types) {
-					Collection<Long> c2s = subclassMultimap.get(type_triple
-							.getObject());
-					loops++;
-					for (Long c2 : c2s) {
+				if (subclassMultimap != null && subclassMultimap.size() != 0){
 
-						Triple result = new TripleImplNaive(
-								type_triple.getSubject(), type, c2);
-						outputTriples.add(result);
-						logTrace(dictionary.printTriple(new TripleImplNaive(
-								type_triple.getSubject(), type, type_triple
-								.getObject()))
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(
-										type_triple.getObject(), subClassOf, c2))
-										+ " -> " + dictionary.printTriple(result));
+					Collection<Triple> types = usableTriples.getbyPredicate(type);
+					for (Triple type_triple : types) {
+						Collection<Long> c2s = subclassMultimap.get(type_triple
+								.getObject());
+						loops++;
+						for (Long c2 : c2s) {
+
+							Triple result = new TripleImplNaive(
+									type_triple.getSubject(), type, c2);
+							outputTriples.add(result);
+							logTrace(dictionary.printTriple(new TripleImplNaive(
+									type_triple.getSubject(), type, type_triple
+									.getObject()))
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(
+											type_triple.getObject(), subClassOf, c2))
+											+ " -> " + dictionary.printTriple(result));
+						}
 					}
 				}
 
@@ -139,7 +136,7 @@ public class Mark1CAX_SCO extends AbstractRule {
 
 			logDebug(this.getClass() + " : " + loops
 					+ " iterations - outputTriples  " + outputTriples.size());
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{

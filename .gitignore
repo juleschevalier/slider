@@ -4,7 +4,8 @@
 target/
 # Output files #
 *.out
-*.cvs
+*.csv
+*.log
 # OS Files #
 .DS_Store
 *.class

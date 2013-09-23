@@ -186,9 +186,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		return result;
 	}
 
-	/**
-	 * Unimplemented
-	 */
 	@Override
 	public void writeToFile(String file, Dictionary dictionary) {
 		try {
@@ -231,12 +228,12 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		rwlock.readLock().lock();
 		Multimap<Long, Long> multimap = null;
 		try {
-			multimap = internalstore.get(p);
+			multimap = ImmutableMultimap.copyOf(internalstore.get(p));
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
-		return ImmutableMultimap.copyOf(multimap);
+		return multimap;
 	}
 }

@@ -26,9 +26,8 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
  *         Triple Store that implements vertical partioning approach
  */
 public class TemporaryVerticalPartioningTripleStoreRWLock implements
-		TripleStore {
-	private static Logger logger = Logger
-			.getLogger(TemporaryVerticalPartioningTripleStoreRWLock.class);
+TripleStore {
+	private static Logger logger = Logger.getLogger(TemporaryVerticalPartioningTripleStoreRWLock.class);
 	HashMap<Long, Multimap<Long, Long>> internalstore;
 	Set<Triple> triplesCollection;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
@@ -77,7 +76,17 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 
 	@Override
 	public Collection<Triple> getAll() {
-		return ImmutableSet.copyOf(triplesCollection);//Avoid concurrent modification
+		Collection<Triple> copy = null;
+		rwlock.readLock().lock();
+		try {
+			copy= ImmutableSet.copyOf(triplesCollection);//Avoid concurrent modification}
+		}
+		catch (Exception e) {
+			logger.debug(e.getMessage());
+		} finally {
+			rwlock.readLock().unlock();
+		}
+		return copy;
 	}
 
 	@Override
@@ -127,13 +136,13 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 		rwlock.readLock().lock();
 		Multimap<Long, Long> multimap = null;
 		try {
-			multimap = internalstore.get(p);
+			multimap = ImmutableMultimap.copyOf(internalstore.get(p));
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		} finally {
 			rwlock.readLock().unlock();
 		}
-		return ImmutableMultimap.copyOf(multimap);
+		return multimap;
 	}
 
 	@Override
@@ -191,43 +200,43 @@ public class TemporaryVerticalPartioningTripleStoreRWLock implements
 	/**
 	 * Unimplemented
 	 */
-	@Override
-	public void writeToFile(String file, Dictionary dictionary) {
-		// TODO Auto-generated method stub
+	 @Override
+	 public void writeToFile(String file, Dictionary dictionary) {
+		 // TODO Auto-generated method stub
 
-	}
+	 }
 
-	@Override
-	public boolean contains(Triple triple) {
-		boolean result = false;
-		rwlock.readLock().lock();
-		try {
-			if (!internalstore.containsKey(triple.getPredicate())) {
+	 @Override
+	 public boolean contains(Triple triple) {
+		 boolean result = false;
+		 rwlock.readLock().lock();
+		 try {
+			 if (!internalstore.containsKey(triple.getPredicate())) {
 
-			} else {
-				result = (internalstore.get(triple.getPredicate())
-						.containsEntry(triple.getSubject(), triple.getObject()));
-			}
+			 } else {
+				 result = (internalstore.get(triple.getPredicate())
+						 .containsEntry(triple.getSubject(), triple.getObject()));
+			 }
 
-		} catch (Exception e) {
-			logger.debug(e.getMessage());
-		} finally {
-			rwlock.readLock().unlock();
-		}
-		return result;
-	}
+		 } catch (Exception e) {
+			 logger.debug(e.getMessage());
+		 } finally {
+			 rwlock.readLock().unlock();
+		 }
+		 return result;
+	 }
 
-	public void clear() {
-		rwlock.writeLock().lock();
-		try {
-			this.internalstore.clear();
-			this.triples = 0;
-			this.triplesCollection.clear();
-		} catch (Exception e) {
-			logger.debug(e.getMessage());
-		} finally {
-			rwlock.writeLock().unlock();
-		}
+	 public void clear() {
+		 rwlock.writeLock().lock();
+		 try {
+			 this.internalstore.clear();
+			 this.triples = 0;
+			 this.triplesCollection.clear();
+		 } catch (Exception e) {
+			 logger.debug(e.getMessage());
+		 } finally {
+			 rwlock.writeLock().unlock();
+		 }
 
-	}
+	 }
 }

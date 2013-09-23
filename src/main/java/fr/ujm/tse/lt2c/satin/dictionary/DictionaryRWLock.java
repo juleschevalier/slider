@@ -158,6 +158,11 @@ public class DictionaryRWLock extends AbstractDictionary{
 		if(o.split("#").length>1)
 			o=o.split("#")[1];
 		
+		s=s.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+		p=p.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+		o=o.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+
+		
 		rwlock.readLock().unlock();
 		
 		return s+" "+p+" "+o;
