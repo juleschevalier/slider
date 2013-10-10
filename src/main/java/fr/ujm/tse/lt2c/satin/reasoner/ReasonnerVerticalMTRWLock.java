@@ -25,7 +25,14 @@ import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
+import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
@@ -50,29 +57,29 @@ public class ReasonnerVerticalMTRWLock {
 
 			for (int i = 0; i < 100; i++) {
 
-				 System.out.println("subclassof.owl 5618 bits");
-				 infere("subclassof.owl", i, writer);
-				 System.out.println();
-				//
-//				 System.out.println("sample1.owl 9714 bits");
-//				 infere("sample1.owl", i, writer);
-//				 System.out.println();
-				//
-				// System.out.println("univ-bench.owl 13840 bits");
-				// infere("univ-bench.owl", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("sweetAll.owl 17538 bits");
-				// infere("sweetAll.owl", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("wine.rdf 78225 bits");
-				// infere("wine.rdf", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical_200Ko.owl 199105 bits");
-				// infere("geopolitical_200Ko.owl", i, writer);
-				// System.out.println();
+				System.out.println("subclassof.owl 5618 bits");
+				infere("subclassof.owl", i, writer);
+				System.out.println();
+
+				System.out.println("sample1.owl 9714 bits");
+				infere("sample1.owl", i, writer);
+				System.out.println();
+
+				System.out.println("univ-bench.owl 13840 bits");
+				infere("univ-bench.owl", i, writer);
+				System.out.println();
+
+				System.out.println("sweetAll.owl 17538 bits");
+				infere("sweetAll.owl", i, writer);
+				System.out.println();
+
+				System.out.println("wine.rdf 78225 bits");
+				infere("wine.rdf", i, writer);
+				System.out.println();
+
+				System.out.println("geopolitical_200Ko.owl 199105 bits");
+				infere("geopolitical_200Ko.owl", i, writer);
+				System.out.println();
 				//
 				// System.out.println("geopolitical_300Ko.owl 306377 bits");
 				// infere("geopolitical_300Ko.owl",i,writer);
@@ -143,30 +150,30 @@ public class ReasonnerVerticalMTRWLock {
 
 		/* Initialize rules used for inference on RhoDF */
 
-//		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
+		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
 		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples,
 				tripleStore, doneSignal));
 		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples,
 				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
-//		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,
-//				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,
+				tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
@@ -211,7 +218,6 @@ public class ReasonnerVerticalMTRWLock {
 					r.setFinished(false);
 				}
 			} catch (InterruptedException e) {
-
 				e.printStackTrace();
 			}
 			logger.debug("End of iteration - Latch : " + doneSignal.getCount());

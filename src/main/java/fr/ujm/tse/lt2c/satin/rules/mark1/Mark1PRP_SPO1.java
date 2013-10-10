@@ -121,7 +121,6 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 			e.printStackTrace();
 		}finally{
 			finish();
-
 		}
 	}
 

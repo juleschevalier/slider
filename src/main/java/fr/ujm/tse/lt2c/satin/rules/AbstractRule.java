@@ -30,19 +30,19 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	protected void addNewTriples(Collection<Triple> outputTriples) {
-//		ReasonnerVerticalMTRWLock.cdlWriter.countDown();
-//		try {
-//			ReasonnerVerticalMTRWLock.cdlWriter.await();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		// ReasonnerVerticalMTRWLock.cdlWriter.countDown();
+		// try {
+		// ReasonnerVerticalMTRWLock.cdlWriter.await();
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		for (Triple triple : outputTriples) {
 			if (!tripleStore.contains(triple)) {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 			} else {
-				
+
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
@@ -66,10 +66,12 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	protected void finish() {
-		logDebug(" unlatching " + doneSignal.getCount());
-		doneSignal.countDown();
-		logDebug(" unlatched" + doneSignal.getCount());
-		this.finished = true;
+		if (!this.finished) {
+			logDebug(" unlatching " + doneSignal.getCount());
+			this.finished = true;
+			doneSignal.countDown();
+			logDebug(" unlatched" + doneSignal.getCount());
+		}
 	}
 
 	public CountDownLatch getDoneSignal() {
