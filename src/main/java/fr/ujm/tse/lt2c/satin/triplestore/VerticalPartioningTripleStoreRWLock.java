@@ -25,8 +25,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
  *         Triple Store that implements vertical partioning approach
  */
 public class VerticalPartioningTripleStoreRWLock implements TripleStore {
-	private static Logger logger = Logger
-			.getLogger(VerticalPartioningTripleStoreRWLock.class);
+	private static Logger logger = Logger.getLogger(VerticalPartioningTripleStoreRWLock.class);
 	HashMap<Long, Multimap<Long, Long>> internalstore;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	int triples;

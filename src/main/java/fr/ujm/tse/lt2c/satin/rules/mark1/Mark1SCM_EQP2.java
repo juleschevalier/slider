@@ -70,7 +70,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 						loops++;
 						for (Long c1a : c1as) {
 
-							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+							if (c1a == triple.getSubject() /*&& triple.getObject() != triple.getSubject()*/) {
 
 								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
 								outputTriples.add(result);
@@ -109,7 +109,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 						loops++;
 						for (Long c1a : c1as) {
 
-							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+							if (c1a == triple.getSubject()/* && triple.getObject() != triple.getSubject()*/) {
 
 								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
 								outputTriples.add(result);
@@ -140,7 +140,7 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 						loops++;
 						for (Long c1a : c1as) {
 
-							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+							if (c1a == triple.getSubject() /*&& triple.getObject() != triple.getSubject()*/) {
 
 								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
 								outputTriples.add(result);

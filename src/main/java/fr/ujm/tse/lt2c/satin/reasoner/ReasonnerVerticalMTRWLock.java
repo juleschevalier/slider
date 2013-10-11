@@ -1,10 +1,11 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -12,8 +13,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.mongodb.MongoClient;
+
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -35,133 +39,87 @@ import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
 import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
+import fr.ujm.tse.lt2c.satin.tools.RunEntity;
 import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class ReasonnerVerticalMTRWLock {
 
 	public static CountDownLatch cdlWriter;
-	private static Logger logger = Logger
-			.getLogger(ReasonnerVerticalMTRWLock.class);
+	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 	private static ExecutorService executor;
+
+	private static boolean PERSIST_RESULTS = true;
+	
+	private static int SESSION_ID = UUID.randomUUID().hashCode();
 
 	public static void main(String[] args) {
 
-		CSVWriter writer = null;
 		try {
-			writer = new CSVWriter(new FileWriter("resultsMTLock.csv"), ';');
 
-			String[] headers = { "File", "i", "Initial triples",
-					"Infered triples", "Loops", "Time", "Left over" };
-			writer.writeNext(headers);
+			for (int i = 0; i < 1; i++) {
 
-			for (int i = 0; i < 100; i++) {
-
-				System.out.println("subclassof.owl 5618 bits");
-				infere("subclassof.owl", i, writer);
-				System.out.println();
-
-				System.out.println("sample1.owl 9714 bits");
-				infere("sample1.owl", i, writer);
-				System.out.println();
-
-				System.out.println("univ-bench.owl 13840 bits");
-				infere("univ-bench.owl", i, writer);
-				System.out.println();
-
-				System.out.println("sweetAll.owl 17538 bits");
-				infere("sweetAll.owl", i, writer);
-				System.out.println();
-
-				System.out.println("wine.rdf 78225 bits");
-				infere("wine.rdf", i, writer);
-				System.out.println();
-				//
-				// System.out.println("geopolitical_200Ko.owl 199105 bits");
-				// infere("geopolitical_200Ko.owl", i, writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical_300Ko.owl 306377 bits");
-				// infere("geopolitical_300Ko.owl",i,writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical_500Ko.owl 497095 bits");
-				// infere("geopolitical_500Ko.owl",i,writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical_1Mo.owl 1047485 bits");
-				// infere("geopolitical_1Mo.owl",i,writer);
-				// System.out.println();
-				//
-				// System.out.println("geopolitical.owl 1780714 bits");
-				// infere("geopolitical.owl",i,writer);
-				// System.out.println();
-				//
-				// System.out.println("efo.owl 26095973 bits");
-				// infere("efo.owl",i,writer);
-				// System.out.println();
-				//
-				// System.out.println("opencyc.owl 252122090 bits");
-				// infere("opencyc.owl",i,writer);
-				// System.out.println();
-				//
+				// infere("subclassof.owl");
+				infere("sample1.owl");
+				// infere("univ-bench.owl");
+				// infere("sweetAll.owl");
+				// infere("wine.rdf");
+				// infere("geopolitical_200Ko.owl");
+				// infere("geopolitical_300Ko.owl");
+				// infere("geopolitical_500Ko.owl");
+				// infere("geopolitical_1Mo.owl");
+				// infere("geopolitical.owl");
+				// infere("efo.owl");
+				// infere("opencyc.owl");
 			}
 
-			writer.close();
-
-			// Runtime.getRuntime().exec(
-			// "text2speech \"The computation is over.\"");
-
+			
+			System.out.println("SESSION ID : "+SESSION_ID);
 			shutdownAndAwaitTermination(executor);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	private static void infere(String input, int i, CSVWriter writer) {
+	private static void infere(String input) {
 
 		logger.debug("***************************************************************************************************************************************************************");
 		logger.debug("****************************************************************************NEW RUN****************************************************************************");
 		logger.debug("***************************************************************************************************************************************************************");
+		System.out.println("Infere : " + input);
 
+		/* Initialise Structures */
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-		// Dictionary dictionary = new DictionaryImplNaive();
 		Dictionary dictionary = new DictionaryRWLock();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
-		// long startTime = System.nanoTime();
+		ArrayList<AbstractRule> rules = new ArrayList<>();
+		TemporaryVerticalPartioningTripleStoreRWLock usableTriples = new TemporaryVerticalPartioningTripleStoreRWLock();
+		Set<Triple> newTriples = Collections.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
 
+		/* File parsing */
 		parser.parse(input);
-
-		// logger.debug("Parsing completed");
-
-		long parsingTime = System.nanoTime();
 
 		long beginNbTriples = tripleStore.size();
 
-		ArrayList<AbstractRule> rules = new ArrayList<>();
-		TemporaryVerticalPartioningTripleStoreRWLock usableTriples = new TemporaryVerticalPartioningTripleStoreRWLock();
-		Set<Triple> newTriples = Collections
-				.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
+		/* Initialize rules used for inference on RhoDF */
 
 		CountDownLatch doneSignal = null;
 
-		/* Initialize rules used for inference on RhoDF */
-
-		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
@@ -171,21 +129,24 @@ public class ReasonnerVerticalMTRWLock {
 
 		long old_size;
 		long new_size;
-		int steps = 0;
+		long steps = 0;
 
 		executor = Executors.newFixedThreadPool(rules.size());
 
+		long parsingTime = System.nanoTime();
+
+		/* Run each rule until there is no more new triple inferred */
 		do {
+
 			old_size = tripleStore.size();
 			long stepTime = System.nanoTime();
-			logger.debug("--------------------STEP " + steps
-					+ "--------------------" + doneSignal.getCount());
+			logger.debug("--------------------STEP " + steps + "--------------------");
 
 			for (Rule rule : rules) {
 				executor.submit(rule);
 			}
+
 			// Wait all rules to finish
-			// System.out.println("Waiting for latch");
 			try {
 
 				// for (AbstractRule r : rules) {
@@ -208,6 +169,8 @@ public class ReasonnerVerticalMTRWLock {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			/* Step end - Replace usableTriples by newTriples */
 			logger.debug("End of iteration - Latch : " + doneSignal.getCount());
 			usableTriples.clear();
 			usableTriples.addAll(newTriples);
@@ -217,8 +180,7 @@ public class ReasonnerVerticalMTRWLock {
 
 			new_size = tripleStore.size();
 			long step2Time = System.nanoTime();
-			logger.debug((step2Time - stepTime) + "ns for "
-					+ (new_size - old_size) + " triples");
+			logger.debug((step2Time - stepTime) + "ns for " + (new_size - old_size) + " triples");
 			steps++;
 			for (Triple triple : usableTriples.getAll()) {
 				logger.trace(dictionary.printTriple(triple));
@@ -227,30 +189,36 @@ public class ReasonnerVerticalMTRWLock {
 
 		long endTime = System.nanoTime();
 
-		long size = Comparator
-				.compare("jena_" + input, dictionary, tripleStore);
+		System.out.print("Inference Done");
 
-		// System.out.println("Dictionary size: "+dictionary.size());
-		// System.out.println("Initial triples: "+beginNbTriples);
-		// System.out.println("Triples after inference: "+tripleStore.size());
-		System.out.println("Generated triples: "
-				+ (tripleStore.size() - beginNbTriples));
-		// System.out.println("Iterations: "+steps);
-		// System.out.println("Parsing: "+(parsingTime-startTime)/1000000.0+"ns");
-		// System.out.println("Inference: "+(endTime-parsingTime)/1000000.0+"ns");
-		// System.out.println("Total time: "+(endTime-startTime)/1000000.0+"ns");
-		// System.out.print("File writing: ");
-		tripleStore.writeToFile("Inferred"
-				+ (tripleStore.size() - beginNbTriples) + input + ".out",
-				dictionary);
-		// System.out.println("ok");
+		/* Print inferred triples to file */
+		tripleStore.writeToFile("Inferred" + (tripleStore.size() - beginNbTriples) + input + ".out", dictionary);
 
-		// String[] headers =
-		// {"File","Size","i","Initial triples","Infered triples","Loops","Time","Correctness"};
-		String[] datas = { input, "" + i, "" + beginNbTriples,
-				"" + (tripleStore.size() - beginNbTriples), "" + steps,
-				"" + (endTime - parsingTime), "" + size };
-		writer.writeNext(datas);
+		/*
+		 * RESULTS PERSISTANCE
+		 */
+		if (PERSIST_RESULTS) {
+			MongoClient client;
+			try {
+				client = new MongoClient();
+				Morphia morphia = new Morphia();
+				morphia.map(RunEntity.class);
+				Datastore ds = morphia.createDatastore(client, "RunResults");
+
+				HashMap<Integer, List<String>> triple_in_much = Comparator.compare("jena_" + input, dictionary, tripleStore);
+
+				List<String> missing_triples = triple_in_much.get(0);
+				List<String> too_triples = triple_in_much.get(1);
+
+				RunEntity runEntity = new RunEntity(input, SESSION_ID, steps, (endTime - parsingTime), beginNbTriples, (tripleStore.size() - beginNbTriples), missing_triples, too_triples);
+				ds.save(runEntity);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("Saving OK");
 
 	}
 
