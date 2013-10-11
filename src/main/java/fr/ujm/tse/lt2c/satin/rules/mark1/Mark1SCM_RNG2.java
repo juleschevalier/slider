@@ -6,6 +6,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Multimap;
+
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -35,103 +37,120 @@ public class Mark1SCM_RNG2 extends AbstractRule {
 	@Override
 	public void run() {
 
-		try{
+		try {
 
-		/*
-		 * Get concepts codes in dictionnary
-		 */
-		long range = AbstractDictionary.range;
-		long subPropertyOf = AbstractDictionary.subPropertyOf;
+			/*
+			 * Get concepts codes in dictionnary
+			 */
+			long subPropertyOf = AbstractDictionary.subPropertyOf;
+			long range = AbstractDictionary.range;
 
-		Collection<Triple> range_Triples = tripleStore.getbyPredicate(range);
-		Collection<Triple> subPropertyOf_Triples = tripleStore
-				.getbyPredicate(subPropertyOf);
-		Collection<Triple> predicate_Triples;
+			long loops = 0;
 
-		long loops = 0;
+			Collection<Triple> outputTriples = new HashSet<>();
 
-		/*
-		 * Get triples matching input
-		 * Create
-		 */
-		Collection<Triple> outputTriples = new HashSet<>();
+			if (usableTriples.isEmpty()) {
 
-		/*
-		 * If usableTriples is null,
-		 * we infere over the entire triplestore
-		 */
-		if (usableTriples.isEmpty()) {
+				Multimap<Long, Long> rangeMultimap = tripleStore.getMultiMapForPredicate(range);
+				if (rangeMultimap != null && rangeMultimap.size() > 0) {
 
-			for (Triple t1 : range_Triples) {
-				long s1 = t1.getSubject(), o1 = t1.getObject();
+					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
 
-				for (Triple t2 : subPropertyOf_Triples) {
-					long s2 = t2.getSubject(), o2 = t2.getObject();
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c2) of subClassOf triples with
+						 * range
+						 * triples
+						 * objects as subject
+						 */
+						Collection<Long> cs = rangeMultimap.get(triple.getObject());
+						loops++;
+						for (Long c : cs) {
 
-					if (s1 == o2) {
-						Triple result = new TripleImplNaive(s2, range, o1);
-						logTrace(dictionary.printTriple(t1) + " & "
-								+ dictionary.printTriple(t2) + " -> "
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
+							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
+							outputTriples.add(result);
+
+							logTrace(dictionary
+									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
+									+ " -> "
+									+ dictionary.printTriple(result));
+						}
 					}
+				}
+			} else {
+				/* range from usableTriples */
+				Multimap<Long, Long> rangeMultimap = usableTriples.getMultiMapForPredicate(range);
+				if (rangeMultimap != null && rangeMultimap.size() > 0) {
 
+					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
+
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c2) of subClassOf triples with
+						 * range
+						 * triples
+						 * objects as subject
+						 */
+						Collection<Long> cs = rangeMultimap.get(triple.getObject());
+						loops++;
+						for (Long c : cs) {
+
+							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
+							outputTriples.add(result);
+
+							logTrace(dictionary
+									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
+									+ " -> "
+									+ dictionary.printTriple(result));
+						}
+					}
 				}
 
-			}
-		}
-		/*
-		 * If usableTriples is not null,
-		 * we infere over the matching triples
-		 * containing at least one from usableTriples
-		 */
-		else {
+				/* range from tripleStore */
+				rangeMultimap = tripleStore.getMultiMapForPredicate(range);
+				if (rangeMultimap != null && rangeMultimap.size() > 0) {
 
-			for (Triple t1 : usableTriples.getAll()) {
-				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
-						.getObject();
+					Collection<Triple> subpropertyTriples = usableTriples.getbyPredicate(subPropertyOf);
 
-				if (p1 == range)
-					predicate_Triples = subPropertyOf_Triples;
-				else if (p1 == subPropertyOf)
-					predicate_Triples = range_Triples;
-				else
-					continue;
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c2) of subClassOf triples with
+						 * range
+						 * triples
+						 * objects as subject
+						 */
+						Collection<Long> cs = rangeMultimap.get(triple.getObject());
+						loops++;
+						for (Long c : cs) {
 
-				for (Triple t2 : predicate_Triples) {
-					long s2 = t2.getSubject(), p2 = t2.getPredicate(), o2 = t2
-							.getObject();
-					loops++;
+							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
+							outputTriples.add(result);
 
-					if (p1 == range && p2 == subPropertyOf && s1 == o2) {
-						Triple result = new TripleImplNaive(s2, range, o1);
-						logTrace(dictionary.printTriple(t1) + " & "
-								+ dictionary.printTriple(t2) + " -> "
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
+							logTrace(dictionary
+									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
+									+ " -> "
+									+ dictionary.printTriple(result));
+						}
 					}
-					if (p2 == range && p1 == subPropertyOf && s2 == o1) {
-						Triple result = new TripleImplNaive(s1, range, o2);
-						logTrace(dictionary.printTriple(t1) + " & "
-								+ dictionary.printTriple(t2) + " -> "
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
-					}
-
 				}
-
 			}
 
-		}
+			addNewTriples(outputTriples);
 
-		addNewTriples(outputTriples);
+			logDebug(this.getClass() + " : " + loops+ " iterations - outputTriples  " + outputTriples.size());
 
-		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
-
-		
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			finish();
 
 		}

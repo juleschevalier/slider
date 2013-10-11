@@ -6,6 +6,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Multimap;
+
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -14,8 +16,8 @@ import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 /**
- * INPUT c1 rdfs:subClassOf c2 c2 rdfs:subClassOf c1 OUPUT c1
- * owl:equivalentClass c2
+ * INPUT c1 rdfs:subPropertyOf c2 c2 rdfs:subPropertyOf c1 OUPUT c1
+ * owl:equivalentProperty c2
  */
 public class Mark1SCM_EQP2 extends AbstractRule {
 
@@ -31,91 +33,138 @@ public class Mark1SCM_EQP2 extends AbstractRule {
 	@Override
 	public void run() {
 
-		try{
+		try {
 
-		/*
-		 * Get concepts codes in dictionnary
-		 */
-		long subClassOf = AbstractDictionary.subClassOf;
-		long equivalentClass = AbstractDictionary.equivalentClass;
+			/*
+			 * Get concepts codes in dictionnary
+			 */
 
-		long loops = 0;
+			long loops = 0;
 
-		/*
-		 * Get triples matching input Create
-		 */
-		Collection<Triple> outputTriples = new HashSet<>();
+			/*
+			 * Get triples matching input
+			 * Create
+			 */
+			long subPropertyOf = AbstractDictionary.subPropertyOf;
+			long equivalentProperty = AbstractDictionary.equivalentProperty;
 
-		Collection<Triple> subClassOf_Triples = tripleStore
-				.getbyPredicate(subClassOf);
+			Collection<Triple> outputTriples = new HashSet<>();
 
-		/*
-		 * If usableTriples is null, we infere over the entire triplestore
-		 */
-		if (usableTriples.isEmpty()) {
+			/*
+			 * If usableTriples is null,
+			 * we infere over the entire triplestore
+			 */
+			if (usableTriples.isEmpty()) {
 
-			for (Triple t1 : subClassOf_Triples) {
-				long s1 = t1.getSubject(), o1 = t1.getObject();
+				Multimap<Long, Long> subpropertyMultimap = tripleStore.getMultiMapForPredicate(subPropertyOf);
+				if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
 
-				for (Triple t2 : subClassOf_Triples) {
-					long s2 = t2.getSubject(), o2 = t2.getObject();
+					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
 
-					if (s1 != o1 && o1 == s2 && s1 == o2) {
-						Triple result = new TripleImplNaive(s1,
-								equivalentClass, o1);
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c1a) of subPropertyOf triples with
+						 */
+						Collection<Long> c1as = subpropertyMultimap.get(triple.getObject());
+						loops++;
+						for (Long c1a : c1as) {
 
-						logTrace(dictionary.printTriple(t1) + " & "
-								+ dictionary.printTriple(t2) + " -> "
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
+							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+
+								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
+								outputTriples.add(result);
+
+								logTrace(dictionary
+										.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+										+ " & "
+										+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject()))
+										+ " -> "
+										+ dictionary.printTriple(result));
+							}
+						}
 					}
+				}
 
+			}
+			/*
+			 * If usableTriples is not null,
+			 * we infere over the matching triples
+			 * containing at least one from usableTriples
+			 */
+			else {
+
+				/* multimap from triplestore */
+				Multimap<Long, Long> subpropertyMultimap = tripleStore.getMultiMapForPredicate(subPropertyOf);
+				if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
+
+					Collection<Triple> subpropertyTriples = usableTriples.getbyPredicate(subPropertyOf);
+
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c1a) of subPropertyOf triples with
+						 */
+						Collection<Long> c1as = subpropertyMultimap.get(triple.getObject());
+						loops++;
+						for (Long c1a : c1as) {
+
+							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+
+								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
+								outputTriples.add(result);
+
+								logTrace(dictionary
+										.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+										+ " & "
+										+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject()))
+										+ " -> "
+										+ dictionary.printTriple(result));
+							}
+						}
+					}
+				}
+
+				/* multimap from usabletriples */
+				subpropertyMultimap = usableTriples.getMultiMapForPredicate(subPropertyOf);
+				if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
+
+					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
+
+					/* For each type triple */
+					for (Triple triple : subpropertyTriples) {
+						/*
+						 * Get all objects (c1a) of subPropertyOf triples with
+						 */
+						Collection<Long> c1as = subpropertyMultimap.get(triple.getObject());
+						loops++;
+						for (Long c1a : c1as) {
+
+							if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
+
+								Triple result = new TripleImplNaive(triple.getSubject(), equivalentProperty, triple.getObject());
+								outputTriples.add(result);
+
+								logTrace(dictionary
+										.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+										+ " & "
+										+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject()))
+										+ " -> "
+										+ dictionary.printTriple(result));
+							}
+						}
+					}
 				}
 
 			}
 
-		}
-		/*
-		 * If usableTriples is not null, we infere over the matching triples
-		 * containing at least one from usableTriples
-		 */
-		else {
+			addNewTriples(outputTriples);
 
-			for (Triple t1 : usableTriples.getAll()) {
-				long s1 = t1.getSubject(), p1 = t1.getPredicate(), o1 = t1
-						.getObject();
+			logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
 
-				if (p1 != subClassOf)
-					continue;
-
-				for (Triple t2 : subClassOf_Triples) {
-					long s2 = t2.getSubject(), o2 = t2.getObject();
-					loops++;
-
-					if (s1 != o1 && o1 == s2 && s1 == o2) {
-						Triple result = new TripleImplNaive(s1,
-								equivalentClass, o1);
-
-						logTrace(dictionary.printTriple(t1) + " & "
-								+ dictionary.printTriple(t2) + " -> "
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
-					}
-
-				}
-
-			}
-
-		}
-
-		addNewTriples(outputTriples);
-
-		logDebug(this.getClass() + " : " + loops + " iterations  - outputTriples  " + outputTriples.size());
-
-		
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			finish();
 
 		}

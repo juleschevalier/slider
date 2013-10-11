@@ -76,10 +76,10 @@ public class ReasonnerVerticalMTRWLock {
 				System.out.println("wine.rdf 78225 bits");
 				infere("wine.rdf", i, writer);
 				System.out.println();
-
-				System.out.println("geopolitical_200Ko.owl 199105 bits");
-				infere("geopolitical_200Ko.owl", i, writer);
-				System.out.println();
+				//
+				// System.out.println("geopolitical_200Ko.owl 199105 bits");
+				// infere("geopolitical_200Ko.owl", i, writer);
+				// System.out.println();
 				//
 				// System.out.println("geopolitical_300Ko.owl 306377 bits");
 				// infere("geopolitical_300Ko.owl",i,writer);
@@ -150,30 +150,18 @@ public class ReasonnerVerticalMTRWLock {
 
 		/* Initialize rules used for inference on RhoDF */
 
-		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
+		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());

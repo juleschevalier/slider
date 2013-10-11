@@ -51,7 +51,6 @@ public abstract class AbstractDictionary implements Dictionary{
 	public static long domain = 0;
 	public static long range = 0;
 	public static long subClassOf = 0;
-	public static long subProperty = 0;
 	public static long subPropertyOf = 0;
 	public static long type = 0;
 	
