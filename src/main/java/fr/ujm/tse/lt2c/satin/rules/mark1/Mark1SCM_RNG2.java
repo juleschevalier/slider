@@ -39,114 +39,20 @@ public class Mark1SCM_RNG2 extends AbstractRule {
 
 		try {
 
-			/*
-			 * Get concepts codes in dictionnary
-			 */
-			long subPropertyOf = AbstractDictionary.subPropertyOf;
-			long range = AbstractDictionary.range;
-
 			long loops = 0;
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
 			if (usableTriples.isEmpty()) {
-
-				Multimap<Long, Long> rangeMultimap = tripleStore.getMultiMapForPredicate(range);
-				if (rangeMultimap != null && rangeMultimap.size() > 0) {
-
-					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
-
-					/* For each type triple */
-					for (Triple triple : subpropertyTriples) {
-						/*
-						 * Get all objects (c2) of subClassOf triples with
-						 * range
-						 * triples
-						 * objects as subject
-						 */
-						Collection<Long> cs = rangeMultimap.get(triple.getObject());
-						loops++;
-						for (Long c : cs) {
-
-							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
-							outputTriples.add(result);
-
-							logTrace(dictionary
-									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
-									+ " -> "
-									+ dictionary.printTriple(result));
-						}
-					}
-				}
+				loops += process(tripleStore, tripleStore, outputTriples);
 			} else {
-				/* range from usableTriples */
-				Multimap<Long, Long> rangeMultimap = usableTriples.getMultiMapForPredicate(range);
-				if (rangeMultimap != null && rangeMultimap.size() > 0) {
-
-					Collection<Triple> subpropertyTriples = tripleStore.getbyPredicate(subPropertyOf);
-
-					/* For each type triple */
-					for (Triple triple : subpropertyTriples) {
-						/*
-						 * Get all objects (c2) of subClassOf triples with
-						 * range
-						 * triples
-						 * objects as subject
-						 */
-						Collection<Long> cs = rangeMultimap.get(triple.getObject());
-						loops++;
-						for (Long c : cs) {
-
-							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
-							outputTriples.add(result);
-
-							logTrace(dictionary
-									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
-									+ " -> "
-									+ dictionary.printTriple(result));
-						}
-					}
-				}
-
-				/* range from tripleStore */
-				rangeMultimap = tripleStore.getMultiMapForPredicate(range);
-				if (rangeMultimap != null && rangeMultimap.size() > 0) {
-
-					Collection<Triple> subpropertyTriples = usableTriples.getbyPredicate(subPropertyOf);
-
-					/* For each type triple */
-					for (Triple triple : subpropertyTriples) {
-						/*
-						 * Get all objects (c2) of subClassOf triples with
-						 * range
-						 * triples
-						 * objects as subject
-						 */
-						Collection<Long> cs = rangeMultimap.get(triple.getObject());
-						loops++;
-						for (Long c : cs) {
-
-							Triple result = new TripleImplNaive(triple.getSubject(), range, c);
-							outputTriples.add(result);
-
-							logTrace(dictionary
-									.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
-									+ " -> "
-									+ dictionary.printTriple(result));
-						}
-					}
-				}
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
 			}
 
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops+ " iterations - outputTriples  " + outputTriples.size());
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -154,6 +60,47 @@ public class Mark1SCM_RNG2 extends AbstractRule {
 			finish();
 
 		}
+	}
+
+	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+
+		long subPropertyOf = AbstractDictionary.subPropertyOf;
+		long range = AbstractDictionary.range;
+
+		int loops = 0;
+
+		Multimap<Long, Long> rangeMultimap = ts1.getMultiMapForPredicate(range);
+		if (rangeMultimap != null && rangeMultimap.size() > 0) {
+
+			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
+
+			/* For each type triple */
+			for (Triple triple : subpropertyTriples) {
+				/*
+				 * Get all objects (c2) of subClassOf triples with
+				 * range
+				 * triples
+				 * objects as subject
+				 */
+				Collection<Long> cs = rangeMultimap.get(triple.getObject());
+				loops++;
+				for (Long c : cs) {
+
+					Triple result = new TripleImplNaive(triple.getSubject(), range, c);
+					outputTriples.add(result);
+
+					logTrace(dictionary
+							.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
+							+ " & "
+							+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),range, c))
+							+ " -> "
+							+ dictionary.printTriple(result));
+				}
+			}
+		}
+
+		return loops;
+
 	}
 
 	@Override

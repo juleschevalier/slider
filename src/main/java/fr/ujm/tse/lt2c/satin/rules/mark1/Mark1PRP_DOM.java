@@ -35,88 +35,20 @@ public class Mark1PRP_DOM extends AbstractRule {
 
 		try {
 
-			/*
-			 * Get concepts codes needed from dictionnary
-			 */
-			long domain = AbstractDictionary.domain;
-			long type = AbstractDictionary.type;
-
 			long loops = 0;
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
-			/* Use all the triplestore */
 			if (usableTriples.isEmpty()) {
-
-				Multimap<Long, Long> domainMultiMap = tripleStore.getMultiMapForPredicate(domain);
-				if (domainMultiMap == null || domainMultiMap.size() == 0) {
-					finish();
-					return;
-				}
-				for (Long p : domainMultiMap.keySet()) {
-					Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p);
-					for (Triple triple : matchingTriples) {
-						for (Long c : domainMultiMap.get(p)) {
-							Triple result = new TripleImplNaive(triple.getSubject(), type, c);
-							logTrace(dictionary.printTriple(triple)
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(p,domain, c)) 
-									+ " -> " 
-									+ dictionary.printTriple(result));
-							outputTriples.add(result);
-						}
-
-					}
-				}
+				loops += process(tripleStore, tripleStore, outputTriples);
+			} else {
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
 			}
-			/* Use usableTriples */
-			else {
-				// HashMap<Long, Collection<Triple>> cache = new HashMap<>();
-				// Case 1, all p of rdfs:domain in usabletriple
-				Multimap<Long, Long> domainMultiMap = usableTriples.getMultiMapForPredicate(domain);
-				if (domainMultiMap != null && domainMultiMap.size() > 0) {
-					for (Long p : domainMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p);
-						for (Triple triple : matchingTriples) {
-							for (Long c : domainMultiMap.get(p)) {
-								Triple result = new TripleImplNaive(triple.getSubject(), type, c);
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p,domain, c)) 
-										+ " -> " 
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
 
-						}
-					}
-				}
-				// Case 2, all x p y in usable triple
-				// Set up a cache for multimaps
-				domainMultiMap = tripleStore.getMultiMapForPredicate(domain);
-				if (domainMultiMap != null && domainMultiMap.size() > 0) {
-					for (Long p : domainMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = usableTriples.getbyPredicate(p);
-						for (Triple triple : matchingTriples) {
-							for (Long c : domainMultiMap.get(p)) {
-								Triple result = new TripleImplNaive(triple.getSubject(), type, c);
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p,domain, c)) 
-										+ " -> "
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
-
-						}
-					}
-				}
-
-			}
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops + " iterations  - "
-					+ outputTriples.size() + " outputTriples");
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -124,6 +56,36 @@ public class Mark1PRP_DOM extends AbstractRule {
 			finish();
 
 		}
+	}
+
+	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+
+		long domain = AbstractDictionary.domain;
+		long type = AbstractDictionary.type;
+
+		int loops = 0;
+
+		Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
+		if (domainMultiMap != null && domainMultiMap.size() > 0) {
+			for (Long p : domainMultiMap.keySet()) {
+				Collection<Triple> matchingTriples = ts2.getbyPredicate(p);
+				for (Triple triple : matchingTriples) {
+					for (Long c : domainMultiMap.get(p)) {
+						Triple result = new TripleImplNaive(triple.getSubject(), type, c);
+						logTrace(dictionary.printTriple(triple)
+								+ " & "
+								+ dictionary.printTriple(new TripleImplNaive(p,domain, c)) 
+								+ " -> " 
+								+ dictionary.printTriple(result));
+						outputTriples.add(result);
+					}
+
+				}
+			}
+		}
+
+		return loops;
+
 	}
 
 	@Override

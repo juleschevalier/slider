@@ -26,107 +26,67 @@ public class Mark1PRP_RNG extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_RNG.class);
 
-	public Mark1PRP_RNG(Dictionary dictionary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore, CountDownLatch doneSignal) {
+	public Mark1PRP_RNG(Dictionary dictionary, TripleStore usableTriples,Collection<Triple> newTriples, TripleStore tripleStore, CountDownLatch doneSignal) {
 		super(dictionary,tripleStore,usableTriples,newTriples,"PRP_RNG",doneSignal);
 
 	}
-
+	
 	@Override
 	public void run() {
 
-		try{
-
-			/*
-			 * Get concepts codes needed from dictionnary
-			 */
-			long range = AbstractDictionary.range;
-			long type = AbstractDictionary.type;
+		try {
 
 			long loops = 0;
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
-			/* Use all the triplestore */
 			if (usableTriples.isEmpty()) {
-
-				Multimap<Long, Long> rangeMultiMap = tripleStore.getMultiMapForPredicate(range);
-				if (rangeMultiMap == null || rangeMultiMap.size() == 0) {
-					finish();
-					return;
-				}
-				for (Long p : rangeMultiMap.keySet()) {
-					Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p);
-					for (Triple triple : matchingTriples) {
-						for (Long c : rangeMultiMap.get(p)) {
-							Triple result = new TripleImplNaive(triple.getObject(), type, c);
-							logTrace(dictionary.printTriple(triple)
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(p,range, c)) 
-									+ " -> " 
-									+ dictionary.printTriple(result));
-							outputTriples.add(result);
-						}
-
-					}
-				}
+				loops += process(tripleStore, tripleStore, outputTriples);
+			} else {
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
 			}
-			/* Use usableTriples */
-			else {
-				// HashMap<Long, Collection<Triple>> cache = new HashMap<>();
 
-				// Case 1, all rdfs:range in usabletriple
-				Multimap<Long, Long> rangeMultiMap = usableTriples.getMultiMapForPredicate(range);
-				if (rangeMultiMap != null && rangeMultiMap.size() > 0) {
-					for (Long p : rangeMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p);
-						for (Triple triple : matchingTriples) {
-							for (Long c : rangeMultiMap.get(p)) {
-								Triple result = new TripleImplNaive(triple.getObject(), type, c);
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p,range, c)) 
-										+ " -> " 
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
-
-						}
-					}
-				}
-				// Case 2, all x p y in usable triple
-				// Set up a cache for multimaps
-				rangeMultiMap = tripleStore.getMultiMapForPredicate(range);
-				if (rangeMultiMap != null && rangeMultiMap.size() > 0) {
-					for (Long p : rangeMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = usableTriples.getbyPredicate(p);
-						for (Triple triple : matchingTriples) {
-							for (Long c : rangeMultiMap.get(p)) {
-								Triple result = new TripleImplNaive(triple.getObject(), type, c);
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p,range, c)) 
-										+ " -> " 
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
-
-						}
-					}
-				}
-
-			}
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops + " iterations  - "+outputTriples.size()+" outputTriples");
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
 
-
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			finish();
 
 		}
+	}
+
+	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+
+		long range = AbstractDictionary.range;
+		long type = AbstractDictionary.type;
+
+		int loops = 0;
+
+		Multimap<Long, Long> rangeMultiMap = ts1.getMultiMapForPredicate(range);
+		if (rangeMultiMap != null && rangeMultiMap.size() > 0) {
+			for (Long p : rangeMultiMap.keySet()) {
+				Collection<Triple> matchingTriples = ts2.getbyPredicate(p);
+				for (Triple triple : matchingTriples) {
+					for (Long c : rangeMultiMap.get(p)) {
+						Triple result = new TripleImplNaive(triple.getObject(), type, c);
+						logTrace(dictionary.printTriple(triple)
+								+ " & "
+								+ dictionary.printTriple(new TripleImplNaive(p,range, c)) 
+								+ " -> " 
+								+ dictionary.printTriple(result));
+						outputTriples.add(result);
+					}
+
+				}
+			}
+		}
+
+		return loops;
+
 	}
 
 	@Override

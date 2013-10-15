@@ -50,7 +50,7 @@ public class ReasonnerVerticalMTRWLock {
 	private static ExecutorService executor;
 
 	private static boolean PERSIST_RESULTS = true;
-	
+
 	private static int SESSION_ID = UUID.randomUUID().hashCode();
 
 	public static void main(String[] args) {
@@ -59,12 +59,12 @@ public class ReasonnerVerticalMTRWLock {
 
 			for (int i = 0; i < 1; i++) {
 
-				// infere("subclassof.owl");
+				infere("subclassof.owl");
 				infere("sample1.owl");
-				// infere("univ-bench.owl");
-				// infere("sweetAll.owl");
-				// infere("wine.rdf");
-				// infere("geopolitical_200Ko.owl");
+				infere("univ-bench.owl");
+				infere("sweetAll.owl");
+				infere("wine.rdf");
+				infere("geopolitical_200Ko.owl");
 				// infere("geopolitical_300Ko.owl");
 				// infere("geopolitical_500Ko.owl");
 				// infere("geopolitical_1Mo.owl");
@@ -73,8 +73,7 @@ public class ReasonnerVerticalMTRWLock {
 				// infere("opencyc.owl");
 			}
 
-			
-			System.out.println("SESSION ID : "+SESSION_ID);
+			System.out.println("SESSION ID : " + SESSION_ID);
 			shutdownAndAwaitTermination(executor);
 
 		} catch (Exception e) {
@@ -192,7 +191,8 @@ public class ReasonnerVerticalMTRWLock {
 		System.out.print("Inference Done");
 
 		/* Print inferred triples to file */
-		tripleStore.writeToFile("Inferred" + (tripleStore.size() - beginNbTriples) + input + ".out", dictionary);
+		// tripleStore.writeToFile("Inferred" + (tripleStore.size() -
+		// beginNbTriples) + input + ".out", dictionary);
 
 		/*
 		 * RESULTS PERSISTANCE

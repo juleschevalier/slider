@@ -39,122 +39,20 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 
 		try {
 
-			/*
-			 * Get concepts codes in dictionnary
-			 */
-			long domain = AbstractDictionary.domain;
-			long subClassOf = AbstractDictionary.subClassOf;
-
 			long loops = 0;
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
 			if (usableTriples.isEmpty()) {
-
-				Multimap<Long, Long> subclassMultimap = tripleStore.getMultiMapForPredicate(subClassOf);
-				if (subclassMultimap == null || subclassMultimap.size() == 0) {
-					finish();
-					return;
-				}
-
-				Collection<Triple> domainTriples = tripleStore.getbyPredicate(domain);
-
-				/* For each type triple */
-				for (Triple triple : domainTriples) {
-					/*
-					 * Get all objects (c2) of subClassOf triples with domain
-					 * triples
-					 * objects as subject
-					 */
-					Collection<Long> c2s = subclassMultimap.get(triple
-							.getObject());
-					loops++;
-					for (Long c2 : c2s) {
-
-						Triple result = new TripleImplNaive(triple.getSubject(), domain, c2);
-						outputTriples.add(result);
-
-						logTrace(dictionary
-								.printTriple(new TripleImplNaive(triple.getSubject(), domain, triple.getObject()))
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subClassOf, c2))
-								+ " -> "
-								+ dictionary.printTriple(result));
-					}
-				}
+				loops += process(tripleStore, tripleStore, outputTriples);
 			} else {
-				/* subClassOf from usableTriples */
-				Multimap<Long, Long> subclassMultimap = usableTriples
-						.getMultiMapForPredicate(subClassOf);
-				if (subclassMultimap != null && subclassMultimap.size() > 0) {
-
-					Collection<Triple> domainTriples = tripleStore
-							.getbyPredicate(domain);
-
-					/* For each type triple */
-					for (Triple triple : domainTriples) {
-						/*
-						 * Get all objects (c2) of subClassOf triples with
-						 * domain
-						 * triples
-						 * objects as subject
-						 */
-						Collection<Long> c2s = subclassMultimap.get(triple
-								.getObject());
-						loops++;
-						for (Long c2 : c2s) {
-
-							Triple result = new TripleImplNaive(
-									triple.getSubject(), domain, c2);
-							outputTriples.add(result);
-
-							logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), domain, triple.getObject()))
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),subClassOf, c2))
-									+ " -> "
-									+ dictionary.printTriple(result));
-						}
-					}
-				}
-
-				/* subClassOf from tripleStore */
-				subclassMultimap = tripleStore
-						.getMultiMapForPredicate(subClassOf);
-
-				if (subclassMultimap != null && subclassMultimap.size() > 0) {
-
-					Collection<Triple> domainTriples = usableTriples.getbyPredicate(domain);
-
-					/* For each type triple */
-					for (Triple triple : domainTriples) {
-						/*
-						 * Get all objects (c2) of subClassOf triples with
-						 * domain
-						 * triples
-						 * objects as subject
-						 */
-						Collection<Long> c2s = subclassMultimap.get(triple
-								.getObject());
-						loops++;
-						for (Long c2 : c2s) {
-
-							Triple result = new TripleImplNaive(
-									triple.getSubject(), domain, c2);
-							outputTriples.add(result);
-
-							logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), domain, triple.getObject()))
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),subClassOf, c2))
-									+ " -> "
-									+ dictionary.printTriple(result));
-						}
-					}
-				}
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
 			}
 
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops+ " iterations - outputTriples  " + outputTriples.size());
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -162,6 +60,43 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 			finish();
 
 		}
+	}
+
+	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+
+		long domain = AbstractDictionary.domain;
+		long subClassOf = AbstractDictionary.subClassOf;
+
+		int loops = 0;
+
+		Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
+		if (subclassMultimap != null && subclassMultimap.size() > 0) {
+
+			Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
+
+			/* For each type triple */
+			for (Triple triple : domainTriples) {
+				/*
+				 * Get all objects (c2) of subClassOf triples with domain triples objects as subject
+				 */
+				Collection<Long> c2s = subclassMultimap.get(triple.getObject());
+				loops++;
+				for (Long c2 : c2s) {
+
+					Triple result = new TripleImplNaive(triple.getSubject(), domain, c2);
+					outputTriples.add(result);
+
+					logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), domain, triple.getObject()))
+							+ " & "
+							+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subClassOf, c2))
+							+ " -> "
+							+ dictionary.printTriple(result));
+				}
+			}
+		}
+
+		return loops;
+
 	}
 
 	@Override

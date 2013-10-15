@@ -29,100 +29,64 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 				doneSignal);
 
 	}
-
+	
 	@Override
 	public void run() {
 
-		try{
-
-			/*
-			 * Get concepts codes needed from dictionnary
-			 */
-			long subPropertyOf = AbstractDictionary.subPropertyOf;
+		try {
 
 			long loops = 0;
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
-			/* Use all the triplestore */
 			if (usableTriples.isEmpty()) {
-
-				Multimap<Long, Long> subPropertyOfMultiMap = tripleStore.getMultiMapForPredicate(subPropertyOf);
-				if (subPropertyOfMultiMap == null || subPropertyOfMultiMap.size() == 0) {
-					finish();
-					return;
-				}
-				for (Long p1 : subPropertyOfMultiMap.keySet()) {
-					Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p1);
-					for (Triple triple : matchingTriples) {
-						for (Long p2 : subPropertyOfMultiMap.get(p1)) {
-							Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
-							logTrace(dictionary.printTriple(triple)
-									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
-									+ " -> " 
-									+ dictionary.printTriple(result));
-							outputTriples.add(result);
-						}
-
-					}
-				}
+				loops += process(tripleStore, tripleStore, outputTriples);
+			} else {
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
 			}
-			/* Use usableTriples */
-			else {
-				// HashMap<Long, Collection<Triple>> cache = new HashMap<>();
-				// Case 1, all p of rdfs:subPropertyOf in usabletriple
-				Multimap<Long, Long> subPropertyOfMultiMap = usableTriples.getMultiMapForPredicate(subPropertyOf);
-				if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
-					for (Long p1 : subPropertyOfMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = tripleStore.getbyPredicate(p1);
-						for (Triple triple : matchingTriples) {
-							for (Long p2 : subPropertyOfMultiMap.get(p1)) {
-								Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
-										+ " -> " 
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
 
-						}
-					}
-				}
-				// Case 2, all x p y in usable triple
-				// Set up a cache for multimaps
-				subPropertyOfMultiMap = tripleStore.getMultiMapForPredicate(subPropertyOf);
-				if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
-					for (Long p1 : subPropertyOfMultiMap.keySet()) {
-						Collection<Triple> matchingTriples = usableTriples.getbyPredicate(p1);
-						for (Triple triple : matchingTriples) {
-							for (Long p2 : subPropertyOfMultiMap.get(p1)) {
-								Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
-								logTrace(dictionary.printTriple(triple)
-										+ " & "
-										+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
-										+ " -> " 
-										+ dictionary.printTriple(result));
-								outputTriples.add(result);
-							}
-
-						}
-					}
-				}
-
-			}
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops + " iterations  - "+outputTriples.size()+" outputTriples");
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
 
-
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			finish();
+
 		}
 	}
+
+	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+
+		long subPropertyOf = AbstractDictionary.subPropertyOf;
+
+		int loops = 0;
+
+		Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
+		if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
+			for (Long p1 : subPropertyOfMultiMap.keySet()) {
+				Collection<Triple> matchingTriples = ts2.getbyPredicate(p1);
+				for (Triple triple : matchingTriples) {
+					for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+						Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
+						logTrace(dictionary.printTriple(triple)
+								+ " & "
+								+ dictionary.printTriple(new TripleImplNaive(p1,subPropertyOf, p2)) 
+								+ " -> " 
+								+ dictionary.printTriple(result));
+						outputTriples.add(result);
+					}
+
+				}
+			}
+		}
+
+		return loops;
+
+	}
+
 
 	@Override
 	public Logger getLogger() {
