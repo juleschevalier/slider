@@ -17,6 +17,7 @@ public class RunEntity {
 	private String file;
 	private Date date;
 	private String loops;
+	private String nb_duplicates;
 	private String inference_time;
 	private String nb_initial_triples;
 	private String nb_infered_triples;
@@ -28,12 +29,13 @@ public class RunEntity {
 	@Embedded
 	private List<String> too_triples;
 
-	public RunEntity(String file, int session_id, long loops, long inference_time, long nb_initial_triples, long nb_infered_triples, List<String> missing_triples, List<String> too_triples) {
+	public RunEntity(String file, int session_id, long loops, int nb_duplicates, long inference_time, long nb_initial_triples, long nb_infered_triples, List<String> missing_triples, List<String> too_triples) {
 		super();
 		this.setSession_id(session_id);
 		this.file = file;
 		this.date = new Date();
 		this.loops = loops+"";
+		this.nb_duplicates = nb_duplicates+"";
 		this.inference_time = inference_time+"";
 		this.nb_initial_triples = nb_initial_triples+"";
 		this.nb_infered_triples = nb_infered_triples+"";
@@ -138,5 +140,15 @@ public class RunEntity {
 	public void setSession_id(int session_id) {
 		this.session_id = session_id;
 	}
+
+	public String getNb_duplicates() {
+		return nb_duplicates;
+	}
+
+	public void setNb_duplicates(String nb_duplicates) {
+		this.nb_duplicates = nb_duplicates;
+	}
+	
+	
 
 }

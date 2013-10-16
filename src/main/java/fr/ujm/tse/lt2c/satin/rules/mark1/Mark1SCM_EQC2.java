@@ -1,7 +1,6 @@
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -33,35 +32,7 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 
 	}
 
-	@Override
-	public void run() {
-
-		try {
-
-			long loops = 0;
-
-			Collection<Triple> outputTriples = new HashSet<>();
-
-			if (usableTriples.isEmpty()) {
-				loops += process(tripleStore, tripleStore, outputTriples);
-			} else {
-				loops += process(usableTriples, tripleStore, outputTriples);
-				loops += process(tripleStore, usableTriples, outputTriples);
-			}
-
-			addNewTriples(outputTriples);
-
-			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			finish();
-
-		}
-	}
-
-	private int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
 
 		long subClassOf = AbstractDictionary.subClassOf;
 		long equivalentClass = AbstractDictionary.equivalentClass;

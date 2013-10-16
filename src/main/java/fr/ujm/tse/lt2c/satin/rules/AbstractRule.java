@@ -1,12 +1,14 @@
 package fr.ujm.tse.lt2c.satin.rules;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerVerticalMTRWLock;
 
 public abstract class AbstractRule implements Rule {
 
@@ -18,9 +20,7 @@ public abstract class AbstractRule implements Rule {
 	protected CountDownLatch doneSignal;
 	protected boolean finished = false;
 
-	public AbstractRule(Dictionary dictionary, TripleStore tripleStore,
-			TripleStore usableTriples, Collection<Triple> newTriples,
-			String ruleName, CountDownLatch doneSignal) {
+	public AbstractRule(Dictionary dictionary, TripleStore tripleStore, TripleStore usableTriples, Collection<Triple> newTriples, String ruleName, CountDownLatch doneSignal) {
 		this.dictionary = dictionary;
 		this.tripleStore = tripleStore;
 		this.usableTriples = usableTriples;
@@ -29,7 +29,38 @@ public abstract class AbstractRule implements Rule {
 		this.doneSignal = doneSignal;
 	}
 
-	protected void addNewTriples(Collection<Triple> outputTriples) {
+	@Override
+	public void run() {
+
+		try {
+
+			long loops = 0;
+
+			Collection<Triple> outputTriples = new HashSet<>();
+
+			if (usableTriples.isEmpty()) {
+				loops += process(tripleStore, tripleStore, outputTriples);
+			} else {
+				loops += process(usableTriples, tripleStore, outputTriples);
+				loops += process(tripleStore, usableTriples, outputTriples);
+			}
+
+			addNewTriples(outputTriples);
+
+			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			finish();
+
+		}
+	}
+
+	abstract protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
+
+	protected int addNewTriples(Collection<Triple> outputTriples) {
+		int duplicates = 0;
 		// ReasonnerVerticalMTRWLock.cdlWriter.countDown();
 		// try {
 		// ReasonnerVerticalMTRWLock.cdlWriter.await();
@@ -42,10 +73,11 @@ public abstract class AbstractRule implements Rule {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 			} else {
-
+				ReasonnerVerticalMTRWLock.nb_duplicates++;
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
+		return duplicates;
 	}
 
 	protected void logDebug(String message) {

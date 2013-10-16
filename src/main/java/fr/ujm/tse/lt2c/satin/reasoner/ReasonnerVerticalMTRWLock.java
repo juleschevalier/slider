@@ -49,6 +49,8 @@ public class ReasonnerVerticalMTRWLock {
 	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 	private static ExecutorService executor;
 
+	public static int nb_duplicates;
+
 	private static boolean PERSIST_RESULTS = true;
 
 	private static int SESSION_ID = UUID.randomUUID().hashCode();
@@ -93,6 +95,7 @@ public class ReasonnerVerticalMTRWLock {
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 		Dictionary dictionary = new DictionaryRWLock();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
+		nb_duplicates=0;
 
 		ArrayList<AbstractRule> rules = new ArrayList<>();
 		TemporaryVerticalPartioningTripleStoreRWLock usableTriples = new TemporaryVerticalPartioningTripleStoreRWLock();
@@ -210,7 +213,7 @@ public class ReasonnerVerticalMTRWLock {
 				List<String> missing_triples = triple_in_much.get(0);
 				List<String> too_triples = triple_in_much.get(1);
 
-				RunEntity runEntity = new RunEntity(input, SESSION_ID, steps, (endTime - parsingTime), beginNbTriples, (tripleStore.size() - beginNbTriples), missing_triples, too_triples);
+				RunEntity runEntity = new RunEntity(input, SESSION_ID, steps, nb_duplicates, (endTime - parsingTime), beginNbTriples, (tripleStore.size() - beginNbTriples), missing_triples, too_triples);
 				ds.save(runEntity);
 
 			} catch (Exception e) {
