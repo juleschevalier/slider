@@ -20,7 +20,9 @@ public abstract class AbstractRule implements Rule {
 	protected CountDownLatch doneSignal;
 	protected boolean finished = false;
 
-	public AbstractRule(Dictionary dictionary, TripleStore tripleStore, TripleStore usableTriples, Collection<Triple> newTriples, String ruleName, CountDownLatch doneSignal) {
+	public AbstractRule(Dictionary dictionary, TripleStore tripleStore,
+			TripleStore usableTriples, Collection<Triple> newTriples,
+			String ruleName, CountDownLatch doneSignal) {
 		this.dictionary = dictionary;
 		this.tripleStore = tripleStore;
 		this.usableTriples = usableTriples;
@@ -47,7 +49,8 @@ public abstract class AbstractRule implements Rule {
 
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
+			logDebug(this.getClass() + " : " + loops
+					+ " iterations - outputTriples  " + outputTriples.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,7 +60,8 @@ public abstract class AbstractRule implements Rule {
 		}
 	}
 
-	abstract protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
+	abstract protected int process(TripleStore ts1, TripleStore ts2,
+			Collection<Triple> outputTriples);
 
 	protected int addNewTriples(Collection<Triple> outputTriples) {
 		int duplicates = 0;
@@ -73,7 +77,7 @@ public abstract class AbstractRule implements Rule {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 			} else {
-				ReasonnerVerticalMTRWLock.nb_duplicates++;
+				ReasonnerVerticalMTRWLock.nb_duplicates.incrementAndGet();
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
