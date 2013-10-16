@@ -1,6 +1,7 @@
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -43,6 +44,8 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 		Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
 		if (subclassMultimap != null && subclassMultimap.size() > 0) {
 
+			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+
 			Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
 
 			/* For each type triple */
@@ -50,7 +53,15 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 				/*
 				 * Get all objects (c2) of subClassOf triples with domain triples objects as subject
 				 */
-				Collection<Long> c2s = subclassMultimap.get(triple.getObject());
+				
+				Collection<Long> c2s;
+				if(!cachePredicates.containsKey(triple.getObject())){
+					c2s = subclassMultimap.get(triple.getObject());
+					cachePredicates.put(triple.getObject(), c2s);
+				}else{
+					c2s = cachePredicates.get(triple.getObject());
+				}
+				
 				loops++;
 				for (Long c2 : c2s) {
 

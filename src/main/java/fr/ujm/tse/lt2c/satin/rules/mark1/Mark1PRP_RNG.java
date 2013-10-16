@@ -1,6 +1,7 @@
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -39,10 +40,23 @@ public class Mark1PRP_RNG extends AbstractRule {
 
 		Multimap<Long, Long> rangeMultiMap = ts1.getMultiMapForPredicate(range);
 		if (rangeMultiMap != null && rangeMultiMap.size() > 0) {
+
+			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
+			
 			for (Long p : rangeMultiMap.keySet()) {
-				Collection<Triple> matchingTriples = ts2.getbyPredicate(p);
+				
+				Collection<Triple> matchingTriples;
+				if(!cachePredicates.containsKey(p)){
+					matchingTriples = ts2.getbyPredicate(p);
+					cachePredicates.put(p, matchingTriples);
+				}else{
+					matchingTriples = cachePredicates.get(p);
+				}
+				
 				for (Triple triple : matchingTriples) {
+					
 					for (Long c : rangeMultiMap.get(p)) {
+						
 						Triple result = new TripleImplNaive(triple.getObject(), type, c);
 						logTrace(dictionary.printTriple(triple)
 								+ " & "
@@ -51,7 +65,6 @@ public class Mark1PRP_RNG extends AbstractRule {
 								+ dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
-
 				}
 			}
 		}

@@ -59,7 +59,7 @@ public class ReasonnerVerticalMTRWLock {
 
 		try {
 
-			for (int i = 0; i < 1; i++) {
+			for (int i = 0; i < 10; i++) {
 
 				infere("subclassof.owl");
 				infere("sample1.owl");

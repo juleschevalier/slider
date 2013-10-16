@@ -1,6 +1,7 @@
 package fr.ujm.tse.lt2c.satin.rules.mark1;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -40,13 +41,23 @@ public class Mark1SCM_SPO extends AbstractRule {
 		if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
+			
+			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
 			/* For each type triple */
 			for (Triple triple : subpropertyTriples) {
 				/*
 				 * Get all objects (p3) of subPropertyOf triples with
 				 */
-				Collection<Long> p3s = subpropertyMultimap.get(triple.getObject());
+				
+				Collection<Long> p3s;
+				if(!cachePredicates.containsKey(triple.getObject())){
+					p3s = subpropertyMultimap.get(triple.getObject());
+					cachePredicates.put(triple.getObject(), p3s);
+				}else{
+					p3s = cachePredicates.get(triple.getObject());
+				}
+
 				loops++;
 				for (Long p3 : p3s) {
 
