@@ -71,6 +71,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<mainClass>fr.ujm.tse.lt2c.satin.reasoner.ReasonnerVerticalMTRWLock</mainClass>
 					<executable>maven</executable>
 				</configuration>
 			</plugin>

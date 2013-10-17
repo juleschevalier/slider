@@ -8,25 +8,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 
-
 /**
  * @author Jules Chevalier
- *
+ * 
  */
-public class DictionaryRWLock extends AbstractDictionary{
+public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 
-	private HashMap<String,Long> triples= new HashMap<>();
+	private HashMap<String, Long> triples = new HashMap<>();
 	long counter;
-	
+	long primitivesCounter;
+
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 
-	
-	public DictionaryRWLock() {
+	public DictionaryPrimitrivesRWLock() {
 		super();
 		this.triples = new HashMap<>();
 		this.counter = 0;
+		this.primitivesCounter = -1;
 		wedontcare = add("X");
-		//RhoDF
+		// RhoDF
 		domain = add("http://www.w3.org/2000/01/rdf-schema#domain");
 		range = add("http://www.w3.org/2000/01/rdf-schema#range");
 		type = add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -35,7 +35,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 		equivalentClass = add("http://www.w3.org/2002/07/owl#equivalentClass");
 		equivalentProperty = add("http://www.w3.org/2002/07/owl#equivalentProperty");
 		sameAs = add("http://www.w3.org/2002/07/owl#sameAs");
-		
+
 		inverseOf = add("http://www.w3.org/2002/07/owl#inverseOf");
 		propertyDisjointWith = add("");
 		differentFrom = add("");
@@ -76,13 +76,19 @@ public class DictionaryRWLock extends AbstractDictionary{
 	@Override
 	public long add(String s) {
 		rwlock.writeLock().lock();
-		if(this.triples.containsKey(s)){
+		if (this.triples.containsKey(s)) {
 			long id = this.get(s);
 			rwlock.writeLock().unlock();
 			return id;
 		}
-		this.triples.put(s, this.counter);
-		long id = this.counter++;
+		long id;
+		if (s.matches("(\".*\")\\^\\^.*")) {
+			this.triples.put(s, this.primitivesCounter);
+			id = this.primitivesCounter--;
+		} else {
+			this.triples.put(s, this.counter);
+			id = this.counter++;
+		}
 		rwlock.writeLock().unlock();
 		return id;
 	}
@@ -93,7 +99,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 		Iterator<Entry<String, Long>> it = this.triples.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, Long> pairs = (Entry<String, Long>) it.next();
-			if (pairs.getValue().equals(index)){
+			if (pairs.getValue().equals(index)) {
 				String value = pairs.getKey();
 				rwlock.readLock().unlock();
 				return value;
@@ -133,7 +139,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DictionaryRWLock other = (DictionaryRWLock) obj;
+		DictionaryPrimitrivesRWLock other = (DictionaryPrimitrivesRWLock) obj;
 		if (counter != other.counter)
 			return false;
 		if (triples == null) {
@@ -143,47 +149,41 @@ public class DictionaryRWLock extends AbstractDictionary{
 			return false;
 		return true;
 	}
-	
-	@Override
-	public String printTriple(Triple t){
-		rwlock.readLock().lock();
-		String s = printConcept(this.get(t.getSubject())),
-			   p = printConcept(this.get(t.getPredicate())),
-			   o = printConcept(this.get(t.getObject()));
-		
-//		s=s.replaceAll("(\".*\")\\^\\^.*", "$1");
-//		p=p.replaceAll("(\".*\")\\^\\^.*", "$1");
-//		o=o.replaceAll("(\".*\")\\^\\^.*", "$1");
-//		
-//		if(s.split("#").length>1)
-//			s=s.split("#")[1];
-//		if(p.split("#").length>1)
-//			p=p.split("#")[1];
-//		if(o.split("#").length>1)
-//			o=o.split("#")[1];
-//		
-//		s=s.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-//		p=p.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-//		o=o.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
 
-		
+	@Override
+	public String printTriple(Triple t) {
+		rwlock.readLock().lock();
+		String s = printConcept(this.get(t.getSubject())), p = printConcept(this.get(t.getPredicate())), o = printConcept(this.get(t.getObject()));
+
+		// s=s.replaceAll("(\".*\")\\^\\^.*", "$1");
+		// p=p.replaceAll("(\".*\")\\^\\^.*", "$1");
+		// o=o.replaceAll("(\".*\")\\^\\^.*", "$1");
+		//
+		// if(s.split("#").length>1)
+		// s=s.split("#")[1];
+		// if(p.split("#").length>1)
+		// p=p.split("#")[1];
+		// if(o.split("#").length>1)
+		// o=o.split("#")[1];
+		//
+		// s=s.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+		// p=p.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+		// o=o.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+
 		rwlock.readLock().unlock();
-		
-		return s+" "+p+" "+o;
+
+		return s + " " + p + " " + o;
 	}
-	
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		rwlock.readLock().lock();
 		for (String s : triples.keySet()) {
-			sb.append(s+" ==> "+printConcept(s)+"\n");
+			sb.append(s + " ==> " + printConcept(s) + "\n");
 		}
 		rwlock.readLock().unlock();
 		return sb.toString();
 	}
-	
-	
 
 }

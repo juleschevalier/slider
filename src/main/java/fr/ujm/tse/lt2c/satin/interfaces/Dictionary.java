@@ -19,6 +19,8 @@ public interface Dictionary {
 
 	public abstract boolean equals(Object obj);
 	
+	public String printConcept(String c);
+	
 	public String printTriple(Triple t);
 	
 }

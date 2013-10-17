@@ -39,30 +39,32 @@ public class Mark1PRP_DOM extends AbstractRule {
 
 		Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
 		if (domainMultiMap != null && domainMultiMap.size() > 0) {
-			
+
 			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
-			
+
 			for (Long p : domainMultiMap.keySet()) {
-				
+
 				Collection<Triple> matchingTriples;
-				if(!cachePredicates.containsKey(p)){
+				if (!cachePredicates.containsKey(p)) {
 					matchingTriples = ts2.getbyPredicate(p);
 					cachePredicates.put(p, matchingTriples);
-				}else{
+				} else {
 					matchingTriples = cachePredicates.get(p);
 				}
 
 				for (Triple triple : matchingTriples) {
-					
+
 					for (Long c : domainMultiMap.get(p)) {
-						
-						Triple result = new TripleImplNaive(triple.getSubject(), type, c);
-						logTrace(dictionary.printTriple(triple)
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(p,domain, c)) 
-								+ " -> " 
-								+ dictionary.printTriple(result));
-						outputTriples.add(result);
+
+						if (triple.getSubject() >= 0) {
+							Triple result = new TripleImplNaive(triple.getSubject(), type, c);
+							logTrace(dictionary.printTriple(triple)
+									+ " & "
+									+ dictionary.printTriple(new TripleImplNaive(p, domain, c))
+									+ " -> "
+									+ dictionary.printTriple(result));
+							outputTriples.add(result);
+						}
 					}
 				}
 			}

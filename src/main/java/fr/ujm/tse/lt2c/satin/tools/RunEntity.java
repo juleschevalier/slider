@@ -148,6 +148,39 @@ public class RunEntity {
 	public void setNb_duplicates(String nb_duplicates) {
 		this.nb_duplicates = nb_duplicates;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RunEntity [id=");
+		builder.append(id);
+		builder.append(", session_id=");
+		builder.append(session_id);
+		builder.append(", file=");
+		builder.append(file);
+		builder.append(", date=");
+		builder.append(date);
+		builder.append(", loops=");
+		builder.append(loops);
+		builder.append(", nb_duplicates=");
+		builder.append(nb_duplicates);
+		builder.append(", inference_time=");
+		builder.append(inference_time);
+		builder.append(", nb_initial_triples=");
+		builder.append(nb_initial_triples);
+		builder.append(", nb_infered_triples=");
+		builder.append(nb_infered_triples);
+		builder.append(", nb_missing_triples=");
+		builder.append(nb_missing_triples);
+		builder.append(", nb_too_triples=");
+		builder.append(nb_too_triples);
+		builder.append(", missing_triples=");
+		builder.append(missing_triples);
+		builder.append(", too_triples=");
+		builder.append(too_triples);
+		builder.append("]");
+		return builder.toString();
+	}
 	
 	
 

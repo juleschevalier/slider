@@ -19,7 +19,7 @@ import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
 
-import fr.ujm.tse.lt2c.satin.dictionary.DictionaryRWLock;
+import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Rule;
@@ -47,8 +47,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 public class ReasonnerVerticalMTRWLock {
 
 	public static CountDownLatch cdlWriter;
-	private static Logger logger = Logger
-			.getLogger(ReasonnerVerticalMTRWLock.class);
+	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 	private static ExecutorService executor;
 
 	public static AtomicInteger nb_duplicates;
@@ -61,7 +60,7 @@ public class ReasonnerVerticalMTRWLock {
 
 		try {
 
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 1; i++) {
 
 				infere("subclassof.owl");
 				infere("sample1.owl");
@@ -71,9 +70,9 @@ public class ReasonnerVerticalMTRWLock {
 				infere("geopolitical_200Ko.owl");
 				infere("geopolitical_300Ko.owl");
 				infere("geopolitical_500Ko.owl");
-				infere("geopolitical_1Mo.owl");
+				// infere("geopolitical_1Mo.owl");
 				// infere("geopolitical.owl");
-				// / infere("efo.owl");
+				// infere("efo.owl");
 				// infere("opencyc.owl");
 			}
 
@@ -95,17 +94,17 @@ public class ReasonnerVerticalMTRWLock {
 
 		/* Initialise Structures */
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-		Dictionary dictionary = new DictionaryRWLock();
+		Dictionary dictionary = new DictionaryPrimitrivesRWLock();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
 		nb_duplicates = new AtomicInteger();
 
 		ArrayList<AbstractRule> rules = new ArrayList<>();
 		TemporaryVerticalPartioningTripleStoreRWLock usableTriples = new TemporaryVerticalPartioningTripleStoreRWLock();
-		Set<Triple> newTriples = Collections
-				.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
+		Set<Triple> newTriples = Collections.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
 
 		/* File parsing */
 		parser.parse(input);
+//		System.out.println(dictionary);
 
 		long beginNbTriples = tripleStore.size();
 
@@ -113,30 +112,18 @@ public class ReasonnerVerticalMTRWLock {
 
 		CountDownLatch doneSignal = null;
 
-		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples,
-				tripleStore, doneSignal));
+		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
@@ -157,8 +144,7 @@ public class ReasonnerVerticalMTRWLock {
 
 			old_size = tripleStore.size();
 			long stepTime = System.nanoTime();
-			logger.debug("--------------------STEP " + steps
-					+ "--------------------");
+			logger.debug("--------------------STEP " + steps + "--------------------");
 
 			for (Rule rule : rules) {
 				executor.submit(rule);
@@ -198,8 +184,7 @@ public class ReasonnerVerticalMTRWLock {
 
 			new_size = tripleStore.size();
 			long step2Time = System.nanoTime();
-			logger.debug((step2Time - stepTime) + "ns for "
-					+ (new_size - old_size) + " triples");
+			logger.debug((step2Time - stepTime) + "ns for " + (new_size - old_size) + " triples");
 			steps++;
 			for (Triple triple : usableTriples.getAll()) {
 				logger.trace(dictionary.printTriple(triple));
@@ -208,7 +193,7 @@ public class ReasonnerVerticalMTRWLock {
 
 		long endTime = System.nanoTime();
 
-		System.out.print("Inference Done");
+		System.out.println("Inference Done");
 
 		/* Print inferred triples to file */
 		// tripleStore.writeToFile("Inferred" + (tripleStore.size() -
@@ -225,24 +210,18 @@ public class ReasonnerVerticalMTRWLock {
 				morphia.map(RunEntity.class);
 				Datastore ds = morphia.createDatastore(client, "RunResults");
 
-				HashMap<Integer, List<String>> triple_in_much = Comparator
-						.compare("jena_" + input, dictionary, tripleStore);
+				HashMap<Integer, List<String>> triple_in_much = Comparator.compare("jena_" + input, dictionary, tripleStore);
 
 				List<String> missing_triples = triple_in_much.get(0);
 				List<String> too_triples = triple_in_much.get(1);
 
-				RunEntity runEntity = new RunEntity(input, SESSION_ID, steps,
-						nb_duplicates.get(), (endTime - parsingTime),
-						beginNbTriples, (tripleStore.size() - beginNbTriples),
-						missing_triples, too_triples);
+				RunEntity runEntity = new RunEntity(input, SESSION_ID, steps, nb_duplicates.get(), (endTime - parsingTime), beginNbTriples, (tripleStore.size() - beginNbTriples), missing_triples, too_triples);
 				ds.save(runEntity);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
-		System.out.println("Saving OK");
 
 	}
 
