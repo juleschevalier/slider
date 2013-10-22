@@ -34,6 +34,8 @@ public abstract class AbstractRule implements Rule {
 	@Override
 	public void run() {
 
+		ReasonnerVerticalMTRWLock.statsd.incrementCounter("concurent_treads");
+		
 		try {
 
 			long loops = 0;
@@ -56,7 +58,7 @@ public abstract class AbstractRule implements Rule {
 			e.printStackTrace();
 		} finally {
 			finish();
-
+			ReasonnerVerticalMTRWLock.statsd.decrementCounter("concurent_treads");
 		}
 	}
 
@@ -78,6 +80,7 @@ public abstract class AbstractRule implements Rule {
 				newTriples.add(triple);
 			} else {
 				ReasonnerVerticalMTRWLock.nb_duplicates.incrementAndGet();
+				ReasonnerVerticalMTRWLock.statsd.incrementCounter("nb_duplicates");
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}

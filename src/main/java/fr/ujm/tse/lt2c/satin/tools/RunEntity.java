@@ -29,6 +29,10 @@ public class RunEntity {
 	@Embedded
 	private List<String> too_triples;
 
+	public RunEntity(){
+	    super();
+	}
+
 	public RunEntity(String file, int session_id, long loops, int nb_duplicates, long inference_time, long nb_initial_triples, long nb_infered_triples, List<String> missing_triples, List<String> too_triples) {
 		super();
 		this.setSession_id(session_id);

@@ -18,6 +18,8 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
 
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -49,6 +51,7 @@ public class ReasonnerVerticalMTRWLock {
 	public static CountDownLatch cdlWriter;
 	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 	private static ExecutorService executor;
+	public static final StatsDClient statsd = new NonBlockingStatsDClient("reasoner", "10.20.0.28", 8125);
 
 	public static AtomicInteger nb_duplicates;
 
@@ -67,9 +70,9 @@ public class ReasonnerVerticalMTRWLock {
 				infere("univ-bench.owl");
 				infere("sweetAll.owl");
 				infere("wine.rdf");
-				infere("geopolitical_200Ko.owl");
-				infere("geopolitical_300Ko.owl");
-				infere("geopolitical_500Ko.owl");
+				// infere("geopolitical_200Ko.owl");
+				// infere("geopolitical_300Ko.owl");
+				// infere("geopolitical_500Ko.owl");
 				// infere("geopolitical_1Mo.owl");
 				// infere("geopolitical.owl");
 				// infere("efo.owl");
@@ -104,7 +107,7 @@ public class ReasonnerVerticalMTRWLock {
 
 		/* File parsing */
 		parser.parse(input);
-//		System.out.println(dictionary);
+		// System.out.println(dictionary);
 
 		long beginNbTriples = tripleStore.size();
 
