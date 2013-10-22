@@ -6,6 +6,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>TripleDico</name>
 
+	<repositories>
+		<repository>
+			<id>Spark repository</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
@@ -52,7 +59,7 @@
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
-			<version>1.1</version>
+			<version>0.9.9.7-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
