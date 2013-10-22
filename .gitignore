@@ -6,6 +6,7 @@ target/
 *.out
 *.csv
 *.log
+catalog-v*.xml
 # OS Files #
 .DS_Store
 *.class
