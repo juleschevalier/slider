@@ -65,7 +65,7 @@ public abstract class AbstractDictionary implements Dictionary{
 			c=c.split("#")[1];
 
 		/*Replace all blanknodes by BLANKNODE*/
-		c=c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+		c=c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-?[0-9a-z]+", "BLANKNODE");
 		
 		return c;
 	}
