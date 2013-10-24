@@ -31,7 +31,7 @@ public class TripleBufferLock implements TripleBuffer{
 		rwlock1.writeLock().lock();
 		try {
 			this.buffer1.add(triple);
-			if(this.buffer1.size()>=BUFFER_SIZE){
+			if(this.buffer1.size()>=BUFFER_SIZE && this.buffer2.isEmpty()){
 				Collection<Triple> temp = buffer1;
 				buffer1=buffer2;
 				buffer2=temp;

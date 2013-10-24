@@ -62,8 +62,7 @@ public abstract class AbstractRule implements Rule {
 		}
 	}
 
-	abstract protected int process(TripleStore ts1, TripleStore ts2,
-			Collection<Triple> outputTriples);
+	abstract protected int process(TripleStore ts1, TripleStore ts2,Collection<Triple> outputTriples);
 
 	protected int addNewTriples(Collection<Triple> outputTriples) {
 		int duplicates = 0;
