@@ -6,23 +6,24 @@ import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 
 public class TestBuffer {
 
 	public static void main(String[] args) {
 
-		TripleBuffer buffer = new TripleBufferLock();
+		TripleBuffer tripleBuffer = new TripleBufferLock();
 		ArrayList<Triple> triples = new ArrayList<>();
 
-		BF bf = (new TestBuffer()).new BF(buffer);
+		BF bf = (new TestBuffer()).new BF(tripleBuffer);
 
-		buffer.addBufferListener(bf);
+		tripleBuffer.addBufferListener(bf);
 
 		for (int i = 0; i < 1000; i++) {
 			Random rnd = new Random();
 			Triple t = new TripleImplNaive(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
-			buffer.add(t);
+			tripleBuffer.add(t);
 			triples.add(t);
 		}
 		try {
@@ -65,10 +66,10 @@ public class TestBuffer {
 		}
 
 		private void count() {
-			Collection<Triple> triples = this.tb.clear();
+			TripleStore triples = this.tb.clear();
 
 			long sum = 0;
-			for (Triple triple : triples) {
+			for (Triple triple : triples.getAll()) {
 				sum += triple.getSubject();
 				sum += triple.getPredicate();
 				sum += triple.getObject();

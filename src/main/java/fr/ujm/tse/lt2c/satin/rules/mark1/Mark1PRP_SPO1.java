@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -21,12 +23,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 public class Mark1PRP_SPO1 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1PRP_SPO1.class);
+	public static long[] matchers = {};
 
-	public Mark1PRP_SPO1(Dictionary dictionary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore,
-			CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, usableTriples, newTriples, "PRP_SPO1",
-				doneSignal);
+	public Mark1PRP_SPO1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "PRP_SPO1", doneSignal, distributor, tripleBuffer);
 
 	}
 
@@ -56,11 +56,7 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 					for (Long p2 : subPropertyOfMultiMap.get(p1)) {
 
 						Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
-						logTrace(dictionary.printTriple(triple)
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(p1, subPropertyOf, p2))
-								+ " -> "
-								+ dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new TripleImplNaive(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 

@@ -18,8 +18,6 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
-import com.timgroup.statsd.NonBlockingStatsDClient;
-import com.timgroup.statsd.StatsDClient;
 
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -51,7 +49,6 @@ public class ReasonnerVerticalMTRWLock {
 	public static CountDownLatch cdlWriter;
 	private static Logger logger = Logger.getLogger(ReasonnerVerticalMTRWLock.class);
 	private static ExecutorService executor;
-	public static final StatsDClient statsd = new NonBlockingStatsDClient("reasoner", "10.20.0.28", 8125);
 
 	public static AtomicInteger nb_duplicates;
 
@@ -115,18 +112,18 @@ public class ReasonnerVerticalMTRWLock {
 
 		CountDownLatch doneSignal = null;
 
-		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
-		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1CAX_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1PRP_DOM(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1PRP_RNG(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1PRP_SPO1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_SCO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_EQC2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_SPO(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_EQP2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_DOM1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_DOM2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_RNG1(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
+//		rules.add(new Mark1SCM_RNG2(dictionary, usableTriples, newTriples, tripleStore, doneSignal));
 
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());

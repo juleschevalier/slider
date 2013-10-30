@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -24,12 +26,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 public class Mark1SCM_EQC2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_EQC2.class);
+	public static long[] matchers = {AbstractDictionary.subClassOf};
 
-	public Mark1SCM_EQC2(Dictionary dictionary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore,
-			CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_EQC2",
-				doneSignal);
+	public Mark1SCM_EQC2(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "SCM_EQC2", doneSignal, distributor, tripleBuffer);
 
 	}
 
@@ -44,7 +44,7 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 		if (subclassMultimap != null && subclassMultimap.size() > 0) {
 
 			Collection<Triple> subclassTriples = ts2.getbyPredicate(subClassOf);
-			
+
 			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
 			/* For each type triple */
@@ -52,15 +52,15 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 				/*
 				 * Get all objects (c1a) of subClassOf triples with
 				 */
-				
+
 				Collection<Long> c1as;
-				if(!cachePredicates.containsKey(triple.getObject())){
+				if (!cachePredicates.containsKey(triple.getObject())) {
 					c1as = subclassMultimap.get(triple.getObject());
 					cachePredicates.put(triple.getObject(), c1as);
-				}else{
+				} else {
 					c1as = cachePredicates.get(triple.getObject());
 				}
-				
+
 				loops++;
 				for (Long c1a : c1as) {
 
@@ -69,12 +69,7 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 						Triple result = new TripleImplNaive(triple.getSubject(), equivalentClass, triple.getObject());
 						outputTriples.add(result);
 
-						logTrace(dictionary
-								.printTriple(new TripleImplNaive(triple.getSubject(), subClassOf, triple.getObject()))
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subClassOf, triple.getSubject()))
-								+ " -> "
-								+ dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}

@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -25,13 +27,11 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 public class Mark1SCM_DOM2 extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_DOM2.class);
+	public static long[] matchers = {AbstractDictionary.domain,AbstractDictionary.subPropertyOf};
 
-	public Mark1SCM_DOM2(Dictionary dictionary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore,
-			CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_DOM2",
-				doneSignal);
-		
+	public Mark1SCM_DOM2(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "SCM_DOM2", doneSignal, distributor, tripleBuffer);
+
 	}
 
 	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
@@ -45,35 +45,31 @@ public class Mark1SCM_DOM2 extends AbstractRule {
 		if (domainMultimap != null && domainMultimap.size() > 0) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
-			
+
 			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
 			/* For each type triple */
 			for (Triple triple : subpropertyTriples) {
 				/*
-				 * Get all objects (c2) of subClassOf triples with domain triples objects as subject
+				 * Get all objects (c2) of subClassOf triples with domain
+				 * triples objects as subject
 				 */
-				
+
 				Collection<Long> cs;
-				if(!cachePredicates.containsKey(triple.getObject())){
+				if (!cachePredicates.containsKey(triple.getObject())) {
 					cs = domainMultimap.get(triple.getObject());
 					cachePredicates.put(triple.getObject(), cs);
-				}else{
+				} else {
 					cs = cachePredicates.get(triple.getObject());
 				}
-				
+
 				loops++;
 				for (Long c : cs) {
 
 					Triple result = new TripleImplNaive(triple.getSubject(), domain, c);
 					outputTriples.add(result);
 
-					logTrace(dictionary
-							.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
-							+ " & "
-							+ dictionary.printTriple(new TripleImplNaive(triple.getObject(),domain, c))
-							+ " -> "
-							+ dictionary.printTriple(result));
+					logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), domain, c)) + " -> " + dictionary.printTriple(result));
 				}
 			}
 		}

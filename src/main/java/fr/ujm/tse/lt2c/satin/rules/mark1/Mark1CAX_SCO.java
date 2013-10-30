@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -25,9 +27,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 public class Mark1CAX_SCO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1CAX_SCO.class);
+	public static long[] matchers = {AbstractDictionary.subClassOf,AbstractDictionary.type};
 
-	public Mark1CAX_SCO(Dictionary dictionary, TripleStore usableTriples, Collection<Triple> newTriples, TripleStore tripleStore, CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, usableTriples, newTriples, "CAX_SCO", doneSignal);
+	public Mark1CAX_SCO(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "CAX_SCO", doneSignal, distributor, tripleBuffer);
 
 	}
 
@@ -60,11 +63,7 @@ public class Mark1CAX_SCO extends AbstractRule {
 					if (type_triple.getSubject() >= 0) {
 						Triple result = new TripleImplNaive(type_triple.getSubject(), type, c2);
 						outputTriples.add(result);
-						logTrace(dictionary.printTriple(new TripleImplNaive(type_triple.getSubject(), type, type_triple.getObject()))
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(type_triple.getObject(), subClassOf, c2))
-								+ " -> "
-								+ dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new TripleImplNaive(type_triple.getSubject(), type, type_triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(type_triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}

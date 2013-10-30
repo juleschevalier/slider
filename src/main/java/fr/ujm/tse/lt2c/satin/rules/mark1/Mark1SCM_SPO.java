@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
@@ -22,12 +24,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
 public class Mark1SCM_SPO extends AbstractRule {
 
 	private static Logger logger = Logger.getLogger(Mark1SCM_SPO.class);
+	public static long[] matchers = {AbstractDictionary.subPropertyOf};
 
-	public Mark1SCM_SPO(Dictionary dictionary, TripleStore usableTriples,
-			Collection<Triple> newTriples, TripleStore tripleStore,
-			CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, usableTriples, newTriples, "SCM_SPO",
-				doneSignal);
+	public Mark1SCM_SPO(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "SCM_SPO", doneSignal, distributor, tripleBuffer);
 
 	}
 
@@ -41,7 +41,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 		if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
-			
+
 			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
 			/* For each type triple */
@@ -49,12 +49,12 @@ public class Mark1SCM_SPO extends AbstractRule {
 				/*
 				 * Get all objects (p3) of subPropertyOf triples with
 				 */
-				
+
 				Collection<Long> p3s;
-				if(!cachePredicates.containsKey(triple.getObject())){
+				if (!cachePredicates.containsKey(triple.getObject())) {
 					p3s = subpropertyMultimap.get(triple.getObject());
 					cachePredicates.put(triple.getObject(), p3s);
-				}else{
+				} else {
 					p3s = cachePredicates.get(triple.getObject());
 				}
 
@@ -66,12 +66,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 						Triple result = new TripleImplNaive(triple.getSubject(), subPropertyOf, p3);
 						outputTriples.add(result);
 
-						logTrace(dictionary
-								.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject()))
-								+ " & "
-								+ dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject()))
-								+ " -> "
-								+ dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}
@@ -80,7 +75,7 @@ public class Mark1SCM_SPO extends AbstractRule {
 		return loops;
 
 	}
-	
+
 	@Override
 	public Logger getLogger() {
 		return logger;
