@@ -5,37 +5,30 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 
 
 /**
- * Naive implementation of triple
+ * Immutable implementation of triple
  * 
  * @author Jules Chevalier
  *
  */
-public class TripleImplNaive implements Triple {
+public final class ImmutableTriple implements Triple {
 
-	long subject;
-	long predicate;
-	long object;
-	public TripleImplNaive(long subject, long predicate, long object) {
+	private final long subject;
+	private final long predicate;
+	private final long object;
+	
+	public ImmutableTriple(long subject, long predicate, long object) {
 		super();
 		this.subject = subject;
 		this.predicate = predicate;
 		this.object = object;
 	}
-	public TripleImplNaive() {
-	}
+
 	/* (non-Javadoc)
 	 * @see fr.ujm.tse.lt2c.satin.Triple#getSubject()
 	 */
 	@Override
 	public long getSubject() {
 		return subject;
-	}
-	/* (non-Javadoc)
-	 * @see fr.ujm.tse.lt2c.satin.Triple#setSubject(long)
-	 */
-	@Override
-	public void setSubject(long subject) {
-		this.subject = subject;
 	}
 	/* (non-Javadoc)
 	 * @see fr.ujm.tse.lt2c.satin.Triple#getPredicate()
@@ -45,25 +38,11 @@ public class TripleImplNaive implements Triple {
 		return predicate;
 	}
 	/* (non-Javadoc)
-	 * @see fr.ujm.tse.lt2c.satin.Triple#setPredicate(long)
-	 */
-	@Override
-	public void setPredicate(long predicate) {
-		this.predicate = predicate;
-	}
-	/* (non-Javadoc)
 	 * @see fr.ujm.tse.lt2c.satin.Triple#getObject()
 	 */
 	@Override
 	public long getObject() {
 		return object;
-	}
-	/* (non-Javadoc)
-	 * @see fr.ujm.tse.lt2c.satin.Triple#setObject(long)
-	 */
-	@Override
-	public void setObject(long object) {
-		this.object = object;
 	}
 	/* (non-Javadoc)
 	 * @see fr.ujm.tse.lt2c.satin.Triple#hashCode()
@@ -78,7 +57,7 @@ public class TripleImplNaive implements Triple {
 		return result;
 	}
 	/* (non-Javadoc)
-	 * @see fr.ujm.tse.lt2c.satin.Triple#equals(java.lang.Object)
+	 * @see fr.ujm.tse.lt2c.satin.Triple#equals(Object obj)
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -88,7 +67,7 @@ public class TripleImplNaive implements Triple {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TripleImplNaive other = (TripleImplNaive) obj;
+		ImmutableTriple other = (ImmutableTriple) obj;
 		if (object != other.object)
 			return false;
 		if (predicate != other.predicate)
@@ -101,7 +80,6 @@ public class TripleImplNaive implements Triple {
 	public String toString() {
 		return "TripleImplNaive [subject=" + subject + ", predicate="
 				+ predicate + ", object=" + object + "]";
-	}
-	
+	}	
 	
 }

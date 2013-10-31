@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT
@@ -61,9 +61,9 @@ public class Mark1CAX_SCO extends AbstractRule {
 				for (Long c2 : c2s) {
 
 					if (type_triple.getSubject() >= 0) {
-						Triple result = new TripleImplNaive(type_triple.getSubject(), type, c2);
+						Triple result = new ImmutableTriple(type_triple.getSubject(), type, c2);
 						outputTriples.add(result);
-						logTrace(dictionary.printTriple(new TripleImplNaive(type_triple.getSubject(), type, type_triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(type_triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new ImmutableTriple(type_triple.getSubject(), type, type_triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(type_triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}

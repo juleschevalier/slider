@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TestVerticalTripleStore {
@@ -14,7 +14,7 @@ public class TestVerticalTripleStore {
 	@Test
 	public void testAdd() {
 		long s = 1l, p = 2l, o = 3l;
-		Triple t1 = new TripleImplNaive(s, p, o);
+		Triple t1 = new ImmutableTriple(s, p, o);
 		TripleStore ts = new VerticalPartioningTripleStoreRWLock();
 
 		ts.add(t1);
@@ -28,8 +28,8 @@ public class TestVerticalTripleStore {
 	public void testGet() {
 		long s1 = 1l, p1 = 2l, o1 = 3l;
 		long s2 = 4l, p2 = 5l, o2 = 6l;
-		Triple t1 = new TripleImplNaive(s1, p1, o1);
-		Triple t2 = new TripleImplNaive(s2, p2, o2);
+		Triple t1 = new ImmutableTriple(s1, p1, o1);
+		Triple t2 = new ImmutableTriple(s2, p2, o2);
 		TripleStore ts = new VerticalPartioningTripleStoreRWLock();
 
 		ts.add(t1);
@@ -59,7 +59,7 @@ public class TestVerticalTripleStore {
 	public void testUnicity() {
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 
-		Triple t = new TripleImplNaive(1l, 2l, 3l);
+		Triple t = new ImmutableTriple(1l, 2l, 3l);
 
 		tripleStore.add(t);
 		tripleStore.add(t);

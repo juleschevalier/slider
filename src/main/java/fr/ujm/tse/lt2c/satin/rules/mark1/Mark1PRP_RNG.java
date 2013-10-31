@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT
@@ -61,10 +61,10 @@ public class Mark1PRP_RNG extends AbstractRule {
 					for (Long c : rangeMultiMap.get(p)) {
 
 						if (triple.getObject() >= 0) {
-							Triple result = new TripleImplNaive(triple.getObject(), type, c);
+							Triple result = new ImmutableTriple(triple.getObject(), type, c);
 							logTrace(dictionary.printTriple(triple)
 									+ " & "
-									+ dictionary.printTriple(new TripleImplNaive(p, range, c))
+									+ dictionary.printTriple(new ImmutableTriple(p, range, c))
 									+ " -> "
 									+ dictionary.printTriple(result));
 							outputTriples.add(result);

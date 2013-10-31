@@ -7,7 +7,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class TestBuffer {
 
@@ -22,7 +22,7 @@ public class TestBuffer {
 
 		for (int i = 0; i < 1000; i++) {
 			Random rnd = new Random();
-			Triple t = new TripleImplNaive(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
+			Triple t = new ImmutableTriple(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
 			tripleBuffer.add(t);
 			triples.add(t);
 		}

@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT p rdfs:domain c x p y OUPUT x rdf:type c
@@ -57,8 +57,8 @@ public class Mark1PRP_DOM extends AbstractRule {
 					for (Long c : domainMultiMap.get(p)) {
 
 						if (triple.getSubject() >= 0) {
-							Triple result = new TripleImplNaive(triple.getSubject(), type, c);
-							logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new TripleImplNaive(p, domain, c)) + " -> " + dictionary.printTriple(result));
+							Triple result = new ImmutableTriple(triple.getSubject(), type, c);
+							logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
 							outputTriples.add(result);
 						}
 					}

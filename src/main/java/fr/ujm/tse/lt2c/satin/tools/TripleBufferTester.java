@@ -12,7 +12,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class TripleBufferTester implements BufferListener {
 
@@ -102,7 +102,7 @@ public class TripleBufferTester implements BufferListener {
 		Collection<Triple> triples = new ArrayList<>();
 
 		for (int i = 0; i < 864; i++) {
-			Triple t = new TripleImplNaive(random.nextInt(100), random.nextInt(100), random.nextInt(100));
+			Triple t = new ImmutableTriple(random.nextInt(100), random.nextInt(100), random.nextInt(100));
 			triples.add(t);
 			tbt.add(t);
 		}

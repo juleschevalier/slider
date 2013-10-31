@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT
@@ -66,10 +66,10 @@ public class Mark1SCM_RNG2 extends AbstractRule {
 				loops++;
 				for (Long c : cs) {
 
-					Triple result = new TripleImplNaive(triple.getSubject(), range, c);
+					Triple result = new ImmutableTriple(triple.getSubject(), range, c);
 					outputTriples.add(result);
 
-					logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), range, c)) + " -> " + dictionary.printTriple(result));
+					logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), range, c)) + " -> " + dictionary.printTriple(result));
 				}
 			}
 		}

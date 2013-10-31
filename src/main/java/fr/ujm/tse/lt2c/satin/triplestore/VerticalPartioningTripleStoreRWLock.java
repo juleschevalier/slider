@@ -77,7 +77,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			for (Long predicate : internalstore.keySet()) {
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
 				for (Entry<Long, Long> entry : multimap.entries()) {
-					result.add(new TripleImplNaive(entry.getKey(), predicate,
+					result.add(new ImmutableTriple(entry.getKey(), predicate,
 							entry.getValue()));
 				}
 			}
@@ -100,7 +100,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 					continue;
 				for (Entry<Long, Long> entry : multimap.entries()) {
 					if (entry.getKey() == s)
-						result.add(new TripleImplNaive(entry.getKey(),
+						result.add(new ImmutableTriple(entry.getKey(),
 								predicate, entry.getValue()));
 				}
 			}
@@ -120,7 +120,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			Multimap<Long, Long> multimap = internalstore.get(p);
 			if (multimap != null) {
 				for (Entry<Long, Long> entry : multimap.entries()) {
-					result.add(new TripleImplNaive(entry.getKey(), p, entry
+					result.add(new ImmutableTriple(entry.getKey(), p, entry
 							.getValue()));
 				}
 			}
@@ -143,7 +143,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 					continue;
 				for (Entry<Long, Long> entry : multimap.entries()) {
 					if (entry.getValue() == o)
-						result.add(new TripleImplNaive(entry.getKey(),
+						result.add(new ImmutableTriple(entry.getKey(),
 								predicate, entry.getValue()));
 				}
 			}

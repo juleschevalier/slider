@@ -13,7 +13,7 @@ import com.hp.hpl.jena.graph.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class ParserImplNaive implements Parser {
 	
@@ -67,7 +67,7 @@ public class ParserImplNaive implements Parser {
 		long pi = this.dictionary.add(p);
 		long oi = this.dictionary.add(o);
 		
-		this.tripleStore.add(new TripleImplNaive(si, pi, oi));
+		this.tripleStore.add(new ImmutableTriple(si, pi, oi));
 	}
 
 	@Override

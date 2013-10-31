@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT p1 rdfs:subPropertyOf p2 x p1 y OUPUT x p2 y
@@ -55,8 +55,8 @@ public class Mark1PRP_SPO1 extends AbstractRule {
 
 					for (Long p2 : subPropertyOfMultiMap.get(p1)) {
 
-						Triple result = new TripleImplNaive(triple.getSubject(), p2, triple.getObject());
-						logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new TripleImplNaive(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
+						Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
+						logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
 						outputTriples.add(result);
 					}
 

@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * c1 rdfs:subClassOf c2
@@ -66,10 +66,10 @@ public class Mark1SCM_EQC2 extends AbstractRule {
 
 					if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
 
-						Triple result = new TripleImplNaive(triple.getSubject(), equivalentClass, triple.getObject());
+						Triple result = new ImmutableTriple(triple.getSubject(), equivalentClass, triple.getObject());
 						outputTriples.add(result);
 
-						logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}

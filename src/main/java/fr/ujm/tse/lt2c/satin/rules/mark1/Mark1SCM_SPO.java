@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.triplestore.TripleImplNaive;
+import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT p3 rdfs:subPropertyOf p2 p2 rdfs:subPropertyOf p3 OUPUT p3
@@ -63,10 +63,10 @@ public class Mark1SCM_SPO extends AbstractRule {
 
 					if (p3 != triple.getSubject()) {
 
-						Triple result = new TripleImplNaive(triple.getSubject(), subPropertyOf, p3);
+						Triple result = new ImmutableTriple(triple.getSubject(), subPropertyOf, p3);
 						outputTriples.add(result);
 
-						logTrace(dictionary.printTriple(new TripleImplNaive(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new TripleImplNaive(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+						logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
 					}
 				}
 			}
