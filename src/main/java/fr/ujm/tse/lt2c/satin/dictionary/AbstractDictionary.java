@@ -55,7 +55,7 @@ public abstract class AbstractDictionary implements Dictionary{
 	public static long type = 0;
 
 
-	@Override
+//	@Override
 	public String printConcept(String c) {
 		/*Replace integers, strings... by their value*/
 		c=c.replaceAll("(\".*\")\\^\\^.*", "$1");

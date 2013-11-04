@@ -4,6 +4,13 @@ import java.util.Collection;
 
 import com.google.common.collect.Multimap;
 
+/**
+ * @author jules
+ * 
+ * Interface of a triplestore
+ * Use Triple interface
+ * @see Triple
+ */
 public interface TripleStore {
 
 	public void add(Triple t);

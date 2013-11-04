@@ -22,21 +22,19 @@ public class TripleBufferLock implements TripleBuffer {
 
 	public TripleBufferLock() {
 		this.buffer1 = new VerticalPartioningTripleStoreRWLock();
-		// this.buffer1_size = 0;
 		this.buffer2 = new VerticalPartioningTripleStoreRWLock();
-		// this.buffer2_size = 0;
 		this.bufferListeners = new ArrayList<>();
 	}
 
 	@Override
 	public void add(Triple triple) {
 		rwlock1.writeLock().lock();
+		rwlock2.writeLock().lock();
 		try {
 			this.buffer1.add(triple);
+			System.out.print("|");
 			if (this.buffer1.size() >= BUFFER_SIZE) {
-//				System.out.println("Buffer full");
 				if (this.buffer2.isEmpty()) {
-//					System.out.println("Buffer switch");
 					TripleStore temp = buffer1;
 					buffer1 = buffer2;
 					buffer2 = temp;
@@ -48,6 +46,7 @@ public class TripleBufferLock implements TripleBuffer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			rwlock2.writeLock().unlock();
 			rwlock1.writeLock().unlock();
 		}
 	}
