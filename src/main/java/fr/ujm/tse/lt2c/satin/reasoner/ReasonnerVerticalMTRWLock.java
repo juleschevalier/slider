@@ -26,22 +26,9 @@ import fr.ujm.tse.lt2c.satin.interfaces.Rule;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1CAX_SCO;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_DOM;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_RNG;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1PRP_SPO1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_DOM2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQC2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_EQP2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG1;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_RNG2;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SCO;
-import fr.ujm.tse.lt2c.satin.rules.mark1.Mark1SCM_SPO;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.tools.RunEntity;
-import fr.ujm.tse.lt2c.satin.triplestore.TemporaryVerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class ReasonnerVerticalMTRWLock {
@@ -99,7 +86,7 @@ public class ReasonnerVerticalMTRWLock {
 		nb_duplicates = new AtomicInteger();
 
 		ArrayList<AbstractRule> rules = new ArrayList<>();
-		TemporaryVerticalPartioningTripleStoreRWLock usableTriples = new TemporaryVerticalPartioningTripleStoreRWLock();
+		VerticalPartioningTripleStoreRWLock usableTriples = new VerticalPartioningTripleStoreRWLock();
 		Set<Triple> newTriples = Collections.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
 
 		/* File parsing */

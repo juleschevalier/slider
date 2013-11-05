@@ -12,68 +12,99 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TripleBufferLock implements TripleBuffer {
 
-	TripleStore buffer1;
-	TripleStore buffer2;
-	ReentrantReadWriteLock rwlock1 = new ReentrantReadWriteLock();
-	ReentrantReadWriteLock rwlock2 = new ReentrantReadWriteLock();
-	Collection<BufferListener> bufferListeners;
+        TripleStore mainBuffer;
+        TripleStore secondaryBuffer;
+        ReentrantReadWriteLock mainLock = new ReentrantReadWriteLock();
+        ReentrantReadWriteLock secondaryLock = new ReentrantReadWriteLock();
+        Collection<BufferListener> bufferListeners; // Registered listeners
 
-	static final long BUFFER_SIZE = 500;
+        static final long BUFFER_LIMIT = 100; // Limit of the main buffer
 
-	public TripleBufferLock() {
-		this.buffer1 = new VerticalPartioningTripleStoreRWLock();
-		this.buffer2 = new VerticalPartioningTripleStoreRWLock();
-		this.bufferListeners = new ArrayList<>();
-	}
+        public TripleBufferLock() {
+                this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
+                // this.buffer1_size = 0;
+                this.secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
+                // this.buffer2_size = 0;
+                this.bufferListeners = new ArrayList<>();
+        }
 
-	@Override
-	public void add(Triple triple) {
-		rwlock1.writeLock().lock();
-		rwlock2.writeLock().lock();
-		try {
-			this.buffer1.add(triple);
-			System.out.print("|");
-			if (this.buffer1.size() >= BUFFER_SIZE) {
-				if (this.buffer2.isEmpty()) {
-					TripleStore temp = buffer1;
-					buffer1 = buffer2;
-					buffer2 = temp;
-					for (BufferListener bufferListener : bufferListeners) {
-						bufferListener.bufferFull();
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			rwlock2.writeLock().unlock();
-			rwlock1.writeLock().unlock();
-		}
-	}
+        @Override
+        public void add(final Triple triple) {
+                mainLock.writeLock().lock();
+                try {
+                        this.mainBuffer.add(triple);
+                        if (this.mainBuffer.size() >= BUFFER_LIMIT) {
+                                // System.out.println("Buffer full");
+                                if (this.secondaryBuffer.isEmpty()) {
+                                        // System.out.println("Buffer switch");
+                                        TripleStore temp = mainBuffer;
+                                        mainBuffer = secondaryBuffer;
+                                        secondaryBuffer = temp;
+                                        for (BufferListener bufferListener : bufferListeners) {
+                                                bufferListener.bufferFull();
+                                        }
+                                }
+                        }
+                } catch (Exception e) {
+                        e.printStackTrace();
+                } finally {
+                        mainLock.writeLock().unlock();
+                }
+        }
 
-	@Override
-	public TripleStore clear() {
-		TripleStore dump = null;
-		rwlock2.writeLock().lock();
-		try {
-			dump = buffer2;
-			buffer2 = new VerticalPartioningTripleStoreRWLock();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			rwlock2.writeLock().unlock();
-		}
-		return dump;
-	}
+        @Override
+        public TripleStore clear() {
+                mainLock.writeLock().lock();
+                TripleStore temp = null;
+                try {
+                        temp = secondaryBuffer;
+                        secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
+                } catch (Exception e) {
+                        e.printStackTrace();
+                } finally {
+                        mainLock.writeLock().unlock();
+                }
+                return temp;
+        }
 
-	@Override
-	public void addBufferListener(BufferListener bufferListener) {
-		this.bufferListeners.add(bufferListener);
-	}
+        @Override
+        public void addBufferListener(BufferListener bufferListener) {
+                this.bufferListeners.add(bufferListener);
+        }
 
-	@Override
-	public TripleStore close() {
-		return this.buffer1;
-	}
+        @Override
+        public TripleStore flush() {
+                TripleStore temp = this.mainBuffer;
+                mainBuffer = new VerticalPartioningTripleStoreRWLock();
+                return temp;
+        }
+
+        @Override
+        public Collection<Triple> getCollection() {
+                return mainBuffer.getAll();
+        }
+
+        @Override
+        public long getBufferLimit() {
+
+                return BUFFER_LIMIT;
+        }
+
+        @Override
+        public long mainBufferOccupation() {
+
+                return mainBuffer.size();
+        }
+
+        @Override
+        public long secondaryBufferOccupation() {
+
+                return secondaryBuffer.size();
+        }
+
+        @Override
+        public Collection<BufferListener> getBufferListeners() {
+                return this.bufferListeners;
+        }
 
 }

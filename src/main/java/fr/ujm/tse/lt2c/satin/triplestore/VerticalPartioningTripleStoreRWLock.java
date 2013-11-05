@@ -71,8 +71,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public Collection<Triple> getAll() {
-		Collection<Triple> result = new ArrayList<>(triples);
 		rwlock.readLock().lock();
+		Collection<Triple> result = new ArrayList<>(triples);
 		try {
 			for (Long predicate : internalstore.keySet()) {
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
@@ -91,8 +91,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public Collection<Triple> getbySubject(long s) {
-		Collection<Triple> result = new ArrayList<>(triples);
 		rwlock.readLock().lock();
+		Collection<Triple> result = new ArrayList<>(triples);
 		try {
 			for (Long predicate : internalstore.keySet()) {
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
@@ -114,8 +114,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public Collection<Triple> getbyPredicate(long p) {
-		Collection<Triple> result = new ArrayList<>(triples);
 		rwlock.readLock().lock();
+		Collection<Triple> result = new ArrayList<>(triples);
 		try {
 			Multimap<Long, Long> multimap = internalstore.get(p);
 			if (multimap != null) {
@@ -134,8 +134,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public Collection<Triple> getbyObject(long o) {
-		Collection<Triple> result = new ArrayList<>(triples);
 		rwlock.readLock().lock();
+		Collection<Triple> result = new ArrayList<>(triples);
 		try {
 			for (Long predicate : internalstore.keySet()) {
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
@@ -157,8 +157,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public long size() {
-		long result = 0;
 		rwlock.readLock().lock();
+		long result = 0;
 		try {
 			result = triples;
 
@@ -172,8 +172,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public boolean isEmpty() {
-		boolean result = false;
 		rwlock.readLock().lock();
+		boolean result = false;
 		try {
 			result = triples == 0;
 
@@ -204,8 +204,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
 	@Override
 	public boolean contains(Triple triple) {
-		boolean result = false;
 		rwlock.readLock().lock();
+		boolean result = false;
 		try {
 			if (!internalstore.containsKey(triple.getPredicate())) {
 
@@ -235,4 +235,18 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		}
 		return multimap;
 	}
+	
+    @Override
+    public void clear() {
+            rwlock.readLock().lock();
+            try {
+                    internalstore.clear();
+                    triples = 0;
+            } catch (Exception e) {
+                    logger.debug(e.getMessage());
+            } finally {
+                    rwlock.readLock().unlock();
+            }
+
+    }
 }

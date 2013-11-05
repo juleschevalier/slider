@@ -1,32 +1,63 @@
 package fr.ujm.tse.lt2c.satin.interfaces;
 
+import java.util.Collection;
+
 /**
  * @author jules
  * 
- * Interface for triple buffer
+ *         Interface for triple buffer
  */
-public interface TripleBuffer{
+public interface TripleBuffer {
 	
 	/**
 	 * @param triple
-	 * Add a triple to the buffer.
-	 * Notifies subcsribers of "bufferfull" if needed
+	 *            Add a triple to the buffer.
+	 *            Notifies subcsribers of "bufferfull" if needed
 	 */
 	public void add(Triple triple);
-	
+
 	/**
-	 * @return The triples stored in the buffer full
+	 * Following operations are performed :
+	 * <ol>
+	 * <li>Returns the second full buffer</li>
+	 * <li>Empty the second buffer</li>
+	 * 
+	 * </ol>
+	 * 
+	 * @return
 	 */
 	public TripleStore clear();
 	
 	/**
-	 * @param bufferListener which want to listen for buffer events
+	 * @param bufferListener
+	 *            which want to listen for buffer events
 	 */
 	public void addBufferListener(BufferListener bufferListener);
-	
+
+	public Collection<BufferListener> getBufferListeners();
+
 	/**
-	 * @return The triples in the not full buffer
+	 * Flush all remaining triples in this buffer. Calls this method when
+	 * terminating the process
+	 * 
+	 * @return
 	 */
-	public TripleStore close();
+	public TripleStore flush();
+
+	/**
+	 * 
+	 * @return the size limit of the main buffer
+	 */
+	public long getBufferLimit();
+
+	/**
+	 * 
+	 * @return all triples in the main buffer
+	 */
+	public Collection<Triple> getCollection();
+
+	public long mainBufferOccupation();
+
+	public long secondaryBufferOccupation();
 
 }

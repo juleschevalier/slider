@@ -36,6 +36,8 @@ public interface TripleStore {
 	public boolean isEmpty();
 
 	public boolean contains(Triple triple);
+	
+    public void clear();
 
 	/**
 	 * Optional operation
