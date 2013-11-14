@@ -34,10 +34,10 @@ public class TripleDistributor {
 		for (Triple triple : triples) {
 			long p = triple.getPredicate();
 			for (TripleBuffer tripleBuffer : this.subcribers.get(p)) {
-				tripleBuffer.add(triple);
+				while(!tripleBuffer.add(triple));
 			}
 			for (TripleBuffer tripleBuffer : this.universalSubscribers) {
-				tripleBuffer.add(triple);
+				while(!tripleBuffer.add(triple));
 			}
 		}
 	}

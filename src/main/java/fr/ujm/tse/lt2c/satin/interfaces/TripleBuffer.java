@@ -8,13 +8,15 @@ import java.util.Collection;
  *         Interface for triple buffer
  */
 public interface TripleBuffer {
-	
+
 	/**
 	 * @param triple
 	 *            Add a triple to the buffer.
 	 *            Notifies subcsribers of "bufferfull" if needed
+	 *            
+	 * @return true if the insertion succeed
 	 */
-	public void add(Triple triple);
+	public boolean add(Triple triple);
 
 	/**
 	 * Following operations are performed :
@@ -27,7 +29,7 @@ public interface TripleBuffer {
 	 * @return
 	 */
 	public TripleStore clear();
-	
+
 	/**
 	 * @param bufferListener
 	 *            which want to listen for buffer events

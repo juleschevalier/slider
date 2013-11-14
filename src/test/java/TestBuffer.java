@@ -23,7 +23,7 @@ public class TestBuffer {
 		for (int i = 0; i < 1000; i++) {
 			Random rnd = new Random();
 			Triple t = new ImmutableTriple(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
-			tripleBuffer.add(t);
+			while(!tripleBuffer.add(t));
 			triples.add(t);
 		}
 		try {

@@ -12,7 +12,7 @@ public interface Dictionary {
 	/**
 	 * @param s
 	 * @return the id of the concept named s, just added in the dictionary
-	 * 			If the concept was already present, it just return the id
+	 *         If the concept was already present, it just return the id
 	 */
 	public abstract long add(String s);
 
@@ -29,7 +29,7 @@ public interface Dictionary {
 	public abstract long get(String s);
 
 	/**
-	 * @return the number of concepts 
+	 * @return the number of concepts
 	 */
 	public abstract long size();
 

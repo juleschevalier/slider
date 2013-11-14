@@ -22,10 +22,10 @@ import com.mongodb.MongoClient;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
-import fr.ujm.tse.lt2c.satin.interfaces.Rule;
+import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
+import fr.ujm.tse.lt2c.satin.rules.run.AbstractRun;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.tools.RunEntity;
@@ -85,7 +85,7 @@ public class ReasonnerVerticalMTRWLock {
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
 		nb_duplicates = new AtomicInteger();
 
-		ArrayList<AbstractRule> rules = new ArrayList<>();
+		ArrayList<AbstractRun> rules = new ArrayList<>();
 		VerticalPartioningTripleStoreRWLock usableTriples = new VerticalPartioningTripleStoreRWLock();
 		Set<Triple> newTriples = Collections.newSetFromMap(new ConcurrentHashMap<Triple, Boolean>());
 
@@ -115,7 +115,7 @@ public class ReasonnerVerticalMTRWLock {
 		doneSignal = new CountDownLatch(rules.size());
 		cdlWriter = new CountDownLatch(rules.size());
 
-		for (AbstractRule r : rules)
+		for (AbstractRun r : rules)
 			r.setDoneSignal(doneSignal);
 
 		long old_size;
@@ -133,8 +133,8 @@ public class ReasonnerVerticalMTRWLock {
 			long stepTime = System.nanoTime();
 			logger.debug("--------------------STEP " + steps + "--------------------");
 
-			for (Rule rule : rules) {
-				executor.submit(rule);
+			for (RuleRun ruleRun : rules) {
+				executor.submit(ruleRun);
 			}
 
 			// Wait all rules to finish
@@ -153,7 +153,7 @@ public class ReasonnerVerticalMTRWLock {
 				// System.out.println("***************************************");
 				doneSignal = new CountDownLatch(rules.size());
 				cdlWriter = new CountDownLatch(rules.size());
-				for (AbstractRule r : rules) {
+				for (AbstractRun r : rules) {
 					r.setDoneSignal(doneSignal);
 					r.setFinished(false);
 				}

@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.rules.mark1;
+package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,18 +14,17 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT p rdfs:domain c x p y OUPUT x rdf:type c
  */
-public class Mark1PRP_DOM extends AbstractRule {
+public class RunPRP_DOM extends AbstractRun {
 
-	private static Logger logger = Logger.getLogger(Mark1PRP_DOM.class);
-	public static long[] matchers = {};
+	private static Logger logger = Logger.getLogger(RunPRP_DOM.class);
+	public static long[] input_matchers = {};
 
-	public Mark1PRP_DOM(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+	public RunPRP_DOM(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
 		super(dictionary, tripleStore, "PRP_DOM", doneSignal, distributor, tripleBuffer);
 
 	}

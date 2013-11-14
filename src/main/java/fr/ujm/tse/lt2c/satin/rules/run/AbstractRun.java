@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.rules;
+package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,25 +7,25 @@ import java.util.concurrent.CountDownLatch;
 
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
-import fr.ujm.tse.lt2c.satin.interfaces.Rule;
+import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerVerticalMTRWLock;
 
-public abstract class AbstractRule implements Rule {
+public abstract class AbstractRun implements RuleRun {
 
 	protected Dictionary dictionary;
 	protected TripleStore tripleStore;
 	protected TripleDistributor distributor;
 	protected TripleBuffer tripleBuffer;
 	protected String ruleName = "";
-	public static long[] matchers;
+	public static long[] input_matchers;
 
 	protected CountDownLatch doneSignal;
 	protected boolean finished = false;
 
-	public AbstractRule(Dictionary dictionary, TripleStore tripleStore, String ruleName, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+	public AbstractRun(Dictionary dictionary, TripleStore tripleStore, String ruleName, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
 		this.dictionary = dictionary;
 		this.tripleStore = tripleStore;
 		this.ruleName = ruleName;

@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.rules.mark1;
+package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,29 +14,27 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
  * INPUT
- * p rdfs:domain c1
+ * p rdfs:range c1
  * c1 rdfs:subClassOf c2
  * OUPUT
- * p rdfs:domain c2
+ * p rdfs:range c2
  */
-public class Mark1SCM_DOM1 extends AbstractRule {
+public class RunSCM_RNG1 extends AbstractRun {
 
-	private static Logger logger = Logger.getLogger(Mark1SCM_DOM1.class);
-	public static long[] matchers = {AbstractDictionary.domain,AbstractDictionary.subClassOf};
+	private static Logger logger = Logger.getLogger(RunSCM_RNG1.class);
+	public static long[] input_matchers = { AbstractDictionary.range, AbstractDictionary.subClassOf};
 
-	public Mark1SCM_DOM1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
-		super(dictionary, tripleStore, "SCM_DOM1", doneSignal, distributor, tripleBuffer);
-
+	public RunSCM_RNG1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "SCM_RNG1", doneSignal, distributor, tripleBuffer);
 	}
 
 	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
 
-		long domain = AbstractDictionary.domain;
+		long range = AbstractDictionary.range;
 		long subClassOf = AbstractDictionary.subClassOf;
 
 		int loops = 0;
@@ -44,15 +42,15 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 		Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
 		if (subclassMultimap != null && subclassMultimap.size() > 0) {
 
+			Collection<Triple> rangeTriples = ts2.getbyPredicate(range);
+
 			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
-			Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
-
 			/* For each type triple */
-			for (Triple triple : domainTriples) {
+			for (Triple triple : rangeTriples) {
 				/*
-				 * Get all objects (c2) of subClassOf triples with domain
-				 * triples objects as subject
+				 * Get all objects (c2) of subClassOf triples with range triples
+				 * objects as subject
 				 */
 
 				Collection<Long> c2s;
@@ -66,10 +64,10 @@ public class Mark1SCM_DOM1 extends AbstractRule {
 				loops++;
 				for (Long c2 : c2s) {
 
-					Triple result = new ImmutableTriple(triple.getSubject(), domain, c2);
+					Triple result = new ImmutableTriple(triple.getSubject(), range, c2);
 					outputTriples.add(result);
 
-					logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), domain, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+					logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), range, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
 				}
 			}
 		}

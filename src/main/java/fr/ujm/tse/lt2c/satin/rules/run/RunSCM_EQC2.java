@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.rules.mark1;
+package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,29 +14,28 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.rules.AbstractRule;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
- * INPUT
  * c1 rdfs:subClassOf c2
- * c2 rdfs:subClassOf c3
+ * c2 rdfs:subClassOf c1
  * OUPUT
- * c1 rdfs:subClassOf c3
+ * c1 owl:equivalentClass c2
  */
-public class Mark1SCM_SCO extends AbstractRule {
+public class RunSCM_EQC2 extends AbstractRun {
 
-	private static Logger logger = Logger.getLogger(Mark1SCM_SCO.class);
-	public static long[] matchers = {AbstractDictionary.subClassOf};
+	private static Logger logger = Logger.getLogger(RunSCM_EQC2.class);
+	public static long[] input_matchers = {AbstractDictionary.subClassOf};
 
-	public Mark1SCM_SCO(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
-		super(dictionary, tripleStore, "SCM_SCO", doneSignal, distributor, tripleBuffer);
+	public RunSCM_EQC2(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
+		super(dictionary, tripleStore, "SCM_EQC2", doneSignal, distributor, tripleBuffer);
 
 	}
 
 	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
 
 		long subClassOf = AbstractDictionary.subClassOf;
+		long equivalentClass = AbstractDictionary.equivalentClass;
 
 		int loops = 0;
 
@@ -53,20 +52,20 @@ public class Mark1SCM_SCO extends AbstractRule {
 				 * Get all objects (c1a) of subClassOf triples with
 				 */
 
-				Collection<Long> c3s;
+				Collection<Long> c1as;
 				if (!cachePredicates.containsKey(triple.getObject())) {
-					c3s = subclassMultimap.get(triple.getObject());
-					cachePredicates.put(triple.getObject(), c3s);
+					c1as = subclassMultimap.get(triple.getObject());
+					cachePredicates.put(triple.getObject(), c1as);
 				} else {
-					c3s = cachePredicates.get(triple.getObject());
+					c1as = cachePredicates.get(triple.getObject());
 				}
 
 				loops++;
-				for (Long c1a : c3s) {
+				for (Long c1a : c1as) {
 
-					if (c1a != triple.getSubject()) {
+					if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
 
-						Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
+						Triple result = new ImmutableTriple(triple.getSubject(), equivalentClass, triple.getObject());
 						outputTriples.add(result);
 
 						logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
