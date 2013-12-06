@@ -8,11 +8,9 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -27,9 +25,10 @@ public class RunSCM_RNG1 extends AbstractRun {
 
 	private static Logger logger = Logger.getLogger(RunSCM_RNG1.class);
 	public static long[] input_matchers = { AbstractDictionary.range, AbstractDictionary.subClassOf};
+	public static long[] output_matchers = {AbstractDictionary.range};
 
-	public RunSCM_RNG1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
-		super(dictionary, tripleStore, "SCM_RNG1", doneSignal, distributor, tripleBuffer);
+	public RunSCM_RNG1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal) {
+		super(dictionary, tripleStore, "SCM_RNG1", doneSignal);
 	}
 
 	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
@@ -79,6 +78,16 @@ public class RunSCM_RNG1 extends AbstractRun {
 	@Override
 	public Logger getLogger() {
 		return logger;
+	}
+
+	@Override
+	public long[] getInputMatchers() {
+		return input_matchers;
+	}
+
+	@Override
+	public long[] getOutputMatchers() {
+		return output_matchers;
 	}
 
 }

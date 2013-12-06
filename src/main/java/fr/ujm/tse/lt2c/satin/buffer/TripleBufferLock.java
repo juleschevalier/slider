@@ -15,7 +15,6 @@ public class TripleBufferLock implements TripleBuffer {
 	TripleStore mainBuffer;
 	TripleStore secondaryBuffer;
 	ReentrantReadWriteLock mainLock = new ReentrantReadWriteLock();
-	ReentrantReadWriteLock secondaryLock = new ReentrantReadWriteLock();
 	Collection<BufferListener> bufferListeners; // Registered listeners
 
 	static final long BUFFER_LIMIT = 100; // Limit of the main buffer
@@ -51,8 +50,8 @@ public class TripleBufferLock implements TripleBuffer {
 		} finally {
 			mainLock.writeLock().unlock();
 		}
-		if (!success)
-			System.out.println(success);
+//		if (!success)
+//			System.out.println(success);
 		return success;
 	}
 
@@ -65,6 +64,9 @@ public class TripleBufferLock implements TripleBuffer {
 	@Override
 	public TripleStore clear() {
 		mainLock.writeLock().lock();
+		if(secondaryBuffer.isEmpty()){
+			switchBuffers();
+		}
 		TripleStore temp = null;
 		try {
 			temp = secondaryBuffer;
@@ -83,6 +85,7 @@ public class TripleBufferLock implements TripleBuffer {
 	}
 
 	@Override
+	@Deprecated
 	public TripleStore flush() {
 		TripleStore temp = this.mainBuffer;
 		mainBuffer = new VerticalPartioningTripleStoreRWLock();

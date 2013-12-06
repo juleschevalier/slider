@@ -8,11 +8,9 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -23,9 +21,10 @@ public class RunPRP_SPO1 extends AbstractRun {
 
 	private static Logger logger = Logger.getLogger(RunPRP_SPO1.class);
 	public static long[] input_matchers = {};
+	public static long[] output_matchers = {};
 
-	public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal, TripleDistributor distributor, TripleBuffer tripleBuffer) {
-		super(dictionary, tripleStore, "PRP_SPO1", doneSignal, distributor, tripleBuffer);
+	public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal) {
+		super(dictionary, tripleStore, "PRP_SPO1", doneSignal);
 
 	}
 
@@ -70,6 +69,16 @@ public class RunPRP_SPO1 extends AbstractRun {
 	@Override
 	public Logger getLogger() {
 		return logger;
+	}
+
+	@Override
+	public long[] getInputMatchers() {
+		return input_matchers;
+	}
+
+	@Override
+	public long[] getOutputMatchers() {
+		return output_matchers;
 	}
 
 }
