@@ -36,8 +36,10 @@ public class ReasonnerStreamed {
 	private static Logger logger = Logger.getLogger(ReasonnerStreamed.class);
 	private static ExecutorService executor;
 
-	public static AtomicInteger nb_duplicates;
+	public static AtomicInteger DEBUG_nb_duplicates;
 	public static AtomicInteger runningThreads;
+	public static int availables_cores = Runtime.getRuntime().availableProcessors();
+	public static int threads_per_core = 10;
 
 	// private static boolean PERSIST_RESULTS = true;
 
@@ -47,14 +49,14 @@ public class ReasonnerStreamed {
 
 		try {
 
-			for (int i = 0; i < 1; i++) {
+			for (int i = 0; i < 10; i++) {
 
 				// infere("subclassof.owl");
 				// infere("sample1.owl");
-				infere("univ-bench.owl");
+				// infere("univ-bench.owl");
 				// infere("sweetAll.owl");
 				// infere("wine.rdf");
-				// infere("geopolitical_200Ko.owl");
+				infere("geopolitical_200Ko.owl");
 				// infere("geopolitical_300Ko.owl");
 				// infere("geopolitical_500Ko.owl");
 				// infere("geopolitical_1Mo.owl");
@@ -77,7 +79,7 @@ public class ReasonnerStreamed {
 		logger.debug("***************************************************************************************************************************************************************");
 		logger.debug("****************************************************************************NEW RUN****************************************************************************");
 		logger.debug("***************************************************************************************************************************************************************");
-		System.out.println("Infere : " + input);
+		// System.out.println("Infere : " + input);
 
 		/* Initialise Structures */
 		TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
@@ -86,18 +88,18 @@ public class ReasonnerStreamed {
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
 		/* Init counters */
-		nb_duplicates = new AtomicInteger();
+		DEBUG_nb_duplicates = new AtomicInteger();
 		runningThreads = new AtomicInteger();
 
 		/* File parsing */
 		parser.parse(input);
 
-		long beginNbTriples = tripleStore.size();
+		long DEBUG_beginNbTriples = tripleStore.size();
 
 		/* Initialize rules used for inference on RhoDF */
 
 		CountDownLatch doneSignal = null;
-		executor = Executors.newFixedThreadPool(12);
+		executor = Executors.newFixedThreadPool(availables_cores * threads_per_core);
 
 		tripleManager.addRule(new Rule(new RunCAX_SCO(dictionary, tripleStore, doneSignal), executor));
 		tripleManager.addRule(new Rule(new RunPRP_DOM(dictionary, tripleStore, doneSignal), executor));
@@ -118,66 +120,74 @@ public class ReasonnerStreamed {
 		// for (Rule r : rules)
 		// r.getRun().setDoneSignal(doneSignal);
 
-		System.out.println(tripleStore.size());
+		// System.out.println(tripleStore.size());
 
+		long DEBUG_startTime = System.nanoTime();
+
+		/************************
+		 * LAUNCH INFERENCE *
+		 ************************/
 		tripleManager.addTriples(tripleStore.getAll());
 
-		long occupation = 0;
-		for (Rule rule : tripleManager.getRules()) {
-			occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
-			System.out.println(rule.name() + " occupation : " + rule.getTripleBuffer().mainBufferOccupation() + " " + rule.getTripleBuffer().secondaryBufferOccupation());
-			System.out.println(rule.name() + " subscribers : " + rule.getTripleDistributor().subcribers());
-		}
-		System.out.println("Occupation :" + occupation);
-
+		/* Notify the triple manager that we don't have more triples */
 		tripleManager.finishThem();
 
+		/* Waits the end of each running threads */
 		while (ReasonnerStreamed.runningThreads.get() > 0) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Running :" + ReasonnerStreamed.runningThreads.get());
+			logger.trace("Running threads :" + ReasonnerStreamed.runningThreads.get());
 		}
 
-		occupation = 0;
+		long DEBUG_occupation = 0;
 		for (Rule rule : tripleManager.getRules()) {
-			occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
-			System.out.println(rule.name() + " " + rule.getTripleBuffer().mainBufferOccupation() + " " + rule.getTripleBuffer().secondaryBufferOccupation());
+			DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
 		}
-		System.out.println("Occupation :" + occupation);
 
-		while (occupation != 0) {
-			System.out.println(occupation);
+		while (DEBUG_occupation != 0) {
+			logger.trace("There are some non-empty buffers (" + DEBUG_occupation + " triples left in buffers)");
 
+			/*
+			 * There are triples in buffers, but no thread running. So let's
+			 * flush buffers
+			 */
 			tripleManager.finishThem();
 
+			/* Wait there is no more running threads */
 			while (ReasonnerStreamed.runningThreads.get() > 0) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Running :" + ReasonnerStreamed.runningThreads.get());
+				logger.trace("Running threads :" + ReasonnerStreamed.runningThreads.get());
 			}
 
-			occupation = 0;
+			DEBUG_occupation = 0;
 			for (Rule rule : tripleManager.getRules()) {
-				occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
-				System.out.println(rule.name() + " +" + rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation());
+				DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
 			}
 		}
+
+		logger.debug("Reasoning is finished");
 
 		executor.shutdown();
 		try {
 			executor.awaitTermination(1, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		System.out.println("Inferred : " + (tripleStore.size() - beginNbTriples));
+		long DEBUG_endTime = System.nanoTime();
+
+		System.out.println(input + ": " + DEBUG_beginNbTriples + " -> " + (tripleStore.size() - DEBUG_beginNbTriples) + " in " + (TimeUnit.MILLISECONDS.convert(DEBUG_endTime - DEBUG_startTime, TimeUnit.NANOSECONDS)) + " ms");
+
+		/*************************
+		 * MUST SAVE RUN RESULTS *
+		 *************************/
 
 		/**
 		 * 
@@ -286,7 +296,6 @@ public class ReasonnerStreamed {
 	}
 
 	static void shutdownAndAwaitTermination(ExecutorService pool) {
-		// System.out.println("finishing");
 		System.exit(-1);
 		pool.shutdown(); // Disable new tasks from being submitted
 		try {

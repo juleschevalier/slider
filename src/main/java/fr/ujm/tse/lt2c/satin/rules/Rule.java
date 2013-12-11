@@ -2,6 +2,8 @@ package fr.ujm.tse.lt2c.satin.rules;
 
 import java.util.concurrent.ExecutorService;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
@@ -9,6 +11,8 @@ import fr.ujm.tse.lt2c.satin.rules.run.AbstractRun;
 
 
 public class Rule implements BufferListener{
+
+	private static Logger logger = Logger.getLogger(Rule.class);
 	
 	/**
 	 * The Buffer receives the triples, notify the the object when it's full
@@ -18,7 +22,6 @@ public class Rule implements BufferListener{
 	
 	TripleBuffer tripleBuffer;
 	AbstractRun ruleRun;
-//	TripleDistributor distributor;
 
 	ExecutorService executor;
 
@@ -27,7 +30,6 @@ public class Rule implements BufferListener{
 		this.tripleBuffer = ruleRun.getTripleBuffer();
 		this.ruleRun = ruleRun;
 		this.executor = executor;
-//		this.distributor = new TripleDistributor();this.distributor.setName(this.ruleRun.getRuleName()+"Dis");
 		
 		this.tripleBuffer.addBufferListener(this);
 		
@@ -35,7 +37,6 @@ public class Rule implements BufferListener{
 	
 	@Override
 	public void bufferFull() {
-//		System.out.println("Full "+this.ruleRun+" "+this.executor);
 		this.executor.submit(this.ruleRun);
 		//How to pass usable triples to already instantiate rule without corrupt each running threads
 		// => No more a problem with buffers

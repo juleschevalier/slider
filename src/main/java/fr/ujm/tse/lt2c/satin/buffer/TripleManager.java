@@ -3,6 +3,8 @@ package fr.ujm.tse.lt2c.satin.buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -17,14 +19,16 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  */
 public class TripleManager {
 
+	private static Logger logger = Logger.getLogger(TripleManager.class);
+
 	ArrayList<Rule> rules;
-	Multimap<String, String> links;/*Useless finaly*/
+	Multimap<String, String> DEBUG_links;
 	TripleDistributor generalDistributor;
 
 	public TripleManager() {
 		super();
 		this.rules = new ArrayList<>();
-		links = HashMultimap.create();
+		DEBUG_links = HashMultimap.create();
 		this.generalDistributor = new TripleDistributor();
 	}
 
@@ -32,30 +36,18 @@ public class TripleManager {
 		this.rules.add(newRule);
 		generalDistributor.subscribe(newRule.getTripleBuffer(), newRule.getInputMatchers());
 		for (Rule rule : this.rules) {
-			// System.out.print(".");
 			if (match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
-				// System.out.println("MATCH !");
 				newRule.getTripleDistributor().subscribe(rule.getTripleBuffer(), rule.getInputMatchers());
-				links.put(newRule.name(), rule.name());
-//				 System.out.println(rule.name()+"->"+newRule.name());
+				DEBUG_links.put(newRule.name(), rule.name());
+				logger.trace("Triple Manager : " + rule.name() + "->" + newRule.name());
 			}
 			if (match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
-				// System.out.println("MATCH !");
 				rule.getTripleDistributor().subscribe(newRule.getTripleBuffer(), newRule.getInputMatchers());
-				links.put(rule.name(), newRule.name());
-//				 System.out.println(newRule.name()+"->"+rule.name());
+				DEBUG_links.put(rule.name(), newRule.name());
+				logger.trace("Triple Manager : " + newRule.name() + "->" + rule.name());
 			}
 
 		}
-		// System.out.print(newRule.name()+" {");
-		// for (long in : newRule.getInputMatchers()) {
-		// System.out.print(in+" ");
-		// }
-		// System.out.print("} {");
-		// for (long out : newRule.getOutputMatchers()) {
-		// System.out.print(out+" ");
-		// }
-		// System.out.println("}");
 	}
 
 	public void addTriples(Collection<Triple> triples) {

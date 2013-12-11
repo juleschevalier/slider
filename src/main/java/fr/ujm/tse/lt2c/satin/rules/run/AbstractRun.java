@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -16,11 +18,13 @@ import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerStreamed;
 
 public abstract class AbstractRun implements RuleRun {
 
+	private static Logger logger = Logger.getLogger(AbstractRun.class);
+
 	protected Dictionary dictionary;
 	protected TripleStore tripleStore;
 	protected TripleDistributor distributor;
-
 	protected TripleBuffer tripleBuffer;
+
 	protected String ruleName = "";
 	public static long[] input_matchers;
 	public static long[] output_matchers;
@@ -40,29 +44,29 @@ public abstract class AbstractRun implements RuleRun {
 	@Override
 	public void run() {
 
-		// System.out.println("THIS IS A RUN");
+		logger.debug(this.ruleName+": New thread");
 		ReasonnerStreamed.runningThreads.incrementAndGet();
 
 		try {
 
-			long loops = 0;
+			long DEBUG_loops = 0;
 
-			// System.out.println(ruleName+" BEFORE CLEAR : "+this.tripleBuffer.mainBufferOccupation()+" "+this.tripleBuffer.secondaryBufferOccupation());
+			/*Get triples from buffer*/
 			TripleStore usableTriples = this.tripleBuffer.clear();
-			// System.out.println(ruleName+" AFTER  CLEAR : "+this.tripleBuffer.mainBufferOccupation()+" "+this.tripleBuffer.secondaryBufferOccupation());
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
-			if (usableTriples.isEmpty()) {
-				loops += process(tripleStore, tripleStore, outputTriples);
+			if (usableTriples.isEmpty()) { //USELESS ??
+				logger.warn(this.ruleName+" run without triples");
+				DEBUG_loops += process(tripleStore, tripleStore, outputTriples);
 			} else {
-				loops += process(usableTriples, tripleStore, outputTriples);
-				loops += process(tripleStore, usableTriples, outputTriples);
+				DEBUG_loops += process(usableTriples, tripleStore, outputTriples);
+				DEBUG_loops += process(tripleStore, usableTriples, outputTriples);
 			}
 
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + loops + " iterations - outputTriples  " + outputTriples.size());
+			logDebug(this.getClass() + " : " + DEBUG_loops + " iterations for " + outputTriples.size() + " triples generated");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,11 +86,11 @@ public abstract class AbstractRun implements RuleRun {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 			} else {
-				ReasonnerStreamed.nb_duplicates.incrementAndGet();
+				ReasonnerStreamed.DEBUG_nb_duplicates.incrementAndGet();
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
-		System.out.println("Distribute "+newTriples.size());
+		logger.trace(this.ruleName+" distribute "+newTriples.size()+" new triples");
 		distributor.distribute(newTriples);
 		return duplicates;
 	}
@@ -109,10 +113,10 @@ public abstract class AbstractRun implements RuleRun {
 
 	protected void finish() {
 		if (!this.finished) {
-			logDebug(" unlatching " + doneSignal.getCount());
+			logTrace(" unlatching " + doneSignal.getCount());
 			this.finished = true;
 			doneSignal.countDown();
-			logDebug(" unlatched" + doneSignal.getCount());
+			logTrace(" unlatched" + doneSignal.getCount());
 		}
 	}
 
@@ -152,47 +156,5 @@ public abstract class AbstractRun implements RuleRun {
 	public String toString() {
 		return this.ruleName;
 	}
-
-	// public static AbstractRun getNewInstance(Class runType, Dictionary
-	// dictionary, TripleStore tripleStore, CountDownLatch doneSignal){
-	// if(runType.equals(RunCAX_SCO.class)){
-	// return new RunCAX_SCO(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunPRP_DOM.class)){
-	// return new RunPRP_DOM(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunPRP_RNG.class)){
-	// return new RunPRP_RNG(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunPRP_SPO1.class)){
-	// return new RunPRP_SPO1(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_DOM1.class)){
-	// return new RunSCM_DOM1(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_DOM2.class)){
-	// return new RunSCM_DOM2(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_EQC2.class)){
-	// return new RunSCM_EQC2(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_EQP2.class)){
-	// return new RunSCM_EQP2(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_RNG1.class)){
-	// return new RunSCM_RNG1(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_RNG2.class)){
-	// return new RunSCM_RNG2(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_SCO.class)){
-	// return new RunSCM_SCO(dictionary, tripleStore, doneSignal);
-	// }
-	// if(runType.equals(RunSCM_SPO.class)){
-	// return new RunSCM_SPO(dictionary, tripleStore, doneSignal);
-	// }
-	//
-	// return null;
-	// }
 
 }

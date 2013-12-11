@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
@@ -12,12 +14,14 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TripleBufferLock implements TripleBuffer {
 
+	private static Logger logger = Logger.getLogger(TripleBufferLock.class);
+
 	TripleStore mainBuffer;
 	TripleStore secondaryBuffer;
-	ReentrantReadWriteLock mainLock = new ReentrantReadWriteLock();
+	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	Collection<BufferListener> bufferListeners; // Registered listeners
 
-	static final long BUFFER_LIMIT = 100; // Limit of the main buffer
+	static final long BUFFER_SIZE = 100; // Limit of the main buffer
 
 	public TripleBufferLock() {
 		this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
@@ -27,16 +31,16 @@ public class TripleBufferLock implements TripleBuffer {
 
 	@Override
 	public boolean add(final Triple triple) {
-		mainLock.writeLock().lock();
+		rwlock.writeLock().lock();
 		boolean success = false;
 		try {
-			if (this.mainBuffer.size() < BUFFER_LIMIT) {
+			if (this.mainBuffer.size() < BUFFER_SIZE) {
 				this.mainBuffer.add(triple);
 				success = true;
 			} else {
-//				 System.out.println("Buffer full");
+				logger.trace(this.hashCode() + " is full");
 				if (this.secondaryBuffer.isEmpty()) {
-//					 System.out.println("Buffer switch");
+					logger.trace(this.hashCode() + " switch buffers");
 					switchBuffers();
 					for (BufferListener bufferListener : bufferListeners) {
 						bufferListener.bufferFull();
@@ -48,10 +52,10 @@ public class TripleBufferLock implements TripleBuffer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			mainLock.writeLock().unlock();
+			rwlock.writeLock().unlock();
 		}
-//		if (!success)
-//			System.out.println(success);
+		if (!success)
+			logger.trace(this.hashCode() + "Add failed");
 		return success;
 	}
 
@@ -63,8 +67,8 @@ public class TripleBufferLock implements TripleBuffer {
 
 	@Override
 	public TripleStore clear() {
-		mainLock.writeLock().lock();
-		if(secondaryBuffer.isEmpty()){
+		rwlock.writeLock().lock();
+		if (secondaryBuffer.isEmpty()) {
 			switchBuffers();
 		}
 		TripleStore temp = null;
@@ -74,7 +78,7 @@ public class TripleBufferLock implements TripleBuffer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			mainLock.writeLock().unlock();
+			rwlock.writeLock().unlock();
 		}
 		return temp;
 	}
@@ -99,13 +103,11 @@ public class TripleBufferLock implements TripleBuffer {
 
 	@Override
 	public long getBufferLimit() {
-
-		return BUFFER_LIMIT;
+		return BUFFER_SIZE;
 	}
 
 	@Override
 	public long mainBufferOccupation() {
-
 		return mainBuffer.size();
 	}
 
