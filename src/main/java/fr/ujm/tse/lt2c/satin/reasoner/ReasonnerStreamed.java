@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -27,6 +29,7 @@ import fr.ujm.tse.lt2c.satin.rules.run.RunSCM_RNG1;
 import fr.ujm.tse.lt2c.satin.rules.run.RunSCM_RNG2;
 import fr.ujm.tse.lt2c.satin.rules.run.RunSCM_SCO;
 import fr.ujm.tse.lt2c.satin.rules.run.RunSCM_SPO;
+import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
@@ -49,13 +52,13 @@ public class ReasonnerStreamed {
 
 		try {
 
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 1; i++) {
 
-				// infere("subclassof.owl");
-				// infere("sample1.owl");
-				// infere("univ-bench.owl");
-				// infere("sweetAll.owl");
-				// infere("wine.rdf");
+				infere("subclassof.owl");
+				infere("sample1.owl");
+				infere("univ-bench.owl");
+				infere("sweetAll.owl");
+				infere("wine.rdf");
 				infere("geopolitical_200Ko.owl");
 				// infere("geopolitical_300Ko.owl");
 				// infere("geopolitical_500Ko.owl");
@@ -184,6 +187,22 @@ public class ReasonnerStreamed {
 		long DEBUG_endTime = System.nanoTime();
 
 		System.out.println(input + ": " + DEBUG_beginNbTriples + " -> " + (tripleStore.size() - DEBUG_beginNbTriples) + " in " + (TimeUnit.MILLISECONDS.convert(DEBUG_endTime - DEBUG_startTime, TimeUnit.NANOSECONDS)) + " ms");
+
+		HashMap<Integer, List<String>> triple_in_much = Comparator.compare("jena_" + input, dictionary, tripleStore);
+
+		List<String> missing_triples = triple_in_much.get(0);
+		List<String> too_triples = triple_in_much.get(1);
+
+		if (missing_triples.size() + too_triples.size() == 0) {
+			System.out.println("Results match");
+		}
+
+		for (String string : missing_triples) {
+			System.out.println("- " + string);
+		}
+		for (String string : too_triples) {
+			System.out.println("+ " + string);
+		}
 
 		/*************************
 		 * MUST SAVE RUN RESULTS *
