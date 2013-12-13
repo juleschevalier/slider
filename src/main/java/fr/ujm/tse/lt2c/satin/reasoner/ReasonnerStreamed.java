@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,7 +43,9 @@ public class ReasonnerStreamed {
 	public static AtomicInteger DEBUG_nb_duplicates;
 	public static AtomicInteger runningThreads;
 	public static int availables_cores = Runtime.getRuntime().availableProcessors();
-	public static int threads_per_core = 10;
+	public static int threads_per_core = 50;
+
+	public static Phaser phaser;
 
 	// private static boolean PERSIST_RESULTS = true;
 
@@ -52,13 +55,13 @@ public class ReasonnerStreamed {
 
 		try {
 
-			for (int i = 0; i < 1; i++) {
+			for (int i = 0; i < 10; i++) {
 
-				infere("subclassof.owl");
-				infere("sample1.owl");
-				infere("univ-bench.owl");
-				infere("sweetAll.owl");
-				infere("wine.rdf");
+				// infere("subclassof.owl");
+				// infere("sample1.owl");
+				// infere("univ-bench.owl");
+				// infere("sweetAll.owl");
+				// infere("wine.rdf");
 				infere("geopolitical_200Ko.owl");
 				// infere("geopolitical_300Ko.owl");
 				// infere("geopolitical_500Ko.owl");
@@ -89,6 +92,11 @@ public class ReasonnerStreamed {
 		Dictionary dictionary = new DictionaryPrimitrivesRWLock();
 		TripleManager tripleManager = new TripleManager();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
+		phaser = new Phaser(1) {
+			protected boolean onAdvance(int phase, int registeredParties) {
+				return phase >= 1 || registeredParties == 0;
+			}
+		};
 
 		/* Init counters */
 		DEBUG_nb_duplicates = new AtomicInteger();
@@ -103,6 +111,7 @@ public class ReasonnerStreamed {
 
 		CountDownLatch doneSignal = null;
 		executor = Executors.newFixedThreadPool(availables_cores * threads_per_core);
+		// executor = Executors.newCachedThreadPool();
 
 		tripleManager.addRule(new Rule(new RunCAX_SCO(dictionary, tripleStore, doneSignal), executor));
 		tripleManager.addRule(new Rule(new RunPRP_DOM(dictionary, tripleStore, doneSignal), executor));
@@ -127,53 +136,78 @@ public class ReasonnerStreamed {
 
 		long DEBUG_startTime = System.nanoTime();
 
+		// phaser.register();
+
 		/************************
 		 * LAUNCH INFERENCE *
 		 ************************/
 		tripleManager.addTriples(tripleStore.getAll());
 
 		/* Notify the triple manager that we don't have more triples */
-		tripleManager.finishThem();
-
-		/* Waits the end of each running threads */
-		while (ReasonnerStreamed.runningThreads.get() > 0) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			logger.trace("Running threads :" + ReasonnerStreamed.runningThreads.get());
+		while (tripleManager.finishThem() != 0) {
+			phaser.arriveAndAwaitAdvance();
 		}
 
-		long DEBUG_occupation = 0;
-		for (Rule rule : tripleManager.getRules()) {
-			DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
-		}
-
-		while (DEBUG_occupation != 0) {
-			logger.trace("There are some non-empty buffers (" + DEBUG_occupation + " triples left in buffers)");
-
-			/*
-			 * There are triples in buffers, but no thread running. So let's
-			 * flush buffers
-			 */
-			tripleManager.finishThem();
-
-			/* Wait there is no more running threads */
-			while (ReasonnerStreamed.runningThreads.get() > 0) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				logger.trace("Running threads :" + ReasonnerStreamed.runningThreads.get());
-			}
-
-			DEBUG_occupation = 0;
-			for (Rule rule : tripleManager.getRules()) {
-				DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation();
-			}
-		}
+		/**********************************************
+		 * 
+		 * BAD WAY TO END THE PROCESS
+		 * 
+		 **********************************************/
+		// /* Waits the end of each running threads */
+		// while (ReasonnerStreamed.runningThreads.get() > 0) {
+		// try {
+		// Thread.sleep(100);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// if (logger.isTraceEnabled())
+		// logger.trace("Running threads :" +
+		// ReasonnerStreamed.runningThreads.get());
+		// }
+		//
+		// long DEBUG_occupation = 0;
+		// for (Rule rule : tripleManager.getRules()) {
+		// DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation()
+		// +
+		// rule.getTripleBuffer().secondaryBufferOccupation();
+		// }
+		//
+		// while (DEBUG_occupation != 0) {
+		// if(logger.isTraceEnabled())
+		// logger.trace("There are some non-empty buffers (" +
+		// DEBUG_occupation
+		// + " triples left in buffers)");
+		//
+		// /*
+		// * There are triples in buffers, but no thread running. So let's
+		// * flush buffers
+		// */
+		// tripleManager.finishThem();
+		//
+		// /* Wait there is no more running threads */
+		// while (ReasonnerStreamed.runningThreads.get() > 0) {
+		// try {
+		// Thread.sleep(100);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// if(logger.isTraceEnabled())
+		// logger.trace("Running threads :" +
+		// ReasonnerStreamed.runningThreads.get());
+		// }
+		//
+		// DEBUG_occupation = 0;
+		// for (Rule rule : tripleManager.getRules()) {
+		// DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation()
+		// +
+		// rule.getTripleBuffer().secondaryBufferOccupation();
+		// }
+		// }
+		/**********************************************
+		 * 
+		 * /END BAD WAY TO END THE PROCESS
+		 * 
+		 **********************************************/
 
 		logger.debug("Reasoning is finished");
 

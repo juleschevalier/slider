@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 
 import org.apache.log4j.Logger;
 
@@ -43,21 +44,25 @@ public abstract class AbstractRun implements RuleRun {
 
 	@Override
 	public void run() {
-
-		logger.debug(this.ruleName+": New thread");
+		if (logger.isDebugEnabled())
+			logger.debug(this.ruleName + ": New thread");
 		ReasonnerStreamed.runningThreads.incrementAndGet();
 
 		try {
 
+			if (logger.isDebugEnabled())
+				logger.debug("register on "+ReasonnerStreamed.phaser);
+			ReasonnerStreamed.phaser.register();
+
 			long DEBUG_loops = 0;
 
-			/*Get triples from buffer*/
+			/* Get triples from buffer */
 			TripleStore usableTriples = this.tripleBuffer.clear();
 
 			Collection<Triple> outputTriples = new HashSet<>();
 
-			if (usableTriples.isEmpty()) { //USELESS ??
-				logger.warn(this.ruleName+" run without triples");
+			if (usableTriples.isEmpty()) { // USELESS ??
+				logger.warn(this.ruleName + " run without triples");
 				DEBUG_loops += process(tripleStore, tripleStore, outputTriples);
 			} else {
 				DEBUG_loops += process(usableTriples, tripleStore, outputTriples);
@@ -71,6 +76,9 @@ public abstract class AbstractRun implements RuleRun {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			if (logger.isDebugEnabled())
+				logger.debug("arriveAndDeregister on "+ReasonnerStreamed.phaser);
+			ReasonnerStreamed.phaser.arriveAndDeregister();
 			ReasonnerStreamed.runningThreads.decrementAndGet();
 			finish();
 		}
@@ -90,7 +98,7 @@ public abstract class AbstractRun implements RuleRun {
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}
-		logger.trace(this.ruleName+" distribute "+newTriples.size()+" new triples");
+		logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
 		distributor.distribute(newTriples);
 		return duplicates;
 	}

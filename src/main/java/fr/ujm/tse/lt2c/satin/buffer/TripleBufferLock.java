@@ -20,13 +20,16 @@ public class TripleBufferLock implements TripleBuffer {
 	TripleStore secondaryBuffer;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	Collection<BufferListener> bufferListeners; // Registered listeners
+	
+	long lastFlush;
 
-	static final long BUFFER_SIZE = 100; // Limit of the main buffer
+	static final long BUFFER_SIZE = 500; // Limit of the main buffer
 
 	public TripleBufferLock() {
 		this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
 		this.secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
 		this.bufferListeners = new ArrayList<>();
+		this.lastFlush=System.nanoTime();
 	}
 
 	@Override
@@ -54,7 +57,7 @@ public class TripleBufferLock implements TripleBuffer {
 		} finally {
 			rwlock.writeLock().unlock();
 		}
-		if (!success)
+		if (!success)if (logger.isDebugEnabled())
 			logger.trace(this.hashCode() + "Add failed");
 		return success;
 	}
@@ -78,6 +81,7 @@ public class TripleBufferLock implements TripleBuffer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			this.lastFlush=System.nanoTime();
 			rwlock.writeLock().unlock();
 		}
 		return temp;
@@ -92,6 +96,7 @@ public class TripleBufferLock implements TripleBuffer {
 	@Deprecated
 	public TripleStore flush() {
 		TripleStore temp = this.mainBuffer;
+		this.lastFlush=System.nanoTime();
 		mainBuffer = new VerticalPartioningTripleStoreRWLock();
 		return temp;
 	}
@@ -121,5 +126,27 @@ public class TripleBufferLock implements TripleBuffer {
 	public Collection<BufferListener> getBufferListeners() {
 		return this.bufferListeners;
 	}
+	
+	public long getLastFlush(){
+		return this.lastFlush;
+	}
 
+	@Override
+	public void sendFullBuffer() {
+		rwlock.writeLock().lock();
+		try {
+			if (!this.mainBuffer.isEmpty() && this.secondaryBuffer.isEmpty()) {
+				logger.trace(this.hashCode() + " switch buffers because of timeout");
+				switchBuffers();
+				for (BufferListener bufferListener : bufferListeners) {
+					bufferListener.bufferFull();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			rwlock.writeLock().unlock();
+		}
+		
+	}
 }

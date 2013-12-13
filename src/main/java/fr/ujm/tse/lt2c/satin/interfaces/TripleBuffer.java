@@ -58,8 +58,15 @@ public interface TripleBuffer {
 	 */
 	public Collection<Triple> getCollection();
 
+	/**
+	 * Notifies all subscribers that the buffer is full
+	 */
+	public void sendFullBuffer();
+
 	public long mainBufferOccupation();
 
 	public long secondaryBufferOccupation();
+	
+	public long getLastFlush();
 
 }
