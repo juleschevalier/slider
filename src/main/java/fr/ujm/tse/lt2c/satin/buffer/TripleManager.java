@@ -33,26 +33,29 @@ public class TripleManager {
 		this.rules = new ArrayList<>();
 		DEBUG_links = HashMultimap.create();
 		this.generalDistributor = new TripleDistributor();
-//		timeoutChecker();
+		// timeoutChecker();
 	}
 
 	public void addRule(Rule newRule) {
 		this.rules.add(newRule);
 		generalDistributor.subscribe(newRule.getTripleBuffer(), newRule.getInputMatchers());
+		if (logger.isTraceEnabled()){
+			logger.trace("Triple Manager : -- ADD RULE " + newRule.name()+" --");
+			logger.trace("Triple Manager : General -> " + newRule.name());
+		}
 		for (Rule rule : this.rules) {
 			if (match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
 				newRule.getTripleDistributor().subscribe(rule.getTripleBuffer(), rule.getInputMatchers());
 				DEBUG_links.put(newRule.name(), rule.name());
-				if(logger.isTraceEnabled())
-				logger.trace("Triple Manager : " + rule.name() + "->" + newRule.name());
+				if (logger.isTraceEnabled())
+					logger.trace("Triple Manager : " + rule.name() + " -> " + newRule.name());
 			}
 			if (match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
 				rule.getTripleDistributor().subscribe(newRule.getTripleBuffer(), newRule.getInputMatchers());
 				DEBUG_links.put(rule.name(), newRule.name());
-				if(logger.isTraceEnabled())
-				logger.trace("Triple Manager : " + newRule.name() + "->" + rule.name());
+				if (logger.isTraceEnabled())
+					logger.trace("Triple Manager : " + newRule.name() + " -> " + rule.name());
 			}
-
 		}
 	}
 
@@ -61,11 +64,10 @@ public class TripleManager {
 	}
 
 	public long finishThem() {
-		long total=0;
+		long total = 0;
 		for (Rule rule : this.rules) {
-			total+=rule.getTripleBuffer().mainBufferOccupation();
-			if (rule.getTripleBuffer().mainBufferOccupation() > 0)
-				rule.bufferFull();
+			total += rule.getTripleBuffer().mainBufferOccupation();
+			rule.bufferFull();
 		}
 		return total;
 

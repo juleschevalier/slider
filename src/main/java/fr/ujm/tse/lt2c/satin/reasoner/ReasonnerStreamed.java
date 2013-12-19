@@ -55,14 +55,14 @@ public class ReasonnerStreamed {
 
 		try {
 
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 1; i++) {
 
-				// infere("subclassof.owl");
+				infere("subclassof.owl");
 				// infere("sample1.owl");
 				// infere("univ-bench.owl");
 				// infere("sweetAll.owl");
 				// infere("wine.rdf");
-				infere("geopolitical_200Ko.owl");
+				// infere("geopolitical_200Ko.owl");
 				// infere("geopolitical_300Ko.owl");
 				// infere("geopolitical_500Ko.owl");
 				// infere("geopolitical_1Mo.owl");
@@ -92,6 +92,7 @@ public class ReasonnerStreamed {
 		Dictionary dictionary = new DictionaryPrimitrivesRWLock();
 		TripleManager tripleManager = new TripleManager();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
+		
 		phaser = new Phaser(1) {
 			protected boolean onAdvance(int phase, int registeredParties) {
 				return phase >= 1 || registeredParties == 0;
@@ -126,6 +127,14 @@ public class ReasonnerStreamed {
 		tripleManager.addRule(new Rule(new RunSCM_RNG1(dictionary, tripleStore, doneSignal), executor));
 		tripleManager.addRule(new Rule(new RunSCM_RNG2(dictionary, tripleStore, doneSignal), executor));
 
+		if (logger.isDebugEnabled())
+			logger.debug(tripleManager.getRules().size() + " Rules");
+
+		for (Rule rule : tripleManager.getRules()) {
+			if (logger.isTraceEnabled())
+				logger.trace(rule.name() + " : " + rule.getTripleDistributor().subscribersNumber());
+		}
+
 		// doneSignal = new CountDownLatch(rules.size());
 		// cdlWriter = new CountDownLatch(rules.size());
 
@@ -143,79 +152,34 @@ public class ReasonnerStreamed {
 		 ************************/
 		tripleManager.addTriples(tripleStore.getAll());
 
-		/* Notify the triple manager that we don't have more triples */
+		/*
+		 * Notify the triple manager that we don't have more triples and wait
+		 * the end
+		 */
+
 		while (tripleManager.finishThem() != 0) {
+			if (logger.isDebugEnabled())
+				logger.debug("Finish Them!");
 			phaser.arriveAndAwaitAdvance();
 		}
 
-		/**********************************************
-		 * 
-		 * BAD WAY TO END THE PROCESS
-		 * 
-		 **********************************************/
-		// /* Waits the end of each running threads */
-		// while (ReasonnerStreamed.runningThreads.get() > 0) {
-		// try {
-		// Thread.sleep(100);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// if (logger.isTraceEnabled())
-		// logger.trace("Running threads :" +
-		// ReasonnerStreamed.runningThreads.get());
-		// }
-		//
-		// long DEBUG_occupation = 0;
-		// for (Rule rule : tripleManager.getRules()) {
-		// DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation()
-		// +
-		// rule.getTripleBuffer().secondaryBufferOccupation();
-		// }
-		//
-		// while (DEBUG_occupation != 0) {
-		// if(logger.isTraceEnabled())
-		// logger.trace("There are some non-empty buffers (" +
-		// DEBUG_occupation
-		// + " triples left in buffers)");
-		//
-		// /*
-		// * There are triples in buffers, but no thread running. So let's
-		// * flush buffers
-		// */
-		// tripleManager.finishThem();
-		//
-		// /* Wait there is no more running threads */
-		// while (ReasonnerStreamed.runningThreads.get() > 0) {
-		// try {
-		// Thread.sleep(100);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// if(logger.isTraceEnabled())
-		// logger.trace("Running threads :" +
-		// ReasonnerStreamed.runningThreads.get());
-		// }
-		//
-		// DEBUG_occupation = 0;
-		// for (Rule rule : tripleManager.getRules()) {
-		// DEBUG_occupation += rule.getTripleBuffer().mainBufferOccupation()
-		// +
-		// rule.getTripleBuffer().secondaryBufferOccupation();
-		// }
-		// }
-		/**********************************************
-		 * 
-		 * /END BAD WAY TO END THE PROCESS
-		 * 
-		 **********************************************/
-
-		logger.debug("Reasoning is finished");
+		if (logger.isDebugEnabled())
+			logger.debug("FAtality!");
 
 		executor.shutdown();
 		try {
 			executor.awaitTermination(1, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+		/*
+		 * END
+		 */
+
+		logger.debug("Reasoning is finished");
+
+		for (Rule rule : tripleManager.getRules()) {
+			logger.debug(rule.getRun().getRuleName() + " launched " + rule.getRun().getThreads() + " times");
 		}
 
 		long DEBUG_endTime = System.nanoTime();
@@ -229,123 +193,21 @@ public class ReasonnerStreamed {
 
 		if (missing_triples.size() + too_triples.size() == 0) {
 			System.out.println("Results match");
+		} else {
+			System.out.println("-" + missing_triples.size() + " +" + too_triples.size());
 		}
 
-		for (String string : missing_triples) {
-			System.out.println("- " + string);
-		}
-		for (String string : too_triples) {
-			System.out.println("+ " + string);
-		}
+		// for (String string : missing_triples) {
+		// System.out.println("- " + string);
+		// }
+		// for (String string : too_triples) {
+		// System.out.println("+ " + string);
+		// }
 
 		/*************************
 		 * MUST SAVE RUN RESULTS *
 		 *************************/
 
-		/**
-		 * 
-		 * *******************OLD VERSION**********************
-		 * 
-		 */
-		//
-		//
-		//
-		// long old_size;
-		// long new_size;
-		// long steps = 0;
-		//
-		//
-		// long parsingTime = System.nanoTime();
-		//
-		// /* Run each rule until there is no more new triple inferred */
-		// do {
-		//
-		// old_size = tripleStore.size();
-		// long stepTime = System.nanoTime();
-		// logger.debug("--------------------STEP " + steps +
-		// "--------------------");
-		//
-		// for (RuleRun ruleRun : rules) {
-		// executor.submit(ruleRun);
-		// }
-		//
-		// // Wait all rules to finish
-		// try {
-		//
-		// // for (AbstractRule r : rules) {
-		// // System.out.println(r.getRuleName() + " " + r.isFinished());
-		// // }
-		// // System.out.println(doneSignal.getCount());
-		// doneSignal.await();
-		// // System.out.println("######################################");
-		// // for (AbstractRule r : rules) {
-		// // System.out.println(r.getRuleName() + " " + r.isFinished());
-		// // }
-		// // System.out.println("Fire in the hole");
-		// // System.out.println("***************************************");
-		// doneSignal = new CountDownLatch(rules.size());
-		// cdlWriter = new CountDownLatch(rules.size());
-		// for (AbstractRun r : rules) {
-		// r.setDoneSignal(doneSignal);
-		// r.setFinished(false);
-		// }
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// /* Step end - Replace usableTriples by newTriples */
-		// logger.debug("End of iteration - Latch : " + doneSignal.getCount());
-		// usableTriples.clear();
-		// usableTriples.addAll(newTriples);
-		// newTriples.clear();
-		//
-		// logger.debug("Usable triples: " + usableTriples.size());
-		//
-		// new_size = tripleStore.size();
-		// long step2Time = System.nanoTime();
-		// logger.debug((step2Time - stepTime) + "ns for " + (new_size -
-		// old_size) + " triples");
-		// steps++;
-		// for (Triple triple : usableTriples.getAll()) {
-		// logger.trace(dictionary.printTriple(triple));
-		// }
-		// } while (!usableTriples.isEmpty());
-		//
-		// long endTime = System.nanoTime();
-		//
-		// System.out.println("Inference Done");
-		//
-		// /* Print inferred triples to file */
-		// // tripleStore.writeToFile("Inferred" + (tripleStore.size() -
-		// // beginNbTriples) + input + ".out", dictionary);
-		//
-		// /*
-		// * RESULTS PERSISTANCE
-		// */
-		// if (PERSIST_RESULTS) {
-		// MongoClient client;
-		// try {
-		// client = new MongoClient();
-		// Morphia morphia = new Morphia();
-		// morphia.map(RunEntity.class);
-		// Datastore ds = morphia.createDatastore(client, "RunResults");
-		//
-		// HashMap<Integer, List<String>> triple_in_much =
-		// Comparator.compare("jena_" + input, dictionary, tripleStore);
-		//
-		// List<String> missing_triples = triple_in_much.get(0);
-		// List<String> too_triples = triple_in_much.get(1);
-		//
-		// RunEntity runEntity = new RunEntity(input, SESSION_ID, steps,
-		// nb_duplicates.get(), (endTime - parsingTime), beginNbTriples,
-		// (tripleStore.size() - beginNbTriples), missing_triples, too_triples);
-		// ds.save(runEntity);
-		//
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		// }
-		//
 	}
 
 	static void shutdownAndAwaitTermination(ExecutorService pool) {

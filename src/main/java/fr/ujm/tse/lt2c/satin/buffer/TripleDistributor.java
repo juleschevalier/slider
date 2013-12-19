@@ -1,7 +1,7 @@
 package fr.ujm.tse.lt2c.satin.buffer;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
@@ -22,11 +22,15 @@ public class TripleDistributor {
 	public TripleDistributor() {
 		super();
 		this.subcribers = HashMultimap.create();
-		this.universalSubscribers = new ArrayList<>();
+		this.universalSubscribers = new HashSet<>();
 	}
 
 	public void subscribe(TripleBuffer tripleBuffer, long[] predicates) {
+		if(logger.isTraceEnabled()){
+			logger.trace(DEBUG_name+" "+predicates.length);
+		}
 		if (predicates.length == 0) {
+			logger.trace(DEBUG_name+" Universal subscribe");
 			this.universalSubscribers.add(tripleBuffer);
 			return;
 		}
@@ -54,6 +58,10 @@ public class TripleDistributor {
 
 	public void setName(String name) {
 		this.DEBUG_name = name;
+	}
+	
+	public int subscribersNumber(){
+		return this.subcribers.values().size()+this.universalSubscribers.size();
 	}
 
 //	public String subcribers() {

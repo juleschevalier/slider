@@ -1,7 +1,7 @@
 package fr.ujm.tse.lt2c.satin.buffer;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
@@ -23,12 +23,12 @@ public class TripleBufferLock implements TripleBuffer {
 	
 	long lastFlush;
 
-	static final long BUFFER_SIZE = 500; // Limit of the main buffer
+	static final long BUFFER_SIZE = 100; // Limit of the main buffer
 
 	public TripleBufferLock() {
 		this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
 		this.secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
-		this.bufferListeners = new ArrayList<>();
+		this.bufferListeners = new HashSet<>();
 		this.lastFlush=System.nanoTime();
 	}
 
@@ -46,6 +46,8 @@ public class TripleBufferLock implements TripleBuffer {
 					logger.trace(this.hashCode() + " switch buffers");
 					switchBuffers();
 					for (BufferListener bufferListener : bufferListeners) {
+						if(logger.isTraceEnabled())
+							logger.trace("Buffer really full");
 						bufferListener.bufferFull();
 					}
 					this.mainBuffer.add(triple);
@@ -72,6 +74,8 @@ public class TripleBufferLock implements TripleBuffer {
 	public TripleStore clear() {
 		rwlock.writeLock().lock();
 		if (secondaryBuffer.isEmpty()) {
+			if(logger.isDebugEnabled())
+				logger.debug("clear for a flush");
 			switchBuffers();
 		}
 		TripleStore temp = null;
