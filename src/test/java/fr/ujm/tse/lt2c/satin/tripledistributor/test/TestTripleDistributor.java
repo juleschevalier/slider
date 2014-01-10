@@ -21,7 +21,7 @@ public class TestTripleDistributor {
 		TripleBuffer tb = new TripleBufferLock();
 		TripleDistributor td = new TripleDistributor();
 		
-		td.subscribe(tb, new long[] {1,2,3});
+		td.addSubscriber(tb, new long[] {1,2,3});
 		
 		assertEquals(tb.mainBufferOccupation()+tb.secondaryBufferOccupation(),0);
 		
@@ -48,8 +48,8 @@ public class TestTripleDistributor {
 		TripleBuffer tb2 = new TripleBufferLock();
 		triples = new HashSet<>();
 		
-		td.subscribe(tb, new long[] {1});
-		td.subscribe(tb2, new long[] {2});
+		td.addSubscriber(tb, new long[] {1});
+		td.addSubscriber(tb2, new long[] {2});
 
 		triples.add(new ImmutableTriple(0, 0, 0));
 		triples.add(new ImmutableTriple(0, 1, 1));

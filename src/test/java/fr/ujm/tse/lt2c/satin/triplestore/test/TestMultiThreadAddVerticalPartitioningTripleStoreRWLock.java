@@ -24,8 +24,7 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
 	@Test
 	public void test() {
 		TripleStore ts = new VerticalPartioningTripleStoreRWLock();
-		Set<Triple> generated = Collections
-				.synchronizedSet(new HashSet<Triple>());
+		Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
 
 		ExecutorService executor = Executors.newCachedThreadPool();
 		for (int j = 0; j < THREADS; j++) {
@@ -38,7 +37,7 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		assertEquals(ts.size(), generated.size());
 		assertEquals(ts.getAll().size(), generated.size());
 
@@ -58,8 +57,7 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
 		public void run() {
 			Random random = new Random();
 			for (int i = 0; i < 100000; i++) {
-				Triple t = new ImmutableTriple(random.nextInt(100),
-						random.nextInt(100), random.nextInt(100));
+				Triple t = new ImmutableTriple(random.nextInt(100), random.nextInt(100), random.nextInt(100));
 				ts.add(t);
 				generated.add(t);
 			}

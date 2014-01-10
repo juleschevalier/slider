@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.log4j.Logger;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -46,15 +45,13 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 				triples++;
 
 			} else {
-				if (!(internalstore.get(t.getPredicate()).containsEntry(
-						t.getSubject(), t.getObject()))) {
-					if (internalstore.get(t.getPredicate()).put(t.getSubject(),
-							t.getObject()))
+				if (!(internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject()))) {
+					if (internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))
 						triples++;
 				}
 			}
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.writeLock().unlock();
 		}
@@ -77,12 +74,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			for (Long predicate : internalstore.keySet()) {
 				Multimap<Long, Long> multimap = internalstore.get(predicate);
 				for (Entry<Long, Long> entry : multimap.entries()) {
-					result.add(new ImmutableTriple(entry.getKey(), predicate,
-							entry.getValue()));
+					result.add(new ImmutableTriple(entry.getKey(), predicate, entry.getValue()));
 				}
 			}
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -100,12 +96,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 					continue;
 				for (Entry<Long, Long> entry : multimap.entries()) {
 					if (entry.getKey() == s)
-						result.add(new ImmutableTriple(entry.getKey(),
-								predicate, entry.getValue()));
+						result.add(new ImmutableTriple(entry.getKey(), predicate, entry.getValue()));
 				}
 			}
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -120,12 +115,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			Multimap<Long, Long> multimap = internalstore.get(p);
 			if (multimap != null) {
 				for (Entry<Long, Long> entry : multimap.entries()) {
-					result.add(new ImmutableTriple(entry.getKey(), p, entry
-							.getValue()));
+					result.add(new ImmutableTriple(entry.getKey(), p, entry.getValue()));
 				}
 			}
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -143,12 +137,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 					continue;
 				for (Entry<Long, Long> entry : multimap.entries()) {
 					if (entry.getValue() == o)
-						result.add(new ImmutableTriple(entry.getKey(),
-								predicate, entry.getValue()));
+						result.add(new ImmutableTriple(entry.getKey(), predicate, entry.getValue()));
 				}
 			}
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -163,7 +156,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			result = triples;
 
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -178,7 +171,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			result = triples == 0;
 
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -210,12 +203,11 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 			if (!internalstore.containsKey(triple.getPredicate())) {
 
 			} else {
-				result = (internalstore.get(triple.getPredicate())
-						.containsEntry(triple.getSubject(), triple.getObject()));
+				result = (internalstore.get(triple.getPredicate()).containsEntry(triple.getSubject(), triple.getObject()));
 			}
 
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
@@ -227,26 +219,27 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 		rwlock.readLock().lock();
 		Multimap<Long, Long> multimap = null;
 		try {
-			multimap = ImmutableMultimap.copyOf(internalstore.get(p));
+			if (internalstore.get(p) != null)
+				multimap = ImmutableMultimap.copyOf(internalstore.get(p));
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			rwlock.readLock().unlock();
 		}
 		return multimap;
 	}
-	
-    @Override
-    public void clear() {
-            rwlock.readLock().lock();
-            try {
-                    internalstore.clear();
-                    triples = 0;
-            } catch (Exception e) {
-                    logger.debug(e.getMessage());
-            } finally {
-                    rwlock.readLock().unlock();
-            }
 
-    }
+	@Override
+	public void clear() {
+		rwlock.readLock().lock();
+		try {
+			internalstore.clear();
+			triples = 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			rwlock.readLock().unlock();
+		}
+
+	}
 }

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.run.AbstractRun;
 
 public class Rule implements BufferListener {
@@ -31,19 +32,16 @@ public class Rule implements BufferListener {
 		this.executor = executor;
 
 		this.tripleBuffer.addBufferListener(this);
+		this.tripleBuffer.setDEBUG_name(ruleRun.getRuleName());
 
 	}
 
 	@Override
 	public void bufferFull() {
-		if ((this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
-			if ((this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) != (this.ruleRun.getTripleBuffer().secondaryBufferOccupation() + this.ruleRun.getTripleBuffer().mainBufferOccupation()))
-				logger.warn("TripleBuffer sizes error");
-			this.executor.submit(this.ruleRun);
+		if ((ReasonnerStreamed.runningThreads.get() < ReasonnerStreamed.max_threads) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
+//			this.executor.submit(this.ruleRun);
+			this.ruleRun.run();
 		}
-		// How to pass usable triples to already instantiate rule without
-		// corrupt each running threads
-		// => No more a problem with buffers
 	}
 
 	public long[] getInputMatchers() {

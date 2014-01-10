@@ -41,20 +41,27 @@ public abstract class AbstractRun implements RuleRun {
 		this.distributor = new TripleDistributor();
 		this.tripleBuffer = new TripleBufferLock();
 		this.threads = 0;
+
+		this.distributor.setName(ruleName + " Distributor");
 	}
 
 	@Override
 	public void run() {
+		
+		if(this.tripleBuffer.mainBufferOccupation()+this.tripleBuffer.secondaryBufferOccupation()==0){
+			logger.warn("EMPTY");
+			return;
+		}
 
-		if (logger.isDebugEnabled())
-			logger.debug(this.ruleName + ": New thread");
+		if (logger.isTraceEnabled())
+			logger.trace(this.ruleName + " START");
 		ReasonnerStreamed.runningThreads.incrementAndGet();
 		this.threads++;
 
 		try {
 
-			if (logger.isDebugEnabled())
-				logger.debug(this.ruleName + " register on " + ReasonnerStreamed.phaser);
+			if (logger.isTraceEnabled())
+				logger.trace(this.ruleName + " register on " + ReasonnerStreamed.phaser);
 			ReasonnerStreamed.phaser.register();
 
 			long DEBUG_loops = 0;
@@ -78,13 +85,15 @@ public abstract class AbstractRun implements RuleRun {
 
 			addNewTriples(outputTriples);
 
-			logDebug(this.getClass() + " : " + DEBUG_loops + " iterations for " + outputTriples.size() + " triples generated");
+//			logDebug(this.ruleName + " : " + DEBUG_loops + " iterations for " + outputTriples.size() + " triples generated");
+			if(logger.isDebugEnabled())
+			logger.debug(this.ruleName + " : " + outputTriples.size() + " triples generated");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (logger.isDebugEnabled())
-				logger.debug(this.ruleName + " arriveAndDeregister on " + ReasonnerStreamed.phaser);
+			if (logger.isTraceEnabled())
+				logger.trace(this.ruleName + " arriveAndDeregister on " + ReasonnerStreamed.phaser);
 			ReasonnerStreamed.phaser.arriveAndDeregister();
 			ReasonnerStreamed.runningThreads.decrementAndGet();
 			finish();
@@ -95,6 +104,10 @@ public abstract class AbstractRun implements RuleRun {
 
 	protected int addNewTriples(Collection<Triple> outputTriples) {
 		int duplicates = 0;
+		
+		if(outputTriples.isEmpty())
+			return duplicates;
+		
 		ArrayList<Triple> newTriples = new ArrayList<>();
 		for (Triple triple : outputTriples) {
 			if (!tripleStore.contains(triple)) {
@@ -129,10 +142,10 @@ public abstract class AbstractRun implements RuleRun {
 
 	protected void finish() {
 		if (!this.finished) {
-			logTrace(" unlatching " + doneSignal.getCount());
-			this.finished = true;
-			doneSignal.countDown();
-			logTrace(" unlatched" + doneSignal.getCount());
+//			logTrace(" unlatching " + doneSignal.getCount());
+//			this.finished = true;
+//			doneSignal.countDown();
+//			logTrace(" unlatched" + doneSignal.getCount());
 		}
 	}
 

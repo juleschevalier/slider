@@ -1,5 +1,6 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -43,7 +44,9 @@ public class ReasonnerStreamed {
 	public static AtomicInteger DEBUG_nb_duplicates;
 	public static AtomicInteger runningThreads;
 	public static int availables_cores = Runtime.getRuntime().availableProcessors();
-	public static int threads_per_core = 50;
+	public static int threads_per_core = 10;
+	public static int max_threads = availables_cores * threads_per_core;
+	// public static int max_threads = 1;
 
 	public static Phaser phaser;
 
@@ -53,22 +56,29 @@ public class ReasonnerStreamed {
 
 	public static void main(String[] args) {
 
+		List<String> files = new ArrayList<String>();
+
+		// files.add("tiny_subclassof.owl");
+		// files.add("subclassof.owl");
+		// files.add("sample1.owl");
+		// files.add("univ-bench.owl");
+		// files.add("sweetAll.owl");
+		// files.add("wine.rdf");
+		 files.add("geopolitical_200Ko.owl");
+		// files.add("geopolitical_300Ko.owl");
+		// files.add("geopolitical_500Ko.owl");
+		// files.add("geopolitical_1Mo.owl");
+		// files.add("geopolitical.owl");
+		// files.add("efo.owl");
+		// files.add("opencyc.owl");
+
 		try {
+			for (int file = 0; file < files.size(); file++) {
 
-			for (int i = 0; i < 1; i++) {
+				for (int i = 0; i < 10; i++) {
 
-				infere("subclassof.owl");
-				// infere("sample1.owl");
-				// infere("univ-bench.owl");
-				// infere("sweetAll.owl");
-				// infere("wine.rdf");
-				// infere("geopolitical_200Ko.owl");
-				// infere("geopolitical_300Ko.owl");
-				// infere("geopolitical_500Ko.owl");
-				// infere("geopolitical_1Mo.owl");
-				// infere("geopolitical.owl");
-				// infere("efo.owl");
-				// infere("opencyc.owl");
+					infere(files.get(file));
+				}
 			}
 
 			System.out.println("SESSION ID : " + SESSION_ID);
@@ -92,7 +102,7 @@ public class ReasonnerStreamed {
 		Dictionary dictionary = new DictionaryPrimitrivesRWLock();
 		TripleManager tripleManager = new TripleManager();
 		Parser parser = new ParserImplNaive(dictionary, tripleStore);
-		
+
 		phaser = new Phaser(1) {
 			protected boolean onAdvance(int phase, int registeredParties) {
 				return phase >= 1 || registeredParties == 0;
@@ -111,8 +121,9 @@ public class ReasonnerStreamed {
 		/* Initialize rules used for inference on RhoDF */
 
 		CountDownLatch doneSignal = null;
-		executor = Executors.newFixedThreadPool(availables_cores * threads_per_core);
-		// executor = Executors.newCachedThreadPool();
+		executor = Executors.newFixedThreadPool(max_threads);
+		// executor = Executors.newFixedThreadPool(availables_cores *
+		// threads_per_core);
 
 		tripleManager.addRule(new Rule(new RunCAX_SCO(dictionary, tripleStore, doneSignal), executor));
 		tripleManager.addRule(new Rule(new RunPRP_DOM(dictionary, tripleStore, doneSignal), executor));
@@ -128,11 +139,12 @@ public class ReasonnerStreamed {
 		tripleManager.addRule(new Rule(new RunSCM_RNG2(dictionary, tripleStore, doneSignal), executor));
 
 		if (logger.isDebugEnabled())
-			logger.debug(tripleManager.getRules().size() + " Rules");
+			logger.debug(tripleManager.getRules().size() + " Rules initialized\n");
 
-		for (Rule rule : tripleManager.getRules()) {
-			if (logger.isTraceEnabled())
-				logger.trace(rule.name() + " : " + rule.getTripleDistributor().subscribersNumber());
+		if (logger.isTraceEnabled()) {
+			for (Rule rule : tripleManager.getRules()) {
+				logger.trace(rule.getTripleDistributor().subscribers(rule.name(), dictionary));
+			}
 		}
 
 		// doneSignal = new CountDownLatch(rules.size());
@@ -141,7 +153,11 @@ public class ReasonnerStreamed {
 		// for (Rule r : rules)
 		// r.getRun().setDoneSignal(doneSignal);
 
-		// System.out.println(tripleStore.size());
+		logger.debug("***************************************************************************************************************************************************************");
+		logger.debug("************************************************************************START INFERENCE************************************************************************");
+		logger.debug("***************************************************************************************************************************************************************");
+
+		// System.out.println("Infere : " + input);
 
 		long DEBUG_startTime = System.nanoTime();
 
@@ -157,14 +173,25 @@ public class ReasonnerStreamed {
 		 * the end
 		 */
 
-		while (tripleManager.finishThem() != 0) {
-			if (logger.isDebugEnabled())
-				logger.debug("Finish Them!");
+		long still = tripleManager.finishThem();
+		if (logger.isTraceEnabled())
+			logger.trace("REASONER There are still " + still + " triples");
+		while (still != 0) {
+			// try {
+			// Thread.sleep(1000);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
+			if (logger.isTraceEnabled())
+				logger.trace("REASONNER Finish Them!");
 			phaser.arriveAndAwaitAdvance();
+			still = tripleManager.finishThem();
+			if (logger.isTraceEnabled())
+				logger.trace("REASONER There are still " + still + " non empty buffers");
 		}
 
 		if (logger.isDebugEnabled())
-			logger.debug("FAtality!");
+			logger.debug("REASONNER FAtality!");
 
 		executor.shutdown();
 		try {
@@ -197,12 +224,12 @@ public class ReasonnerStreamed {
 			System.out.println("-" + missing_triples.size() + " +" + too_triples.size());
 		}
 
-		// for (String string : missing_triples) {
-		// System.out.println("- " + string);
-		// }
-		// for (String string : too_triples) {
-		// System.out.println("+ " + string);
-		// }
+		for (String string : missing_triples) {
+			System.out.println("- " + string);
+		}
+		for (String string : too_triples) {
+			System.out.println("+ " + string);
+		}
 
 		/*************************
 		 * MUST SAVE RUN RESULTS *

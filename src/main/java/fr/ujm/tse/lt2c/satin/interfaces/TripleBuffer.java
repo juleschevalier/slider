@@ -68,5 +68,7 @@ public interface TripleBuffer {
 	public long secondaryBufferOccupation();
 	
 	public long getLastFlush();
+	public void setDEBUG_name(String name);
+	public String getDEBUG_name();
 
 }

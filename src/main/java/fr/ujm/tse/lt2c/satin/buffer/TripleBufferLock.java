@@ -21,6 +21,16 @@ public class TripleBufferLock implements TripleBuffer {
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 	Collection<BufferListener> bufferListeners; // Registered listeners
 	
+	String DEBUG_name;
+	
+	public String getDEBUG_name() {
+		return DEBUG_name;
+	}
+
+	public void setDEBUG_name(String DEBUG_name) {
+		this.DEBUG_name = DEBUG_name;
+	}
+
 	long lastFlush;
 
 	static final long BUFFER_SIZE = 100; // Limit of the main buffer
@@ -59,7 +69,7 @@ public class TripleBufferLock implements TripleBuffer {
 		} finally {
 			rwlock.writeLock().unlock();
 		}
-		if (!success)if (logger.isDebugEnabled())
+		if (!success)if (logger.isTraceEnabled())
 			logger.trace(this.hashCode() + "Add failed");
 		return success;
 	}
@@ -72,10 +82,13 @@ public class TripleBufferLock implements TripleBuffer {
 
 	@Override
 	public TripleStore clear() {
+		if(mainBufferOccupation()+secondaryBufferOccupation()==0)
+			logger.warn(this.DEBUG_name+" clear an empty buffer");
+		
 		rwlock.writeLock().lock();
 		if (secondaryBuffer.isEmpty()) {
-			if(logger.isDebugEnabled())
-				logger.debug("clear for a flush");
+//			if(logger.isTraceEnabled())
+//				logger.trace("clear for a flush");
 			switchBuffers();
 		}
 		TripleStore temp = null;

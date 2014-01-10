@@ -21,8 +21,7 @@ public class TestVerticalPartitioningTripleStoreRWLock {
 		Set<Triple> generated = new HashSet<>();
 		Random random = new Random();
 		for (int i = 0; i < 10000; i++) {
-			Triple t = new ImmutableTriple(random.nextInt(10),
-					random.nextInt(10), random.nextInt(10));
+			Triple t = new ImmutableTriple(random.nextInt(10), random.nextInt(10), random.nextInt(10));
 			ts.add(t);
 			generated.add(t);
 		}
