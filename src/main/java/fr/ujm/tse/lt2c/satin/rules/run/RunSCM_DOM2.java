@@ -40,7 +40,7 @@ public class RunSCM_DOM2 extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> domainMultimap = ts1.getMultiMapForPredicate(domain);
-		if (domainMultimap != null && domainMultimap.size() > 0) {
+		if (domainMultimap != null && !domainMultimap.isEmpty()) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 

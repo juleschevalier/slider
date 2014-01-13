@@ -23,8 +23,8 @@ public class TripleManager {
 
 	private static Logger logger = Logger.getLogger(TripleManager.class);
 
-	ArrayList<Rule> rules;
-	Multimap<String, String> DEBUG_links;
+	List<Rule> rules;
+	Multimap<String, String> debugLinks;
 	TripleDistributor generalDistributor;
 
 	static final long TIMEOUT = 100; // Timeout
@@ -32,10 +32,10 @@ public class TripleManager {
 	public TripleManager() {
 		super();
 		this.rules = new ArrayList<>();
-		DEBUG_links = HashMultimap.create();
+		debugLinks = HashMultimap.create();
 		this.generalDistributor = new TripleDistributor();
 		this.generalDistributor.setName("T_MANAGER");
-		// timeoutChecker();
+		/* timeoutChecker(); to activate timeout*/
 	}
 
 	public void addRule(Rule newRule) {
@@ -49,13 +49,13 @@ public class TripleManager {
 			if (match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
 				long[] matchers = extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
 				newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
-				DEBUG_links.put(newRule.name(), rule.name());
+				debugLinks.put(newRule.name(), rule.name());
 				if (logger.isTraceEnabled())
 					logger.trace("Triple Manager : " + rule.name() + " -> " + newRule.name());
 			}
 			if ((rule != newRule) && match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
 				rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
-				DEBUG_links.put(rule.name(), newRule.name());
+				debugLinks.put(rule.name(), newRule.name());
 				if (logger.isTraceEnabled())
 					logger.trace("Triple Manager : " + newRule.name() + " -> " + rule.name());
 			}
@@ -127,7 +127,7 @@ public class TripleManager {
 							rule.getTripleBuffer().sendFullBuffer();
 					}
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					logger.error("",e);
 				}
 			}
 		};

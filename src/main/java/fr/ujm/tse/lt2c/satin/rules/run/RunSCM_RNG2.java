@@ -40,7 +40,7 @@ public class RunSCM_RNG2 extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> rangeMultimap = ts1.getMultiMapForPredicate(range);
-		if (rangeMultimap != null && rangeMultimap.size() > 0) {
+		if (rangeMultimap != null && !rangeMultimap.isEmpty()) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 

@@ -7,6 +7,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
 import org.apache.jena.riot.lang.PipedTriplesStream;
+import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.graph.Triple;
 
@@ -16,14 +17,15 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class ParserImplNaive implements Parser {
-	
-//	private static Logger logger = Logger.getLogger(ParserImplNaive.class);
-	
+
+	private static Logger logger = Logger.getLogger(ParserImplNaive.class);
+
 	Dictionary dictionary;
 	TripleStore tripleStore;
 
 	/**
-	 * @param f the file to parse
+	 * @param f
+	 *            the file to parse
 	 */
 	public ParserImplNaive(Dictionary dictionary, TripleStore tripleStore) {
 		this.dictionary = dictionary;
@@ -54,19 +56,20 @@ public class ParserImplNaive implements Parser {
 			Triple next = iter.next();
 			addTriple(next);
 		}
+		if(logger.isDebugEnabled()){
+			logger.debug("Parsing done");
+		}
 	}
 
 	private void addTriple(Triple next) {
 		String s = next.getSubject().toString();
 		String p = next.getPredicate().toString();
 		String o = next.getObject().toString();
-		
-//		logger.trace(s+" "+p+" "+o);
-		
+
 		long si = this.dictionary.add(s);
 		long pi = this.dictionary.add(p);
 		long oi = this.dictionary.add(o);
-		
+
 		this.tripleStore.add(new ImmutableTriple(si, pi, oi));
 	}
 
@@ -74,10 +77,8 @@ public class ParserImplNaive implements Parser {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((dictionary == null) ? 0 : dictionary.hashCode());
-		result = prime * result
-				+ ((tripleStore == null) ? 0 : tripleStore.hashCode());
+		result = prime * result + ((dictionary == null) ? 0 : dictionary.hashCode());
+		result = prime * result + ((tripleStore == null) ? 0 : tripleStore.hashCode());
 		return result;
 	}
 
@@ -102,5 +103,5 @@ public class ParserImplNaive implements Parser {
 			return false;
 		return true;
 	}
-	
+
 }

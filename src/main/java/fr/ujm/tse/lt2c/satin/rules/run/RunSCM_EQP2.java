@@ -36,7 +36,7 @@ public class RunSCM_EQP2 extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> subpropertyMultimap = ts1.getMultiMapForPredicate(subPropertyOf);
-		if (subpropertyMultimap != null && subpropertyMultimap.size() > 0) {
+		if (subpropertyMultimap != null && !subpropertyMultimap.isEmpty()) {
 
 			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 

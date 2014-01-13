@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
@@ -20,8 +21,12 @@ import com.mongodb.MongoClient;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-
 public class ResultsViewer {
+
+	private ResultsViewer() {
+	}
+
+	private static Logger logger = Logger.getLogger(ResultsViewer.class);
 
 	/**
 	 * @param args
@@ -44,18 +49,16 @@ public class ResultsViewer {
 				StringWriter writer = new StringWriter();
 				try {
 					Template hellotemplate = config.getTemplate("run.ftl");
-					// DBObject document = collection.findOne();
 					Map<String, Object> data = new HashMap<String, Object>();
 					List<String> runs = new ArrayList<String>();
 					for (RunEntity run : ds.find(RunEntity.class).order("-date")) {
 						runs.add(writeRun(run));
-						// System.out.println(writeRun(run));
 					}
 					data.put("runs", runs);
 
 					hellotemplate.process(data, writer);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("", e);
 					halt(500);
 				}
 				return writer;
@@ -64,17 +67,18 @@ public class ResultsViewer {
 			private String writeRun(RunEntity run) {
 
 				StringBuilder sb = new StringBuilder();
+				String td = "<TD>", etd = "</TD";
 
-				sb.append("<TD>" + run.getSession_id() + "</TD>");
-				sb.append("<TD>" + run.getDate().toLocaleString() + "</TD>");
-				sb.append("<TD>" + run.getFile() + "</TD>");
-				sb.append("<TD>" + run.getInference_time() + "</TD>");
-				sb.append("<TD>" + run.getNb_initial_triples() + "</TD>");
-				sb.append("<TD>" + run.getNb_infered_triples() + "</TD>");
-				sb.append("<TD>" + run.getLoops() + "</TD>");
-				sb.append("<TD>" + run.getNb_duplicates() + "</TD>");
-				sb.append("<TD>" + ((run.getMissing_triples() == null) ? 0 : run.getMissing_triples().size()) + "</TD>");
-				sb.append("<TD>" + ((run.getToo_triples() == null) ? 0 : run.getToo_triples().size()) + "</TD>");
+				sb.append(td + run.getSessionId() + etd);
+				sb.append(td + run.getDate().toLocaleString() + etd);
+				sb.append(td + run.getFile() + etd);
+				sb.append(td + run.getInferenceTime() + etd);
+				sb.append(td + run.getNbInitialTriples() + etd);
+				sb.append(td + run.getNbInferedTriples() + etd);
+				sb.append(td + run.getLoops() + etd);
+				sb.append(td + run.getNbDuplicates() + etd);
+				sb.append(td + ((run.getMissingTriples() == null) ? 0 : run.getMissingTriples().size()) + etd);
+				sb.append(td + ((run.getTooTriples() == null) ? 0 : run.getTooTriples().size()) + etd);
 
 				return sb.toString();
 			}

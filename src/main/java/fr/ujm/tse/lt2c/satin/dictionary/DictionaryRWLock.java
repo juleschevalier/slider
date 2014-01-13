@@ -15,7 +15,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
  */
 public class DictionaryRWLock extends AbstractDictionary{
 
-	private HashMap<String,Long> triples= new HashMap<>();
+	private Map<String,Long> triples= new HashMap<>();
 	long counter;
 	
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
@@ -74,7 +74,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 	}
 
 	@Override
-	public long add(String s) {
+	public final long add(String s) {
 		rwlock.writeLock().lock();
 		if(this.triples.containsKey(s)){
 			long id = this.get(s);
@@ -88,7 +88,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 	}
 
 	@Override
-	public String get(long index) {
+	public final String get(long index) {
 		rwlock.readLock().lock();
 		Iterator<Entry<String, Long>> it = this.triples.entrySet().iterator();
 		while (it.hasNext()) {
@@ -104,7 +104,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 	}
 
 	@Override
-	public long get(String s) {
+	public final long get(String s) {
 		rwlock.readLock().lock();
 		long id = this.triples.get(s);
 		rwlock.readLock().unlock();
@@ -112,7 +112,7 @@ public class DictionaryRWLock extends AbstractDictionary{
 	}
 
 	@Override
-	public long size() {
+	public final long size() {
 		return this.triples.size();
 	}
 

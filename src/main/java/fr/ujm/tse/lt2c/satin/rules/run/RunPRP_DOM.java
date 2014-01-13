@@ -36,7 +36,7 @@ public class RunPRP_DOM extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
-		if (domainMultiMap != null && domainMultiMap.size() > 0) {
+		if (domainMultiMap != null && !domainMultiMap.isEmpty()) {
 
 			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 

@@ -90,7 +90,7 @@ public abstract class AbstractRun implements RuleRun {
 			logger.debug(this.ruleName + " : " + outputTriples.size() + " triples generated");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("",e);
 		} finally {
 			if (logger.isTraceEnabled())
 				logger.trace(this.ruleName + " arriveAndDeregister on " + ReasonnerStreamed.phaser);
@@ -114,7 +114,7 @@ public abstract class AbstractRun implements RuleRun {
 				tripleStore.add(triple);
 				newTriples.add(triple);
 			} else {
-				ReasonnerStreamed.DEBUG_nb_duplicates.incrementAndGet();
+				ReasonnerStreamed.debugNbDuplicates.incrementAndGet();
 				logTrace(dictionary.printTriple(triple) + " already present");
 			}
 		}

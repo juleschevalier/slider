@@ -40,7 +40,7 @@ public class RunPRP_RNG extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> rangeMultiMap = ts1.getMultiMapForPredicate(range);
-		if (rangeMultiMap != null && rangeMultiMap.size() > 0) {
+		if (rangeMultiMap != null && !rangeMultiMap.isEmpty()) {
 
 			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 

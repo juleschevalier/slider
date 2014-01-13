@@ -16,9 +16,9 @@ public class TripleDistributor {
 
 	private static Logger logger = Logger.getLogger(TripleDistributor.class);
 
-	private Multimap<Long, TripleBuffer> subscribers;
-	private Collection<TripleBuffer> universalSubscribers;
-	String DEBUG_name = "";
+	private final Multimap<Long, TripleBuffer> subscribers;
+	private final Collection<TripleBuffer> universalSubscribers;
+	String debugName = "";
 
 	public TripleDistributor() {
 		super();
@@ -28,13 +28,15 @@ public class TripleDistributor {
 
 	public void addSubscriber(TripleBuffer tripleBuffer, long[] predicates) {
 		if (predicates.length == 0) {
-			if (!this.universalSubscribers.contains(tripleBuffer))
+			if (!this.universalSubscribers.contains(tripleBuffer)) {
 				this.universalSubscribers.add(tripleBuffer);
+			}
 			return;
 		}
 		for (Long predicate : predicates) {
-			if (!this.subscribers.containsEntry(predicate, tripleBuffer))
+			if (!this.subscribers.containsEntry(predicate, tripleBuffer)) {
 				this.subscribers.put(predicate, tripleBuffer);
+			}
 		}
 	}
 
@@ -42,25 +44,28 @@ public class TripleDistributor {
 		/*
 		 * ISSUE -> ALL BUFFERS WAIT FOR ONE BLOCKED
 		 */
-		long DEBUG_distributed = 0;
+		long debugDistributed = 0;
 		for (Triple triple : triples) {
 			long p = triple.getPredicate();
 			for (TripleBuffer tripleBuffer : this.subscribers.get(p)) {
-				while (!tripleBuffer.add(triple))
+				while (!tripleBuffer.add(triple)) {
 					;
+				}
 			}
 			for (TripleBuffer tripleBuffer : this.universalSubscribers) {
-				while (!tripleBuffer.add(triple))
+				while (!tripleBuffer.add(triple)) {
 					;
+				}
 			}
-			DEBUG_distributed += (this.universalSubscribers.size() + this.subscribers.get(p).size());
+			debugDistributed += (this.universalSubscribers.size() + this.subscribers.get(p).size());
 		}
-		if (logger.isTraceEnabled())
-			logger.trace(DEBUG_name + " " + DEBUG_distributed + " triples sent (" + triples.size() + " unique triples, " + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
+		if (logger.isTraceEnabled()) {
+			logger.trace(debugName + " " + debugDistributed + " triples sent (" + triples.size() + " unique triples, " + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
+		}
 	}
 
 	public void setName(String name) {
-		this.DEBUG_name = name;
+		this.debugName = name;
 	}
 
 	public int subscribersNumber() {
@@ -71,11 +76,11 @@ public class TripleDistributor {
 		StringBuilder subs = new StringBuilder();
 		subs.append("\n");
 		for (TripleBuffer buffer : universalSubscribers) {
-			subs.append(name + " send to " + buffer.getDEBUG_name() + " for *\n");
+			subs.append(name + " send to " + buffer.getDebugName() + " for *\n");
 		}
 		for (Long predicate : subscribers.keySet()) {
 			for (TripleBuffer buffer : subscribers.get(predicate)) {
-				subs.append(name + " send to " + buffer.getDEBUG_name() + " for " + dictionary.printConcept(dictionary.get(predicate)) + "\n");
+				subs.append(name + " send to " + buffer.getDebugName() + " for " + dictionary.printConcept(dictionary.get(predicate)) + "\n");
 			}
 		}
 		return subs.toString();

@@ -40,7 +40,7 @@ public class RunSCM_DOM1 extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
-		if (subclassMultimap != null && subclassMultimap.size() > 0) {
+		if (subclassMultimap != null && !subclassMultimap.isEmpty()) {
 
 			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 

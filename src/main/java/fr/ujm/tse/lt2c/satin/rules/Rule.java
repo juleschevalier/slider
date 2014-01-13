@@ -32,13 +32,13 @@ public class Rule implements BufferListener {
 		this.executor = executor;
 
 		this.tripleBuffer.addBufferListener(this);
-		this.tripleBuffer.setDEBUG_name(ruleRun.getRuleName());
+		this.tripleBuffer.setDebugName(ruleRun.getRuleName());
 
 	}
 
 	@Override
 	public void bufferFull() {
-		if ((ReasonnerStreamed.runningThreads.get() < ReasonnerStreamed.max_threads) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
+		if ((ReasonnerStreamed.runningThreads.get() < ReasonnerStreamed.maxThreads) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
 //			this.executor.submit(this.ruleRun);
 			this.ruleRun.run();
 		}

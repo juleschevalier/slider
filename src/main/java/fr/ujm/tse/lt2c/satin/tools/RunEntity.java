@@ -13,40 +13,40 @@ public class RunEntity {
 
 	@Id
 	private ObjectId id;
-	private int session_id;
+	private int sessionId;
 	private String file;
 	private Date date;
 	private String loops;
-	private String nb_duplicates;
-	private String inference_time;
-	private String nb_initial_triples;
-	private String nb_infered_triples;
-	private String nb_missing_triples;
-	private String nb_too_triples;
+	private String nbDuplicates;
+	private String inferenceTime;
+	private String nbInitialTriples;
+	private String nbInferedTriples;
+	private String nbMissingTriples;
+	private String nbTooTriples;
 
 	@Embedded
-	private List<String> missing_triples;
+	private List<String> missingTriples;
 	@Embedded
-	private List<String> too_triples;
+	private List<String> tooTriples;
 
-	public RunEntity(){
-	    super();
+	public RunEntity() {
+		super();
 	}
 
-	public RunEntity(String file, int session_id, long loops, int nb_duplicates, long inference_time, long nb_initial_triples, long nb_infered_triples, List<String> missing_triples, List<String> too_triples) {
+	public RunEntity(String file, int sessionId, long loops, int nbDuplicates, long inferenceTime, long nbInitialTriples, long nb_infered_triples, List<String> missing_triples, List<String> too_triples) {
 		super();
-		this.setSession_id(session_id);
+		this.sessionId = sessionId;
 		this.file = file;
 		this.date = new Date();
-		this.loops = loops+"";
-		this.nb_duplicates = nb_duplicates+"";
-		this.inference_time = inference_time+"";
-		this.nb_initial_triples = nb_initial_triples+"";
-		this.nb_infered_triples = nb_infered_triples+"";
-		this.nb_missing_triples = missing_triples.size()+"";
-		this.nb_too_triples = too_triples.size()+"";
-		this.missing_triples = missing_triples;
-		this.too_triples = too_triples;
+		this.loops = loops + "";
+		this.nbDuplicates = nbDuplicates + "";
+		this.inferenceTime = inferenceTime + "";
+		this.nbInitialTriples = nbInitialTriples + "";
+		this.nbInferedTriples = nb_infered_triples + "";
+		this.nbMissingTriples = missing_triples.size() + "";
+		this.nbTooTriples = too_triples.size() + "";
+		this.missingTriples = missing_triples;
+		this.tooTriples = too_triples;
 	}
 
 	public ObjectId getId() {
@@ -55,6 +55,14 @@ public class RunEntity {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+	public int getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(int sessionId) {
+		this.sessionId = sessionId;
 	}
 
 	public String getFile() {
@@ -81,76 +89,68 @@ public class RunEntity {
 		this.loops = loops;
 	}
 
-	public String getInference_time() {
-		return inference_time;
+	public String getNbDuplicates() {
+		return nbDuplicates;
 	}
 
-	public void setInference_time(String inference_time) {
-		this.inference_time = inference_time;
+	public void setNbDuplicates(String nbDuplicates) {
+		this.nbDuplicates = nbDuplicates;
 	}
 
-	public String getNb_initial_triples() {
-		return nb_initial_triples;
+	public String getInferenceTime() {
+		return inferenceTime;
 	}
 
-	public void setNb_initial_triples(String nb_initial_triples) {
-		this.nb_initial_triples = nb_initial_triples;
+	public void setInferenceTime(String inferenceTime) {
+		this.inferenceTime = inferenceTime;
 	}
 
-	public String getNb_infered_triples() {
-		return nb_infered_triples;
+	public String getNbInitialTriples() {
+		return nbInitialTriples;
 	}
 
-	public void setNb_infered_triples(String nb_infered_triples) {
-		this.nb_infered_triples = nb_infered_triples;
+	public void setNbInitialTriples(String nbInitialTriples) {
+		this.nbInitialTriples = nbInitialTriples;
 	}
 
-	public String getNb_missing_triples() {
-		return nb_missing_triples;
+	public String getNbInferedTriples() {
+		return nbInferedTriples;
 	}
 
-	public void setNb_missing_triples(String nb_missing_triples) {
-		this.nb_missing_triples = nb_missing_triples;
+	public void setNbInferedTriples(String nbInferedTriples) {
+		this.nbInferedTriples = nbInferedTriples;
 	}
 
-	public String getNb_too_triples() {
-		return nb_too_triples;
+	public String getNbMissingTriples() {
+		return nbMissingTriples;
 	}
 
-	public void setNb_too_triples(String nb_too_triples) {
-		this.nb_too_triples = nb_too_triples;
+	public void setNbMissingTriples(String nbMissingTriples) {
+		this.nbMissingTriples = nbMissingTriples;
 	}
 
-	public List<String> getMissing_triples() {
-		return missing_triples;
+	public String getNbTooTriples() {
+		return nbTooTriples;
 	}
 
-	public void setMissing_triples(List<String> missing_triples) {
-		this.missing_triples = missing_triples;
+	public void setNbTooTriples(String nbTooTriples) {
+		this.nbTooTriples = nbTooTriples;
 	}
 
-	public List<String> getToo_triples() {
-		return too_triples;
+	public List<String> getMissingTriples() {
+		return missingTriples;
 	}
 
-	public void setToo_triples(List<String> too_triples) {
-		this.too_triples = too_triples;
+	public void setMissingTriples(List<String> missingTriples) {
+		this.missingTriples = missingTriples;
 	}
 
-	public int getSession_id() {
-		return session_id;
+	public List<String> getTooTriples() {
+		return tooTriples;
 	}
 
-	public void setSession_id(int session_id) {
-		this.session_id = session_id;
-	}
-
-	public String getNb_duplicates() {
-		return nb_duplicates;
-	}
-
-	public void setNb_duplicates(String nb_duplicates) {
-		this.nb_duplicates = nb_duplicates;
+	public void setTooTriples(List<String> tooTriples) {
+		this.tooTriples = tooTriples;
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class RunEntity {
 		builder.append("RunEntity [id=");
 		builder.append(id);
 		builder.append(", session_id=");
-		builder.append(session_id);
+		builder.append(sessionId);
 		builder.append(", file=");
 		builder.append(file);
 		builder.append(", date=");
@@ -167,25 +167,23 @@ public class RunEntity {
 		builder.append(", loops=");
 		builder.append(loops);
 		builder.append(", nb_duplicates=");
-		builder.append(nb_duplicates);
+		builder.append(nbDuplicates);
 		builder.append(", inference_time=");
-		builder.append(inference_time);
+		builder.append(inferenceTime);
 		builder.append(", nb_initial_triples=");
-		builder.append(nb_initial_triples);
+		builder.append(nbInitialTriples);
 		builder.append(", nb_infered_triples=");
-		builder.append(nb_infered_triples);
+		builder.append(nbInferedTriples);
 		builder.append(", nb_missing_triples=");
-		builder.append(nb_missing_triples);
+		builder.append(nbMissingTriples);
 		builder.append(", nb_too_triples=");
-		builder.append(nb_too_triples);
+		builder.append(nbTooTriples);
 		builder.append(", missing_triples=");
-		builder.append(missing_triples);
+		builder.append(missingTriples);
 		builder.append(", too_triples=");
-		builder.append(too_triples);
+		builder.append(tooTriples);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 
 }

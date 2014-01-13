@@ -12,6 +12,10 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
+/**
+ * @author Jules Chevalier
+ * 
+ */
 public class TripleBufferLock implements TripleBuffer {
 
 	private static Logger logger = Logger.getLogger(TripleBufferLock.class);
@@ -19,27 +23,30 @@ public class TripleBufferLock implements TripleBuffer {
 	TripleStore mainBuffer;
 	TripleStore secondaryBuffer;
 	ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
-	Collection<BufferListener> bufferListeners; // Registered listeners
-	
-	String DEBUG_name;
-	
-	public String getDEBUG_name() {
-		return DEBUG_name;
+	Collection<BufferListener> bufferListeners;
+
+	String debugName;
+
+	@Override
+	public String getDebugName() {
+		return debugName;
 	}
 
-	public void setDEBUG_name(String DEBUG_name) {
-		this.DEBUG_name = DEBUG_name;
+	@Override
+	public void setDebugName(String debugName) {
+		this.debugName = debugName;
 	}
 
 	long lastFlush;
 
-	static final long BUFFER_SIZE = 100; // Limit of the main buffer
+	// Limit of the main buffer
+	static final long BUFFER_SIZE = 100;
 
 	public TripleBufferLock() {
 		this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
 		this.secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
 		this.bufferListeners = new HashSet<>();
-		this.lastFlush=System.nanoTime();
+		this.lastFlush = System.nanoTime();
 	}
 
 	@Override
@@ -56,8 +63,9 @@ public class TripleBufferLock implements TripleBuffer {
 					logger.trace(this.hashCode() + " switch buffers");
 					switchBuffers();
 					for (BufferListener bufferListener : bufferListeners) {
-						if(logger.isTraceEnabled())
+						if (logger.isTraceEnabled()) {
 							logger.trace("Buffer really full");
+						}
 						bufferListener.bufferFull();
 					}
 					this.mainBuffer.add(triple);
@@ -65,12 +73,15 @@ public class TripleBufferLock implements TripleBuffer {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 		} finally {
 			rwlock.writeLock().unlock();
 		}
-		if (!success)if (logger.isTraceEnabled())
-			logger.trace(this.hashCode() + "Add failed");
+		if (!success) {
+			if (logger.isTraceEnabled()) {
+				logger.trace(this.hashCode() + "Add failed");
+			}
+		}
 		return success;
 	}
 
@@ -82,13 +93,12 @@ public class TripleBufferLock implements TripleBuffer {
 
 	@Override
 	public TripleStore clear() {
-		if(mainBufferOccupation()+secondaryBufferOccupation()==0)
-			logger.warn(this.DEBUG_name+" clear an empty buffer");
-		
+		if (mainBufferOccupation() + secondaryBufferOccupation() == 0) {
+			logger.warn(this.debugName + " clear an empty buffer");
+		}
+
 		rwlock.writeLock().lock();
 		if (secondaryBuffer.isEmpty()) {
-//			if(logger.isTraceEnabled())
-//				logger.trace("clear for a flush");
 			switchBuffers();
 		}
 		TripleStore temp = null;
@@ -96,9 +106,9 @@ public class TripleBufferLock implements TripleBuffer {
 			temp = secondaryBuffer;
 			secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 		} finally {
-			this.lastFlush=System.nanoTime();
+			this.lastFlush = System.nanoTime();
 			rwlock.writeLock().unlock();
 		}
 		return temp;
@@ -109,11 +119,14 @@ public class TripleBufferLock implements TripleBuffer {
 		this.bufferListeners.add(bufferListener);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public TripleStore flush() {
 		TripleStore temp = this.mainBuffer;
-		this.lastFlush=System.nanoTime();
+		this.lastFlush = System.nanoTime();
 		mainBuffer = new VerticalPartioningTripleStoreRWLock();
 		return temp;
 	}
@@ -143,8 +156,9 @@ public class TripleBufferLock implements TripleBuffer {
 	public Collection<BufferListener> getBufferListeners() {
 		return this.bufferListeners;
 	}
-	
-	public long getLastFlush(){
+
+	@Override
+	public long getLastFlush() {
 		return this.lastFlush;
 	}
 
@@ -160,10 +174,10 @@ public class TripleBufferLock implements TripleBuffer {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 		} finally {
 			rwlock.writeLock().unlock();
 		}
-		
+
 	}
 }

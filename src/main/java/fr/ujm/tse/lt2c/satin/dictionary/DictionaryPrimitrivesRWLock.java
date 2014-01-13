@@ -14,7 +14,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
  */
 public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 
-	private HashMap<String, Long> triples = new HashMap<>();
+	private Map<String, Long> triples = new HashMap<>();
 	long counter;
 	long primitivesCounter;
 
@@ -74,7 +74,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 	}
 
 	@Override
-	public long add(String s) {
+	public final long add(String s) {
 		rwlock.writeLock().lock();
 		if (this.triples.containsKey(s)) {
 			long id = this.get(s);
@@ -94,7 +94,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 	}
 
 	@Override
-	public String get(long index) {
+	public final String get(long index) {
 		rwlock.readLock().lock();
 		Iterator<Entry<String, Long>> it = this.triples.entrySet().iterator();
 		while (it.hasNext()) {
@@ -110,7 +110,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 	}
 
 	@Override
-	public long get(String s) {
+	public final long get(String s) {
 		rwlock.readLock().lock();
 		long id = this.triples.get(s);
 		rwlock.readLock().unlock();
@@ -118,7 +118,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 	}
 
 	@Override
-	public long size() {
+	public final long size() {
 		return this.triples.size();
 	}
 
@@ -154,22 +154,6 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 	public String printTriple(Triple t) {
 		rwlock.readLock().lock();
 		String s = printConcept(this.get(t.getSubject())), p = printConcept(this.get(t.getPredicate())), o = printConcept(this.get(t.getObject()));
-
-		// s=s.replaceAll("(\".*\")\\^\\^.*", "$1");
-		// p=p.replaceAll("(\".*\")\\^\\^.*", "$1");
-		// o=o.replaceAll("(\".*\")\\^\\^.*", "$1");
-		//
-		// if(s.split("#").length>1)
-		// s=s.split("#")[1];
-		// if(p.split("#").length>1)
-		// p=p.split("#")[1];
-		// if(o.split("#").length>1)
-		// o=o.split("#")[1];
-		//
-		// s=s.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-		// p=p.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-		// o=o.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-
 		rwlock.readLock().unlock();
 
 		return s + " " + p + " " + o;

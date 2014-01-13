@@ -2,12 +2,11 @@ package fr.ujm.tse.lt2c.satin.dictionary;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 
-
 /**
  * @author Jules Chevalier
- *
+ * 
  */
-public abstract class AbstractDictionary implements Dictionary{
+public abstract class AbstractDictionary implements Dictionary {
 
 	public static long wedontcare = -1;
 	public static long allDifferent = 0;
@@ -54,20 +53,21 @@ public abstract class AbstractDictionary implements Dictionary{
 	public static long subPropertyOf = 0;
 	public static long type = 0;
 
-
-//	@Override
+	// @Override
+	@Override
 	public String printConcept(String c) {
-		/*Replace integers, strings... by their value*/
-		c=c.replaceAll("(\".*\")\\^\\^.*", "$1");
-		
-		/*Cut the url, keep the name*/
-		if(c.split("#").length>1)
-			c=c.split("#")[1];
+		/* Replace integers, strings... by their value */
+		c = c.replaceAll("(\".*\")\\^\\^.*", "$1");
 
-		/*Replace all blanknodes by BLANKNODE*/
-		c=c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
-		
+		/* Cut the url, keep the name */
+		if (c.split("#").length > 1) {
+			c = c.split("#")[1];
+		}
+
+		/* Replace all blanknodes by BLANKNODE */
+		c = c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-[0-9a-z]+", "BLANKNODE");
+
 		return c;
 	}
-	
+
 }

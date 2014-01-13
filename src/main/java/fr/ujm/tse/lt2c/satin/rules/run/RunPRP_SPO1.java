@@ -35,7 +35,7 @@ public class RunPRP_SPO1 extends AbstractRun {
 		int loops = 0;
 
 		Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
-		if (subPropertyOfMultiMap != null && subPropertyOfMultiMap.size() > 0) {
+		if (subPropertyOfMultiMap != null && !subPropertyOfMultiMap.isEmpty()) {
 
 			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 
