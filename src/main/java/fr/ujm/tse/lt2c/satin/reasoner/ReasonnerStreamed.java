@@ -67,7 +67,7 @@ public class ReasonnerStreamed {
 		// files.add("univ-bench.owl");
 		// files.add("sweetAll.owl");
 		// files.add("wine.rdf");
-		// files.add("geopolitical_200Ko.owl");
+		files.add("geopolitical_200Ko.owl");
 		// files.add("geopolitical_300Ko.owl");
 		// files.add("geopolitical_500Ko.owl");
 		// files.add("geopolitical_1Mo.owl");
