@@ -15,19 +15,19 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TestVerticalPartitioningTripleStoreRWLock {
 
-	@Test
-	public void test() {
-		TripleStore ts = new VerticalPartioningTripleStoreRWLock();
-		Set<Triple> generated = new HashSet<>();
-		Random random = new Random();
-		for (int i = 0; i < 10000; i++) {
-			Triple t = new ImmutableTriple(random.nextInt(10), random.nextInt(10), random.nextInt(10));
-			ts.add(t);
-			generated.add(t);
-		}
-		assertEquals(ts.size(), generated.size());
-		assertEquals(ts.getAll().size(), generated.size());
+    @Test
+    public void test() {
+        TripleStore ts = new VerticalPartioningTripleStoreRWLock();
+        Set<Triple> generated = new HashSet<>();
+        Random random = new Random();
+        for (int i = 0; i < 10000; i++) {
+            Triple t = new ImmutableTriple(random.nextInt(10), random.nextInt(10), random.nextInt(10));
+            ts.add(t);
+            generated.add(t);
+        }
+        assertEquals(ts.size(), generated.size());
+        assertEquals(ts.getAll().size(), generated.size());
 
-	}
+    }
 
 }

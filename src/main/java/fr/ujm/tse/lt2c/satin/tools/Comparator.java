@@ -14,48 +14,48 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class Comparator {
 
-	private Comparator() {
-	}
+    private Comparator() {
+    }
 
-	public static Map<Integer, List<String>> compare(String ground_file, Dictionary dictionary, TripleStore triples) {
+    public static Map<Integer, List<String>> compare(String groundFile, Dictionary dictionary, TripleStore triples) {
 
-		TripleStore ground_triples = new VerticalPartioningTripleStoreRWLock();
-		List<String> missing_triples = new ArrayList<>();
-		List<String> too_triples = new ArrayList<>();
+        TripleStore groundTriples = new VerticalPartioningTripleStoreRWLock();
+        List<String> missingTriples = new ArrayList<>();
+        List<String> tooTriples = new ArrayList<>();
 
-		Parser parser = new ParserImplNaive(dictionary, ground_triples);
-		parser.parse(ground_file);
+        Parser parser = new ParserImplNaive(dictionary, groundTriples);
+        parser.parse(groundFile);
 
-		for (Triple groundTriple : ground_triples.getAll()) {
-			if (!triples.contains(groundTriple)) {
-				missing_triples.add(dictionary.printTriple(groundTriple));
-			}
-		}
-		for (Triple triple : triples.getAll()) {
-			if (!ground_triples.contains(triple)) {
-				too_triples.add(dictionary.printTriple(triple));
-			}
-		}
-		Collections.sort(missing_triples);
-		Collections.sort(too_triples);
+        for (Triple groundTriple : groundTriples.getAll()) {
+            if (!triples.contains(groundTriple)) {
+                missingTriples.add(dictionary.printTriple(groundTriple));
+            }
+        }
+        for (Triple triple : triples.getAll()) {
+            if (!groundTriples.contains(triple)) {
+                tooTriples.add(dictionary.printTriple(triple));
+            }
+        }
+        Collections.sort(missingTriples);
+        Collections.sort(tooTriples);
 
-		removeDuplicates(missing_triples, too_triples);
+        removeDuplicates(missingTriples, tooTriples);
 
-		Map<Integer, List<String>> return_tists = new HashMap<>();
-		return_tists.put(0, missing_triples);
-		return_tists.put(1, too_triples);
+        Map<Integer, List<String>> returnLists = new HashMap<>();
+        returnLists.put(0, missingTriples);
+        returnLists.put(1, tooTriples);
 
-		return return_tists;
-	}
+        return returnLists;
+    }
 
-	private static void removeDuplicates(List<String> missing_triples, List<String> too_triples) {
-		List<String> tmp = new ArrayList<>();
-		for (String string : missing_triples) {
-			tmp.add(string);
-		}
+    private static void removeDuplicates(List<String> missingTriples, List<String> tooTriples) {
+        List<String> tmp = new ArrayList<>();
+        for (String string : missingTriples) {
+            tmp.add(string);
+        }
 
-		missing_triples.removeAll(too_triples);
-		too_triples.removeAll(tmp);
-	}
+        missingTriples.removeAll(tooTriples);
+        tooTriples.removeAll(tmp);
+    }
 
 }

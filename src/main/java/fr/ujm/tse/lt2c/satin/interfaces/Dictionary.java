@@ -9,45 +9,53 @@ package fr.ujm.tse.lt2c.satin.interfaces;
  */
 public interface Dictionary {
 
-	/**
-	 * @param s
-	 * @return the id of the concept named s, just added in the dictionary
-	 *         If the concept was already present, it just return the id
-	 */
-	public abstract long add(String s);
+    /**
+     * @param s
+     * @return the id of the concept named s, just added in the dictionary
+     *         If the concept was already present, it just return the id
+     */
+    long add(String s);
 
-	/**
-	 * @param index
-	 * @return the name of the concept indexed with index
-	 */
-	public abstract String get(long index);
+    /**
+     * @param index
+     * @return the name of the concept indexed with index
+     */
+    String get(long index);
 
-	/**
-	 * @param s
-	 * @return the id of the concept named s
-	 */
-	public abstract long get(String s);
+    /**
+     * @param s
+     * @return the id of the concept named s
+     */
+    long get(String s);
 
-	/**
-	 * @return the number of concepts
-	 */
-	public abstract long size();
+    /**
+     * @return the number of concepts
+     */
+    long size();
 
-	/**
-	 * @param c
-	 * @return the concept name without the url, or "BLANKNODE" if it is one
-	 */
-	public String printConcept(String c);
+    /**
+     * @param c
+     * @return the concept name without the url, or "BLANKNODE" if it is one
+     */
+    String printConcept(String c);
 
-	/**
-	 * @param t
-	 * @return the triple printed thanks to printConcept
-	 * @see printConcept
-	 */
-	public String printTriple(Triple t);
+    /**
+     * @param t
+     * @return the triple printed thanks to printConcept
+     * @see #printConcept(String)
+     * @see Triple
+     */
+    String printTriple(Triple t);
 
-	public abstract int hashCode();
+    @Override
+    int hashCode();
 
-	public abstract boolean equals(Object obj);
+    @Override
+    boolean equals(Object obj);
+
+    /**
+     * @return the entire dictionary in a String
+     */
+    String printDico();
 
 }

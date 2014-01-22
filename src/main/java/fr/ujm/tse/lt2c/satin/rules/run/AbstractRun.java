@@ -3,7 +3,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 
 import org.apache.log4j.Logger;
 
@@ -14,180 +14,195 @@ import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerStreamed;
 
 public abstract class AbstractRun implements RuleRun {
 
-	private static Logger logger = Logger.getLogger(AbstractRun.class);
+    private static Logger logger = Logger.getLogger(AbstractRun.class);
 
-	protected Dictionary dictionary;
-	protected TripleStore tripleStore;
-	protected TripleDistributor distributor;
-	protected TripleBuffer tripleBuffer;
+    protected Dictionary dictionary;
+    protected TripleStore tripleStore;
+    protected TripleDistributor distributor;
+    protected TripleBuffer tripleBuffer;
+    protected String ruleName = "";
+    protected int debugThreads;
+    protected Phaser phaser;
 
-	protected String ruleName = "";
-	public static long[] input_matchers;
-	public static long[] output_matchers;
+    /**
+     * Constructor
+     * 
+     * @param dictionary
+     * @param tripleStore
+     * @param ruleName
+     * @param doneSignal
+     * 
+     * @see Dictionary
+     * @see TripleStore
+     */
+    public AbstractRun(Dictionary dictionary, TripleStore tripleStore, Phaser pĥaser, String ruleName) {
+        this.dictionary = dictionary;
+        this.tripleStore = tripleStore;
+        this.ruleName = ruleName;
+        this.distributor = new TripleDistributor();
+        this.tripleBuffer = new TripleBufferLock();
+        this.debugThreads = 0;
+        this.phaser = pĥaser;
 
-	protected CountDownLatch doneSignal;
-	protected boolean finished = false;
-	protected int threads;
+        this.distributor.setName(ruleName + " Distributor");
+    }
 
-	public AbstractRun(Dictionary dictionary, TripleStore tripleStore, String ruleName, CountDownLatch doneSignal) {
-		this.dictionary = dictionary;
-		this.tripleStore = tripleStore;
-		this.ruleName = ruleName;
-		this.doneSignal = doneSignal;
-		this.distributor = new TripleDistributor();
-		this.tripleBuffer = new TripleBufferLock();
-		this.threads = 0;
+    @Override
+    public void run() {
 
-		this.distributor.setName(ruleName + " Distributor");
-	}
+        final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
 
-	@Override
-	public void run() {
-		
-		if(this.tripleBuffer.mainBufferOccupation()+this.tripleBuffer.secondaryBufferOccupation()==0){
-			logger.warn("EMPTY");
-			return;
-		}
+        if (logger.isTraceEnabled()) {
+            logger.trace(this.ruleName + runId + " START");
+        }
 
-		if (logger.isTraceEnabled())
-			logger.trace(this.ruleName + " START");
-		ReasonnerStreamed.runningThreads.incrementAndGet();
-		this.threads++;
+        /*
+         * Buffer verification
+         */
 
-		try {
+        if (this.tripleBuffer.mainBufferOccupation() + this.tripleBuffer.secondaryBufferOccupation() == 0) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(this.ruleName + runId + " started for nothing");
+                logger.trace(this.ruleName + runId + " END");
+            }
+            return;
+        }
 
-			if (logger.isTraceEnabled())
-				logger.trace(this.ruleName + " register on " + ReasonnerStreamed.phaser);
-			ReasonnerStreamed.phaser.register();
+        try {
 
-			long DEBUG_loops = 0;
+            /*
+             * Get triples from buffer
+             */
+            TripleStore usableTriples = this.tripleBuffer.clear();
 
-			/* Get triples from buffer */
-			TripleStore usableTriples = this.tripleBuffer.clear();
+            if (usableTriples == null) {
+                logger.error(this.ruleName + runId + " NULL usableTriples");
+                return;
+            }
 
-			if (usableTriples == null)
-				logger.warn(this.ruleName + " NULL usableTriples");
+            /*
+             * Register on phaser
+             * Notifies the Reasoner this thread infers
+             */
+            if (logger.isTraceEnabled()) {
+                logger.trace(this.ruleName + runId + " register on " + this.phaser);
+            }
+            if (this.phaser.register() < 0) {
+                logger.warn(ruleName + runId + " register on closed phaser");
+            }
+            this.debugThreads++;
 
-			Collection<Triple> outputTriples = new HashSet<>();
+            long debugLoops = 0;
 
-			if (usableTriples.isEmpty()) { // USELESS ??
-				logger.warn(this.ruleName + " run without triples");
-				// DEBUG_loops += process(tripleStore, tripleStore,
-				// outputTriples);
-			} else {
-				DEBUG_loops += process(usableTriples, tripleStore, outputTriples);
-				DEBUG_loops += process(tripleStore, usableTriples, outputTriples);
-			}
+            /*
+             * Initialize structure and get new triples from process()
+             */
+            Collection<Triple> outputTriples = new HashSet<>();
 
-			addNewTriples(outputTriples);
+            if (usableTriples.isEmpty()) {
+                logger.warn(this.ruleName + runId + " run without triples");
+            } else {
+                debugLoops += process(usableTriples, tripleStore, outputTriples);
+                debugLoops += process(tripleStore, usableTriples, outputTriples);
+            }
 
-//			logDebug(this.ruleName + " : " + DEBUG_loops + " iterations for " + outputTriples.size() + " triples generated");
-			if(logger.isDebugEnabled())
-			logger.debug(this.ruleName + " : " + outputTriples.size() + " triples generated");
+            /*
+             * Add new triples to the TripleStore
+             */
+            addNewTriples(outputTriples);
 
-		} catch (Exception e) {
-			logger.error("",e);
-		} finally {
-			if (logger.isTraceEnabled())
-				logger.trace(this.ruleName + " arriveAndDeregister on " + ReasonnerStreamed.phaser);
-			ReasonnerStreamed.phaser.arriveAndDeregister();
-			ReasonnerStreamed.runningThreads.decrementAndGet();
-			finish();
-		}
-	}
+            if (logger.isDebugEnabled()) {
+                logger.debug(this.ruleName + runId + " : " + outputTriples.size() + " triples generated (" + debugLoops + " loops)");
+            }
 
-	abstract protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
+        } catch (Exception e) {
+            logger.error("", e);
+        } finally {
+            /*
+             * Unregister from phaser (notifies the Reasoner the inference is
+             * over)
+             */
+            if (logger.isTraceEnabled()) {
+                logger.trace(this.ruleName + runId + " arriveAndDeregister on " + this.phaser);
+            }
+            if (this.phaser.arrive()/* AndDeregister() */< 0) {
+                logger.warn(ruleName + runId + " deregister on closed phaser");
+            }
+            if (logger.isTraceEnabled()) {
+                logger.trace(this.ruleName + runId + " END");
+            }
+        }
+    }
 
-	protected int addNewTriples(Collection<Triple> outputTriples) {
-		int duplicates = 0;
-		
-		if(outputTriples.isEmpty())
-			return duplicates;
-		
-		ArrayList<Triple> newTriples = new ArrayList<>();
-		for (Triple triple : outputTriples) {
-			if (!tripleStore.contains(triple)) {
-				tripleStore.add(triple);
-				newTriples.add(triple);
-			} else {
-				ReasonnerStreamed.debugNbDuplicates.incrementAndGet();
-				logTrace(dictionary.printTriple(triple) + " already present");
-			}
-		}
-		if (logger.isTraceEnabled())
-			logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
-		distributor.distribute(newTriples);
-		return duplicates;
-	}
+    protected abstract int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
 
-	protected void logDebug(String message) {
-		if (getLogger().isDebugEnabled()) {
-			// getLogger().debug((usableTriples.isEmpty() ? "F " + ruleName +
-			// " " : ruleName) + message);
-			getLogger().debug(ruleName + " " + message);
-		}
-	}
+    protected int addNewTriples(Collection<Triple> outputTriples) {
+        int duplicates = 0;
 
-	protected void logTrace(String message) {
-		if (getLogger().isTraceEnabled()) {
-			// getLogger().trace((usableTriples.isEmpty() ? "F " + ruleName +
-			// " " : ruleName + " ") + message);
-			getLogger().trace(ruleName + " " + message);
-		}
-	}
+        if (outputTriples.isEmpty()) {
+            return duplicates;
+        }
 
-	protected void finish() {
-		if (!this.finished) {
-//			logTrace(" unlatching " + doneSignal.getCount());
-//			this.finished = true;
-//			doneSignal.countDown();
-//			logTrace(" unlatched" + doneSignal.getCount());
-		}
-	}
+        ArrayList<Triple> newTriples = new ArrayList<>();
+        for (Triple triple : outputTriples) {
+            if (!tripleStore.contains(triple)) {
+                tripleStore.add(triple);
+                newTriples.add(triple);
+            } else {
+                logTrace(dictionary.printTriple(triple) + " already present");
+            }
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
+        }
+        distributor.distribute(newTriples);
+        return duplicates;
+    }
 
-	public CountDownLatch getDoneSignal() {
-		return doneSignal;
-	}
+    protected void logDebug(String message) {
+        if (getLogger().isDebugEnabled()) {
+            final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
+            getLogger().debug(ruleName + runId + " " + message);
+        }
+    }
 
-	public void setDoneSignal(CountDownLatch doneSignal) {
-		this.doneSignal = doneSignal;
-	}
+    protected void logTrace(String message) {
+        if (getLogger().isTraceEnabled()) {
+            final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
+            getLogger().trace(ruleName + runId + " " + message);
+        }
+    }
 
-	public boolean isFinished() {
-		return finished;
-	}
+    public String getRuleName() {
+        return ruleName;
+    }
 
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
+    public TripleBuffer getTripleBuffer() {
+        return this.tripleBuffer;
+    }
 
-	public String getRuleName() {
-		return ruleName;
-	}
+    public TripleDistributor getDistributor() {
+        return this.distributor;
+    }
 
-	public TripleBuffer getTripleBuffer() {
-		return this.tripleBuffer;
-	}
+    public abstract long[] getInputMatchers();
 
-	public TripleDistributor getDistributor() {
-		return this.distributor;
-	}
+    public abstract long[] getOutputMatchers();
 
-	abstract public long[] getInputMatchers();
+    public int getThreads() {
+        return debugThreads;
+    }
 
-	abstract public long[] getOutputMatchers();
+    @Override
+    public String toString() {
+        return this.ruleName;
+    }
 
-	public int getThreads() {
-		return threads;
-	}
-
-	@Override
-	public String toString() {
-		return this.ruleName;
-	}
+    public Phaser getPhaser() {
+        return this.phaser;
+    }
 
 }

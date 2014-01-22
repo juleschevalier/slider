@@ -3,72 +3,94 @@ package fr.ujm.tse.lt2c.satin.interfaces;
 import java.util.Collection;
 
 /**
+ * Interface for triple buffer
+ * 
  * @author jules
  * 
- *         Interface for triple buffer
  */
 public interface TripleBuffer {
 
-	/**
-	 * @param triple
-	 *            Add a triple to the buffer.
-	 *            Notifies subcsribers of "bufferfull" if needed
-	 *            
-	 * @return true if the insertion succeed
-	 */
-	public boolean add(Triple triple);
+    /**
+     * Add a triple to the buffer.
+     * Notifies subcsribers of "bufferfull" if needed
+     * 
+     * @param triple
+     * @return true if the insertion succeed
+     * @see Triple
+     */
+    boolean add(Triple triple);
 
-	/**
-	 * Following operations are performed :
-	 * <ol>
-	 * <li>Returns the second full buffer</li>
-	 * <li>Empty the second buffer</li>
-	 * 
-	 * </ol>
-	 * 
-	 * @return
-	 */
-	public TripleStore clear();
+    /**
+     * Following operations are performed :
+     * <ol>
+     * <li>Returns the second full buffer</li>
+     * <li>Empty the second buffer</li>
+     * 
+     * </ol>
+     * 
+     * @return
+     */
+    TripleStore clear();
 
-	/**
-	 * @param bufferListener
-	 *            which want to listen for buffer events
-	 */
-	public void addBufferListener(BufferListener bufferListener);
+    /**
+     * Add a listener to the buffer's events
+     * 
+     * @param bufferListener
+     * @see BufferListener
+     */
+    void addBufferListener(BufferListener bufferListener);
 
-	public Collection<BufferListener> getBufferListeners();
+    Collection<BufferListener> getBufferListeners();
 
-	/**
-	 * Flush all remaining triples in this buffer. Calls this method when
-	 * terminating the process
-	 * 
-	 * @return
-	 */
-	public TripleStore flush();
+    /**
+     * Flush all remaining triples in this buffer. Calls this method when
+     * terminating the process
+     * 
+     * @return
+     */
+    TripleStore flush();
 
-	/**
-	 * 
-	 * @return the size limit of the main buffer
-	 */
-	public long getBufferLimit();
+    /**
+     * 
+     * @return the size limit of the main buffer
+     */
+    long getBufferLimit();
 
-	/**
-	 * 
-	 * @return all triples in the main buffer
-	 */
-	public Collection<Triple> getCollection();
+    /**
+     * 
+     * @return all triples in the main buffer
+     * @see Triple
+     */
+    Collection<Triple> getCollection();
 
-	/**
-	 * Notifies all subscribers that the buffer is full
-	 */
-	public void sendFullBuffer();
+    /**
+     * Notifies all subscribers that the buffer is full
+     */
+    void sendFullBuffer();
 
-	public long mainBufferOccupation();
+    /**
+     * @return the number of triples in the main buffer
+     */
+    long mainBufferOccupation();
 
-	public long secondaryBufferOccupation();
-	
-	public long getLastFlush();
-	public void setDebugName(String name);
-	public String getDebugName();
+    /**
+     * @return the number of triples in the secondary buffer
+     */
+    long secondaryBufferOccupation();
+
+    /**
+     * @return the timestamp since the last time the buffer were flushed
+     */
+    long getLastFlush();
+
+    /**
+     * @param name
+     */
+    void setDebugName(String name);
+
+    /**
+     * @return the name for debugging
+     */
+    String getDebugName();
 
 }

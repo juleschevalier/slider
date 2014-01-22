@@ -7,44 +7,99 @@ import com.google.common.collect.Multimap;
 /**
  * @author jules
  * 
- * Interface of a triplestore
- * Use Triple interface
+ *         Interface of a triplestore
+ *         Use Triple interface
  * @see Triple
  */
 public interface TripleStore {
 
-	public void add(Triple t);
+    /**
+     * Add the triple to the TripleStore
+     * 
+     * @param t
+     * @see Triple
+     */
+    void add(Triple t);
 
-	public void addAll(Collection<Triple> t);
+    /**
+     * Calls add for each triple in the collection
+     * 
+     * @param t
+     * @see Triple
+     * @see #add(Triple)
+     */
+    void addAll(Collection<Triple> t);
 
-	public Collection<Triple> getAll();
+    /**
+     * @return all the triples in the TripleStore in a Collection
+     * @see Triple
+     */
+    Collection<Triple> getAll();
 
-	public Collection<Triple> getbySubject(long s);
+    /**
+     * @param s
+     * @return the triples with s as subject, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbySubject(long s);
 
-	public Collection<Triple> getbyPredicate(long p);
+    /**
+     * @param p
+     * @return the triples with p as predicate, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbyPredicate(long p);
 
-	public Collection<Triple> getbyObject(long o);
+    /**
+     * @param o
+     * @return the triples with o as object, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbyObject(long o);
 
-	public long size();
+    /**
+     * @return the number of triples in the TripleStore
+     */
+    long size();
 
-	public int hashCode();
+    /**
+     * Writes the TripleStore in a file in a RAW format
+     * 
+     * @param file
+     * @param dictionary
+     * @see Dictionary
+     */
+    void writeToFile(String file, Dictionary dictionary);
 
-	public boolean equals(Object obj);
+    /**
+     * @return true if the TripleStore is empty, false else
+     */
+    boolean isEmpty();
 
-	public void writeToFile(String file, Dictionary dictionary);
+    /**
+     * @param triple
+     * @return true if the TripleStore contains triple, false else
+     * @see Triple
+     */
+    boolean contains(Triple triple);
 
-	public boolean isEmpty();
+    /**
+     * Remove all the triples
+     */
+    void clear();
 
-	public boolean contains(Triple triple);
-	
-    public void clear();
+    /**
+     * Optional operation
+     * 
+     * @param p
+     * @return the triples with p as predicate, as a multimap
+     */
+    Multimap<Long, Long> getMultiMapForPredicate(long p);
 
-	/**
-	 * Optional operation
-	 * 
-	 * @param p
-	 * @return
-	 */
-	public Multimap<Long, Long> getMultiMapForPredicate(long p);
+    @Override
+    int hashCode();
+
+    @Override
+    boolean equals(Object obj);
 
 }

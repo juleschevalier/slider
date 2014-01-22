@@ -2,7 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 
 import org.apache.log4j.Logger;
 
@@ -20,73 +20,74 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  */
 public class RunSCM_SPO extends AbstractRun {
 
-	private static Logger logger = Logger.getLogger(RunSCM_SPO.class);
-	public static long[] input_matchers = {AbstractDictionary.subPropertyOf};
-	public static long[] output_matchers = {AbstractDictionary.subPropertyOf};
+    private static final Logger logger = Logger.getLogger(RunSCM_SPO.class);
+    public static final long[] INPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
+    public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
 
-	public RunSCM_SPO(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, "SCM_SPO", doneSignal);
+    public RunSCM_SPO(Dictionary dictionary, TripleStore tripleStore, Phaser phaser) {
+        super(dictionary, tripleStore, phaser, "SCM_SPO");
 
-	}
+    }
 
-	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    @Override
+    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
 
-		long subPropertyOf = AbstractDictionary.subPropertyOf;
+        long subPropertyOf = AbstractDictionary.subPropertyOf;
 
-		int loops = 0;
+        int loops = 0;
 
-		Multimap<Long, Long> subpropertyMultimap = ts1.getMultiMapForPredicate(subPropertyOf);
-		if (subpropertyMultimap != null && !subpropertyMultimap.isEmpty()) {
+        Multimap<Long, Long> subpropertyMultimap = ts1.getMultiMapForPredicate(subPropertyOf);
+        if (subpropertyMultimap != null && !subpropertyMultimap.isEmpty()) {
 
-			Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
+            Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 
-			HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
-			/* For each type triple */
-			for (Triple triple : subpropertyTriples) {
-				/*
-				 * Get all objects (p3) of subPropertyOf triples with
-				 */
+            /* For each type triple */
+            for (Triple triple : subpropertyTriples) {
+                /*
+                 * Get all objects (p3) of subPropertyOf triples with
+                 */
 
-				Collection<Long> p3s;
-				if (!cachePredicates.containsKey(triple.getObject())) {
-					p3s = subpropertyMultimap.get(triple.getObject());
-					cachePredicates.put(triple.getObject(), p3s);
-				} else {
-					p3s = cachePredicates.get(triple.getObject());
-				}
+                Collection<Long> p3s;
+                if (!cachePredicates.containsKey(triple.getObject())) {
+                    p3s = subpropertyMultimap.get(triple.getObject());
+                    cachePredicates.put(triple.getObject(), p3s);
+                } else {
+                    p3s = cachePredicates.get(triple.getObject());
+                }
 
-				loops++;
-				for (Long p3 : p3s) {
+                loops++;
+                for (Long p3 : p3s) {
 
-					if (p3 != triple.getSubject()) {
+                    if (p3 != triple.getSubject()) {
 
-						Triple result = new ImmutableTriple(triple.getSubject(), subPropertyOf, p3);
-						outputTriples.add(result);
+                        Triple result = new ImmutableTriple(triple.getSubject(), subPropertyOf, p3);
+                        outputTriples.add(result);
 
-						logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
-					}
-				}
-			}
-		}
+                        logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                    }
+                }
+            }
+        }
 
-		return loops;
+        return loops;
 
-	}
+    }
 
-	@Override
-	public Logger getLogger() {
-		return logger;
-	}
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
 
-	@Override
-	public long[] getInputMatchers() {
-		return input_matchers;
-	}
+    @Override
+    public long[] getInputMatchers() {
+        return INPUT_MATCHERS;
+    }
 
-	@Override
-	public long[] getOutputMatchers() {
-		return input_matchers;
-	}
+    @Override
+    public long[] getOutputMatchers() {
+        return INPUT_MATCHERS;
+    }
 
 }

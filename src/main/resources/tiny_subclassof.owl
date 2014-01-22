@@ -6,18 +6,16 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY subclassof "http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#" >
 ]>
 
 
-<rdf:RDF xmlns="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#"
-     xml:base="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof"
+<rdf:RDF xmlns="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#"
+     xml:base="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:subclassof="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <owl:Ontology rdf:about="http://www.semanticweb.org/jules/ontologies/2013/6/subclassof"/>
+    <owl:Ontology rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof"/>
     
 
 
@@ -29,36 +27,44 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#2 -->
-
-    <owl:Class rdf:about="&subclassof;2">
-        <rdfs:subClassOf rdf:resource="&subclassof;1"/>
-    </owl:Class>
+    
 
 
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#3 -->
+    <!-- http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#1 -->
 
-    <owl:Class rdf:about="&subclassof;3">
-        <rdfs:subClassOf rdf:resource="&subclassof;2"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#1"/>
+    
+
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#2 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#2">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#1"/>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#4 -->
+    <!-- http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#3 -->
 
-    <owl:Class rdf:about="&subclassof;4">
-        <rdfs:subClassOf rdf:resource="&subclassof;3"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#3">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#2"/>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/jules/ontologies/2013/6/subclassof#5 -->
+    <!-- http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#4 -->
 
-    <owl:Class rdf:about="&subclassof;5">
-        <rdfs:subClassOf rdf:resource="&subclassof;4"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#4">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#3"/>
     </owl:Class>
+    
 
+
+    <!-- http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#5 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#5">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#4"/>
+    </owl:Class>
 </rdf:RDF>
 
 

@@ -2,7 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 
 import org.apache.log4j.Logger;
 
@@ -19,66 +19,67 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  */
 public class RunPRP_SPO1 extends AbstractRun {
 
-	private static Logger logger = Logger.getLogger(RunPRP_SPO1.class);
-	public static long[] input_matchers = {};
-	public static long[] output_matchers = {};
+    private static final Logger logger = Logger.getLogger(RunPRP_SPO1.class);
+    public static final long[] INPUT_MATCHERS = {};
+    public static final long[] OUTPUT_MATCHERS = {};
 
-	public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, CountDownLatch doneSignal) {
-		super(dictionary, tripleStore, "PRP_SPO1", doneSignal);
+    public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, Phaser phaser) {
+        super(dictionary, tripleStore, phaser, "PRP_SPO1");
 
-	}
+    }
 
-	protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    @Override
+    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
 
-		long subPropertyOf = AbstractDictionary.subPropertyOf;
+        long subPropertyOf = AbstractDictionary.subPropertyOf;
 
-		int loops = 0;
+        int loops = 0;
 
-		Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
-		if (subPropertyOfMultiMap != null && !subPropertyOfMultiMap.isEmpty()) {
+        Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
+        if (subPropertyOfMultiMap != null && !subPropertyOfMultiMap.isEmpty()) {
 
-			HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
+            HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 
-			for (Long p1 : subPropertyOfMultiMap.keySet()) {
+            for (Long p1 : subPropertyOfMultiMap.keySet()) {
 
-				Collection<Triple> matchingTriples;
-				if (!cachePredicates.containsKey(p1)) {
-					matchingTriples = ts2.getbyPredicate(p1);
-					cachePredicates.put(p1, matchingTriples);
-				} else {
-					matchingTriples = cachePredicates.get(p1);
-				}
+                Collection<Triple> matchingTriples;
+                if (!cachePredicates.containsKey(p1)) {
+                    matchingTriples = ts2.getbyPredicate(p1);
+                    cachePredicates.put(p1, matchingTriples);
+                } else {
+                    matchingTriples = cachePredicates.get(p1);
+                }
 
-				for (Triple triple : matchingTriples) {
+                for (Triple triple : matchingTriples) {
 
-					for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+                    for (Long p2 : subPropertyOfMultiMap.get(p1)) {
 
-						Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
-						logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
-						outputTriples.add(result);
-					}
+                        Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
+                        logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
+                        outputTriples.add(result);
+                    }
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		return loops;
+        return loops;
 
-	}
+    }
 
-	@Override
-	public Logger getLogger() {
-		return logger;
-	}
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
 
-	@Override
-	public long[] getInputMatchers() {
-		return input_matchers;
-	}
+    @Override
+    public long[] getInputMatchers() {
+        return INPUT_MATCHERS;
+    }
 
-	@Override
-	public long[] getOutputMatchers() {
-		return output_matchers;
-	}
+    @Override
+    public long[] getOutputMatchers() {
+        return OUTPUT_MATCHERS;
+    }
 
 }

@@ -5,7 +5,7 @@ target/
 # Output files #
 *.out
 *.csv
-*.log
+*.log*
 catalog-v*.xml
 # OS Files #
 .DS_Store
