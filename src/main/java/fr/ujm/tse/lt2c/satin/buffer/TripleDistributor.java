@@ -67,17 +67,33 @@ public class TripleDistributor {
             }
             long p = triple.getPredicate();
             for (TripleBuffer tripleBuffer : this.subscribers.get(p)) {
-                while (!tripleBuffer.add(triple)) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("TD buffer add failed");
+                synchronized (tripleBuffer) {
+
+                    while (!tripleBuffer.add(triple)) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("TD buffer add failed");
+                        }
+                        try {
+                            tripleBuffer.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 debugDistributed++;
             }
             for (TripleBuffer tripleBuffer : this.universalSubscribers) {
-                while (!tripleBuffer.add(triple)) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("TD buffer add failed");
+                synchronized (tripleBuffer) {
+
+                    while (!tripleBuffer.add(triple)) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("TD buffer add failed");
+                        }
+                        try {
+                            tripleBuffer.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 debugDistributed++;

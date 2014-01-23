@@ -3,7 +3,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -25,7 +25,7 @@ public abstract class AbstractRun implements RuleRun {
     protected TripleBuffer tripleBuffer;
     protected String ruleName = "";
     protected int debugThreads;
-    protected Phaser phaser;
+    protected AtomicInteger phaser;
 
     /**
      * Constructor
@@ -38,14 +38,14 @@ public abstract class AbstractRun implements RuleRun {
      * @see Dictionary
      * @see TripleStore
      */
-    public AbstractRun(Dictionary dictionary, TripleStore tripleStore, Phaser pĥaser, String ruleName) {
+    public AbstractRun(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser, String ruleName) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
         this.ruleName = ruleName;
         this.distributor = new TripleDistributor();
         this.tripleBuffer = new TripleBufferLock();
         this.debugThreads = 0;
-        this.phaser = pĥaser;
+        this.phaser = phaser;
 
         this.distributor.setName(ruleName + " Distributor");
     }
@@ -88,11 +88,11 @@ public abstract class AbstractRun implements RuleRun {
              * Notifies the Reasoner this thread infers
              */
             if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " register on " + this.phaser);
+                logger.trace(this.ruleName + runId + " increment phaser " + this.phaser);
             }
-            if (this.phaser.register() < 0) {
-                logger.warn(ruleName + runId + " register on closed phaser");
-            }
+
+            this.phaser.incrementAndGet();
+
             this.debugThreads++;
 
             long debugLoops = 0;
@@ -126,11 +126,13 @@ public abstract class AbstractRun implements RuleRun {
              * over)
              */
             if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " arriveAndDeregister on " + this.phaser);
+                logger.trace(this.ruleName + runId + " decrement phaser " + this.phaser);
             }
-            if (this.phaser.arrive()/* AndDeregister() */< 0) {
-                logger.warn(ruleName + runId + " deregister on closed phaser");
+            synchronized (phaser) {
+                this.phaser.decrementAndGet();
+                this.phaser.notifyAll();
             }
+
             if (logger.isTraceEnabled()) {
                 logger.trace(this.ruleName + runId + " END");
             }
@@ -158,6 +160,7 @@ public abstract class AbstractRun implements RuleRun {
         if (logger.isTraceEnabled()) {
             logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
         }
+        // push data in queue threaded
         distributor.distribute(newTriples);
         return duplicates;
     }
@@ -201,7 +204,7 @@ public abstract class AbstractRun implements RuleRun {
         return this.ruleName;
     }
 
-    public Phaser getPhaser() {
+    public AtomicInteger getPhaser() {
         return this.phaser;
     }
 

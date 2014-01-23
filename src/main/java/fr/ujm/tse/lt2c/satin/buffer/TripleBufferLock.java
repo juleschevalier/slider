@@ -32,20 +32,10 @@ public class TripleBufferLock implements TripleBuffer {
 
     String debugName;
 
-    @Override
-    public String getDebugName() {
-        return debugName;
-    }
-
-    @Override
-    public void setDebugName(String debugName) {
-        this.debugName = debugName;
-    }
-
     long lastFlush;
 
     /* Limit of the main buffer (adding the last triple calls bufferfull) */
-    static final long BUFFER_SIZE = 100;
+    static final long BUFFER_SIZE = 10;
 
     /**
      * Constructor
@@ -59,9 +49,9 @@ public class TripleBufferLock implements TripleBuffer {
 
     @Override
     public boolean add(final Triple triple) {
-        rwlock.writeLock().lock();
         boolean success = false;
         try {
+            rwlock.writeLock().lock();
             if (this.mainBuffer.size() < BUFFER_SIZE) {
                 this.mainBuffer.add(triple);
                 success = true;
@@ -79,6 +69,7 @@ public class TripleBufferLock implements TripleBuffer {
                     this.mainBuffer.add(triple);
                     success = true;
                 }
+
             }
         } catch (Exception e) {
             logger.error("", e);
@@ -118,6 +109,9 @@ public class TripleBufferLock implements TripleBuffer {
             logger.error("", e);
         } finally {
             this.lastFlush = System.nanoTime();
+            synchronized (this) {
+                this.notifyAll();
+            }
             rwlock.writeLock().unlock();
         }
         return temp;
@@ -188,5 +182,15 @@ public class TripleBufferLock implements TripleBuffer {
             rwlock.writeLock().unlock();
         }
 
+    }
+
+    @Override
+    public String getDebugName() {
+        return debugName;
+    }
+
+    @Override
+    public void setDebugName(String debugName) {
+        this.debugName = debugName;
     }
 }

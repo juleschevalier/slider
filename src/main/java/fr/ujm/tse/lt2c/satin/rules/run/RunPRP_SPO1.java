@@ -2,7 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -23,7 +23,7 @@ public class RunPRP_SPO1 extends AbstractRun {
     public static final long[] INPUT_MATCHERS = {};
     public static final long[] OUTPUT_MATCHERS = {};
 
-    public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, Phaser phaser) {
+    public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
         super(dictionary, tripleStore, phaser, "PRP_SPO1");
 
     }

@@ -92,7 +92,7 @@ public class TripleManager {
      * 
      * @return the number of rules with non-empty buffers
      */
-    public long finishThem() {
+    public long flushBuffers() {
         long total = 0;
         for (Rule rule : this.rules) {
             if ((rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation()) > 0) {

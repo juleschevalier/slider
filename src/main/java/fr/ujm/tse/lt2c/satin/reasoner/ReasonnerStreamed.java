@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -32,8 +32,9 @@ public class ReasonnerStreamed {
     private static final Logger logger = Logger.getLogger(ReasonnerStreamed.class);
     public static final int SESSION_ID = UUID.randomUUID().hashCode();
     private static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
-    private static final int THREADS_PER_CORE = 10;
+    private static final int THREADS_PER_CORE = 1;
     public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
+    // public static final int MAX_THREADS = 1;
     private static final boolean PERSIST_RESULTS = false;
 
     private static ExecutorService executor;
@@ -50,19 +51,17 @@ public class ReasonnerStreamed {
 
         List<String> files = new ArrayList<String>();
 
-        // files.add("tiny_subclassof.owl");
-        files.add("subclassof.owl");
-        // files.add("sample1.owl");
-        // files.add("univ-bench.owl");
-        // files.add("sweetAll.owl");
-        // files.add("wine.rdf");
-        // files.add("geopolitical_200Ko.owl");
-        // files.add("geopolitical_300Ko.owl");
-        // files.add("geopolitical_500Ko.owl");
-        // files.add("geopolitical_1Mo.owl");
-        // files.add("geopolitical.owl");
-        // files.add("efo.owl");
-        // files.add("opencyc.owl");
+        // files.add("tiny_subclassof.nt");
+        files.add("subclassof.nt");
+        // files.add("sample1.nt");
+        // files.add("univ-bench.nt");
+        // files.add("geopolitical_200Ko.nt");
+        // files.add("geopolitical_300Ko.nt");
+        // files.add("geopolitical_500Ko.nt");
+        // files.add("geopolitical_1Mo.nt");
+        // files.add("geopolitical.nt");
+        // files.add("efo.nt");
+        // files.add("opencyc.nt");
 
         try {
 
@@ -71,7 +70,7 @@ public class ReasonnerStreamed {
             for (int file = 0; file < files.size(); file++) {
 
                 for (int i = 0; i < max; i++) {
-
+                    logger.info(i);
                     if (!infere(files.get(file))) {
                         fail++;
                     }
@@ -107,13 +106,8 @@ public class ReasonnerStreamed {
         TripleManager tripleManager = new TripleManager();
         Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
-        Phaser phaser = new Phaser(1) {
-            @Override
-            protected boolean onAdvance(int phase, int registeredParties) {
-                return phase >= 1 || registeredParties == 0;
-            }
-        };
-        // Phaser phaser = new Phaser(1);
+        AtomicInteger phaser = new AtomicInteger();
+
         /* File parsing */
         parser.parse(input);
 
@@ -181,31 +175,41 @@ public class ReasonnerStreamed {
          * the end
          */
 
-        long still = 1;
-        while (still != 0) {
+        long still_nonempty_buffers = tripleManager.flushBuffers();
+        while (still_nonempty_buffers > 0) {
 
             if (logger.isTraceEnabled()) {
-                logger.trace("REASONNER Finish Them!");
+                logger.trace("REASONNER Flush Buffers!");
             }
 
-            still = tripleManager.finishThem();
+            // still_nonempty_buffers = tripleManager.flushBuffers();
 
             if (logger.isTraceEnabled()) {
-                logger.trace("REASONER There are still " + still + " non empty buffers");
+                logger.trace("REASONER There are still " + still_nonempty_buffers + " non empty buffers");
             }
 
-            phaser.arriveAndAwaitAdvance();
+            // while (phaser.get() > 0) {}
 
-            // while (phaser.getUnarrivedParties() > 1) {}
+            synchronized (phaser) {
+                long still_runnning = phaser.get();
+                while (still_runnning > 0) {
+                    try {
+                        phaser.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    still_runnning = phaser.get();
+                }
+            }
 
-            still = tripleManager.finishThem();
+            still_nonempty_buffers = tripleManager.flushBuffers();
 
         }
 
         /* Reasoning must be ended */
 
-        if (tripleManager.finishThem() > 0) {
-            logger.error("Well, fuck");
+        if (tripleManager.flushBuffers() > 0) {
+            logger.error("Non empty buffers after the end");
         }
 
         if (logger.isDebugEnabled()) {
@@ -252,12 +256,12 @@ public class ReasonnerStreamed {
             } else {
                 logger.info("-" + missingTriples.size() + " +" + tooTriples.size());
 
-                // for (String string : missingTriples) {
-                // logger.info("- " + string);
-                // }
-                // for (String string : tooTriples) {
-                // logger.info("+ " + string);
-                // }
+                for (String string : missingTriples) {
+                    logger.info("- " + string);
+                }
+                for (String string : tooTriples) {
+                    logger.info("+ " + string);
+                }
                 /* Must disappear */
                 // System.exit(-1);
             }

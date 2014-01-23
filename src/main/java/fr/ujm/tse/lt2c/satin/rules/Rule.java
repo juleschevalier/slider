@@ -38,7 +38,7 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        if ((ruleRun.getPhaser().getUnarrivedParties() < ReasonnerStreamed.MAX_THREADS) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
+        if ((ruleRun.getPhaser().get() < ReasonnerStreamed.MAX_THREADS) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
             this.executor.submit(this.ruleRun);
             /*
              * For monothread :

@@ -2,7 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -24,7 +24,7 @@ public class RunSCM_SPO extends AbstractRun {
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
 
-    public RunSCM_SPO(Dictionary dictionary, TripleStore tripleStore, Phaser phaser) {
+    public RunSCM_SPO(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
         super(dictionary, tripleStore, phaser, "SCM_SPO");
 
     }

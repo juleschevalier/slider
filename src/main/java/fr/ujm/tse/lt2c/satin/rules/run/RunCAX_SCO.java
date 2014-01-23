@@ -2,7 +2,7 @@ package fr.ujm.tse.lt2c.satin.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +27,7 @@ public class RunCAX_SCO extends AbstractRun {
     private static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf, AbstractDictionary.type };
     private static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
 
-    public RunCAX_SCO(Dictionary dictionary, TripleStore tripleStore, Phaser phaser) {
+    public RunCAX_SCO(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
         super(dictionary, tripleStore, phaser, "CAX_SCO");
 
     }
