@@ -38,6 +38,10 @@ public class TripleManager {
         debugLinks = HashMultimap.create();
         this.generalDistributor = new TripleDistributor();
         this.generalDistributor.setName("T_MANAGER");
+        if (logger.isTraceEnabled()) {
+            logger.trace("T_MANAGER launch distributor");
+        }
+        Executors.newSingleThreadExecutor().submit(generalDistributor);
         if (enableTimeout) {
             timeoutChecker();
         }
@@ -82,7 +86,8 @@ public class TripleManager {
      * @param triples
      */
     public void addTriples(Collection<Triple> triples) {
-        this.generalDistributor.distribute(triples);
+        // this.generalDistributor.distribute(triples);
+        this.generalDistributor.getTripleQueue().addAll(triples);
     }
 
     /**
@@ -123,7 +128,7 @@ public class TripleManager {
      *         else
      */
     private boolean match(long[] in, long[] out) {
-        if (in.length == 0 || out.length == 0) {
+        if ((in.length == 0) || (out.length == 0)) {
             return true;
         }
         // Broken loops
@@ -147,7 +152,7 @@ public class TripleManager {
      * @see #match(long[], long[])
      */
     private long[] extractMatchers(long[] out, long[] in) {
-        if (in.length == 0 || out.length == 0) {
+        if ((in.length == 0) || (out.length == 0)) {
             return new long[] {};
         }
 

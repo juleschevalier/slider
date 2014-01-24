@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -22,25 +24,26 @@ public class RunPRP_SPO1 extends AbstractRun {
     private static final Logger logger = Logger.getLogger(RunPRP_SPO1.class);
     public static final long[] INPUT_MATCHERS = {};
     public static final long[] OUTPUT_MATCHERS = {};
+    public static final String ruleName = "PRP_SPO1";
 
-    public RunPRP_SPO1(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
-        super(dictionary, tripleStore, phaser, "PRP_SPO1");
+    public RunPRP_SPO1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+        super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
 
     @Override
-    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        long subPropertyOf = AbstractDictionary.subPropertyOf;
+        final long subPropertyOf = AbstractDictionary.subPropertyOf;
 
-        int loops = 0;
+        final int loops = 0;
 
-        Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
-        if (subPropertyOfMultiMap != null && !subPropertyOfMultiMap.isEmpty()) {
+        final Multimap<Long, Long> subPropertyOfMultiMap = ts1.getMultiMapForPredicate(subPropertyOf);
+        if ((subPropertyOfMultiMap != null) && !subPropertyOfMultiMap.isEmpty()) {
 
-            HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
+            final HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 
-            for (Long p1 : subPropertyOfMultiMap.keySet()) {
+            for (final Long p1 : subPropertyOfMultiMap.keySet()) {
 
                 Collection<Triple> matchingTriples;
                 if (!cachePredicates.containsKey(p1)) {
@@ -50,11 +53,11 @@ public class RunPRP_SPO1 extends AbstractRun {
                     matchingTriples = cachePredicates.get(p1);
                 }
 
-                for (Triple triple : matchingTriples) {
+                for (final Triple triple : matchingTriples) {
 
-                    for (Long p2 : subPropertyOfMultiMap.get(p1)) {
+                    for (final Long p2 : subPropertyOfMultiMap.get(p1)) {
 
-                        Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
+                        final Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
                         logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
                         outputTriples.add(result);
                     }
@@ -73,13 +76,8 @@ public class RunPRP_SPO1 extends AbstractRun {
     }
 
     @Override
-    public long[] getInputMatchers() {
-        return INPUT_MATCHERS;
-    }
-
-    @Override
-    public long[] getOutputMatchers() {
-        return OUTPUT_MATCHERS;
+    public String toString() {
+        return this.ruleName;
     }
 
 }

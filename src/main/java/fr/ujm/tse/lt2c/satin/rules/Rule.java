@@ -1,14 +1,20 @@
 package fr.ujm.tse.lt2c.satin.rules;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerStreamed;
-import fr.ujm.tse.lt2c.satin.rules.run.AbstractRun;
+import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
+import fr.ujm.tse.lt2c.satin.rules.run.RunFactory;
 
 public class Rule implements BufferListener {
 
@@ -20,26 +26,36 @@ public class Rule implements BufferListener {
      * The distributor sends the new triples to the subscribers
      */
 
-    TripleBuffer tripleBuffer;
-    AbstractRun ruleRun;
+    private final TripleBuffer tripleBuffer;
+    private final TripleDistributor tripleDistributor;
+    private final AtomicInteger phaser;
+    private final Dictionary dictionary;
+    private final TripleStore tripleStore;
+    private final AvaibleRuns run;
 
     ExecutorService executor;
 
-    public Rule(AbstractRun ruleRun, ExecutorService executor) {
+    public Rule(AvaibleRuns run, ExecutorService executor, AtomicInteger phaser, Dictionary dictionary, TripleStore tripleStore) {
         super();
-        this.tripleBuffer = ruleRun.getTripleBuffer();
-        this.ruleRun = ruleRun;
+        this.run = run;
         this.executor = executor;
+        this.phaser = phaser;
+        this.dictionary = dictionary;
+        this.tripleStore = tripleStore;
 
+        this.tripleBuffer = new TripleBufferLock();
         this.tripleBuffer.addBufferListener(this);
-        this.tripleBuffer.setDebugName(ruleRun.getRuleName());
+        this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
+
+        this.tripleDistributor = new TripleDistributor();
+        Executors.newSingleThreadExecutor().submit(tripleDistributor);
 
     }
 
     @Override
     public boolean bufferFull() {
-        if ((ruleRun.getPhaser().get() < ReasonnerStreamed.MAX_THREADS) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
-            this.executor.submit(this.ruleRun);
+        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
+            this.executor.submit(RunFactory.getRunInstance(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser));
             /*
              * For monothread :
              * this.ruleRun.run();
@@ -53,11 +69,11 @@ public class Rule implements BufferListener {
     }
 
     public long[] getInputMatchers() {
-        return this.ruleRun.getInputMatchers();
+        return RunFactory.getInputMatchers(run);
     }
 
     public long[] getOutputMatchers() {
-        return this.ruleRun.getOutputMatchers();
+        return RunFactory.getOutputMatchers(run);
     }
 
     public TripleBuffer getTripleBuffer() {
@@ -65,14 +81,10 @@ public class Rule implements BufferListener {
     }
 
     public TripleDistributor getTripleDistributor() {
-        return this.ruleRun.getDistributor();
+        return this.tripleDistributor;
     }
 
     public String name() {
-        return this.ruleRun.getRuleName();
-    }
-
-    public AbstractRun getRun() {
-        return this.ruleRun;
+        return RunFactory.getRuleName(run);
     }
 }

@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -22,26 +24,27 @@ public class RunPRP_DOM extends AbstractRun {
     private static final Logger logger = Logger.getLogger(RunPRP_DOM.class);
     public static final long[] INPUT_MATCHERS = {};
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
+    public static final String ruleName = "PRP_DOM";
 
-    public RunPRP_DOM(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
-        super(dictionary, tripleStore, phaser, "PRP_DOM");
+    public RunPRP_DOM(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+        super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
 
     @Override
-    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        long domain = AbstractDictionary.domain;
-        long type = AbstractDictionary.type;
+        final long domain = AbstractDictionary.domain;
+        final long type = AbstractDictionary.type;
 
-        int loops = 0;
+        final int loops = 0;
 
-        Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
-        if (domainMultiMap != null && !domainMultiMap.isEmpty()) {
+        final Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
+        if ((domainMultiMap != null) && !domainMultiMap.isEmpty()) {
 
-            HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
+            final HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 
-            for (Long p : domainMultiMap.keySet()) {
+            for (final Long p : domainMultiMap.keySet()) {
 
                 Collection<Triple> matchingTriples;
                 if (!cachePredicates.containsKey(p)) {
@@ -51,12 +54,12 @@ public class RunPRP_DOM extends AbstractRun {
                     matchingTriples = cachePredicates.get(p);
                 }
 
-                for (Triple triple : matchingTriples) {
+                for (final Triple triple : matchingTriples) {
 
-                    for (Long c : domainMultiMap.get(p)) {
+                    for (final Long c : domainMultiMap.get(p)) {
 
                         if (triple.getSubject() >= 0) {
-                            Triple result = new ImmutableTriple(triple.getSubject(), type, c);
+                            final Triple result = new ImmutableTriple(triple.getSubject(), type, c);
                             logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
                             outputTriples.add(result);
                         }
@@ -75,13 +78,8 @@ public class RunPRP_DOM extends AbstractRun {
     }
 
     @Override
-    public long[] getInputMatchers() {
-        return INPUT_MATCHERS;
-    }
-
-    @Override
-    public long[] getOutputMatchers() {
-        return OUTPUT_MATCHERS;
+    public String toString() {
+        return this.ruleName;
     }
 
 }

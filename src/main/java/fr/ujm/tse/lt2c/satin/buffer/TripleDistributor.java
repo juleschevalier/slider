@@ -2,8 +2,11 @@ package fr.ujm.tse.lt2c.satin.buffer;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.util.BlockingArrayQueue;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -12,19 +15,23 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 
-public class TripleDistributor {
+public class TripleDistributor implements Runnable {
 
     private static Logger logger = Logger.getLogger(TripleDistributor.class);
 
     private final Multimap<Long, TripleBuffer> subscribers;
     private final Collection<TripleBuffer> universalSubscribers;
-    String debugName = "";
+    private final BlockingQueue<Triple> tripleQueue;
+    private String debugName = "";
+    private final boolean running = true;
 
     /**
      * Constructor
      */
     public TripleDistributor() {
         super();
+        this.tripleQueue = new BlockingArrayQueue<>();
+
         this.subscribers = HashMultimap.create();
         this.universalSubscribers = new HashSet<>();
     }
@@ -50,12 +57,60 @@ public class TripleDistributor {
         }
     }
 
+    @Override
+    public void run() {
+
+        if (logger.isTraceEnabled()) {
+            logger.trace(debugName + " Distributor run");
+        }
+
+        while (running) {
+            try {
+                Triple triple = this.tripleQueue.poll(1, TimeUnit.DAYS);
+                for (TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
+                    synchronized (tripleBuffer) {
+
+                        while (!tripleBuffer.add(triple)) {
+                            if (logger.isTraceEnabled()) {
+                                logger.trace("TD buffer add failed");
+                            }
+                            try {
+                                tripleBuffer.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                for (TripleBuffer tripleBuffer : this.universalSubscribers) {
+                    synchronized (tripleBuffer) {
+
+                        while (!tripleBuffer.add(triple)) {
+                            if (logger.isTraceEnabled()) {
+                                logger.trace("TD buffer add failed");
+                            }
+                            try {
+                                tripleBuffer.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     /**
      * Send all the triples to all matching subscribers
      * 
      * @param triples
      * @see Triple
      */
+    @Deprecated
     public void distribute(Collection<Triple> triples) {
         /*
          * ISSUE -> ALL BUFFERS WAIT FOR ONE BLOCKED
@@ -137,6 +192,10 @@ public class TripleDistributor {
             }
         }
         return subs.toString();
+    }
+
+    public BlockingQueue<Triple> getTripleQueue() {
+        return tripleQueue;
     }
 
 }

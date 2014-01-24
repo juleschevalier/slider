@@ -35,7 +35,7 @@ public class TripleBufferLock implements TripleBuffer {
     long lastFlush;
 
     /* Limit of the main buffer (adding the last triple calls bufferfull) */
-    static final long BUFFER_SIZE = 10;
+    static final long BUFFER_SIZE = 100;
 
     /**
      * Constructor
@@ -93,7 +93,7 @@ public class TripleBufferLock implements TripleBuffer {
 
     @Override
     public TripleStore clear() {
-        if (mainBufferOccupation() + secondaryBufferOccupation() == 0) {
+        if ((mainBufferOccupation() + secondaryBufferOccupation()) == 0) {
             logger.warn(this.debugName + " clear an empty buffer");
         }
 

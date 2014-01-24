@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -26,29 +28,30 @@ public class RunSCM_DOM1 extends AbstractRun {
     private static final Logger logger = Logger.getLogger(RunSCM_DOM1.class);
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.domain, AbstractDictionary.subClassOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.domain };
+    public static final String ruleName = "SCM_DOM1";
 
-    public RunSCM_DOM1(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
-        super(dictionary, tripleStore, phaser, "SCM_DOM1");
+    public RunSCM_DOM1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+        super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
 
     @Override
-    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        long domain = AbstractDictionary.domain;
-        long subClassOf = AbstractDictionary.subClassOf;
+        final long domain = AbstractDictionary.domain;
+        final long subClassOf = AbstractDictionary.subClassOf;
 
         int loops = 0;
 
-        Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
-        if (subclassMultimap != null && !subclassMultimap.isEmpty()) {
+        final Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
+        if ((subclassMultimap != null) && !subclassMultimap.isEmpty()) {
 
-            HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            final HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
-            Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
+            final Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
 
             /* For each type triple */
-            for (Triple triple : domainTriples) {
+            for (final Triple triple : domainTriples) {
                 /*
                  * Get all objects (c2) of subClassOf triples with domain
                  * triples objects as subject
@@ -63,9 +66,9 @@ public class RunSCM_DOM1 extends AbstractRun {
                 }
 
                 loops++;
-                for (Long c2 : c2s) {
+                for (final Long c2 : c2s) {
 
-                    Triple result = new ImmutableTriple(triple.getSubject(), domain, c2);
+                    final Triple result = new ImmutableTriple(triple.getSubject(), domain, c2);
                     outputTriples.add(result);
 
                     logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), domain, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
@@ -83,13 +86,8 @@ public class RunSCM_DOM1 extends AbstractRun {
     }
 
     @Override
-    public long[] getInputMatchers() {
-        return INPUT_MATCHERS;
-    }
-
-    @Override
-    public long[] getOutputMatchers() {
-        return OUTPUT_MATCHERS;
+    public String toString() {
+        return this.ruleName;
     }
 
 }

@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
@@ -38,22 +37,22 @@ public abstract class AbstractRun implements RuleRun {
      * @see Dictionary
      * @see TripleStore
      */
-    public AbstractRun(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser, String ruleName) {
+    public AbstractRun(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
-        this.ruleName = ruleName;
-        this.distributor = new TripleDistributor();
-        this.tripleBuffer = new TripleBufferLock();
+        this.distributor = tripleDistributor;
+        this.tripleBuffer = tripleBuffer;
         this.debugThreads = 0;
         this.phaser = phaser;
 
+        this.ruleName = this.toString();
         this.distributor.setName(ruleName + " Distributor");
     }
 
     @Override
     public void run() {
 
-        final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
+        final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
 
         if (logger.isTraceEnabled()) {
             logger.trace(this.ruleName + runId + " START");
@@ -63,7 +62,7 @@ public abstract class AbstractRun implements RuleRun {
          * Buffer verification
          */
 
-        if (this.tripleBuffer.mainBufferOccupation() + this.tripleBuffer.secondaryBufferOccupation() == 0) {
+        if ((this.tripleBuffer.mainBufferOccupation() + this.tripleBuffer.secondaryBufferOccupation()) == 0) {
             if (logger.isTraceEnabled()) {
                 logger.trace(this.ruleName + runId + " started for nothing");
                 logger.trace(this.ruleName + runId + " END");
@@ -76,7 +75,7 @@ public abstract class AbstractRun implements RuleRun {
             /*
              * Get triples from buffer
              */
-            TripleStore usableTriples = this.tripleBuffer.clear();
+            final TripleStore usableTriples = this.tripleBuffer.clear();
 
             if (usableTriples == null) {
                 logger.error(this.ruleName + runId + " NULL usableTriples");
@@ -100,7 +99,7 @@ public abstract class AbstractRun implements RuleRun {
             /*
              * Initialize structure and get new triples from process()
              */
-            Collection<Triple> outputTriples = new HashSet<>();
+            final Collection<Triple> outputTriples = new HashSet<>();
 
             if (usableTriples.isEmpty()) {
                 logger.warn(this.ruleName + runId + " run without triples");
@@ -118,7 +117,7 @@ public abstract class AbstractRun implements RuleRun {
                 logger.debug(this.ruleName + runId + " : " + outputTriples.size() + " triples generated (" + debugLoops + " loops)");
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
             /*
@@ -141,15 +140,15 @@ public abstract class AbstractRun implements RuleRun {
 
     protected abstract int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
 
-    protected int addNewTriples(Collection<Triple> outputTriples) {
-        int duplicates = 0;
+    protected int addNewTriples(final Collection<Triple> outputTriples) {
+        final int duplicates = 0;
 
         if (outputTriples.isEmpty()) {
             return duplicates;
         }
 
-        ArrayList<Triple> newTriples = new ArrayList<>();
-        for (Triple triple : outputTriples) {
+        final ArrayList<Triple> newTriples = new ArrayList<>();
+        for (final Triple triple : outputTriples) {
             if (!tripleStore.contains(triple)) {
                 tripleStore.add(triple);
                 newTriples.add(triple);
@@ -161,20 +160,21 @@ public abstract class AbstractRun implements RuleRun {
             logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
         }
         // push data in queue threaded
-        distributor.distribute(newTriples);
+        distributor.getTripleQueue().addAll(newTriples);
+        // distributor.distribute(newTriples);
         return duplicates;
     }
 
-    protected void logDebug(String message) {
+    protected void logDebug(final String message) {
         if (getLogger().isDebugEnabled()) {
-            final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
+            final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
             getLogger().debug(ruleName + runId + " " + message);
         }
     }
 
-    protected void logTrace(String message) {
+    protected void logTrace(final String message) {
         if (getLogger().isTraceEnabled()) {
-            final String runId = "(" + (Thread.currentThread().hashCode() % 100 + 1000) + ")";
+            final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
             getLogger().trace(ruleName + runId + " " + message);
         }
     }
@@ -190,10 +190,6 @@ public abstract class AbstractRun implements RuleRun {
     public TripleDistributor getDistributor() {
         return this.distributor;
     }
-
-    public abstract long[] getInputMatchers();
-
-    public abstract long[] getOutputMatchers();
 
     public int getThreads() {
         return debugThreads;

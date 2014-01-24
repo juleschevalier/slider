@@ -18,7 +18,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
-import fr.ujm.tse.lt2c.satin.rules.run.RunSCM_SCO;
+import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
@@ -33,8 +33,8 @@ public class ReasonnerStreamed {
     public static final int SESSION_ID = UUID.randomUUID().hashCode();
     private static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
     private static final int THREADS_PER_CORE = 1;
-    public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
-    // public static final int MAX_THREADS = 1;
+    // public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
+    public static final int MAX_THREADS = 1;
     private static final boolean PERSIST_RESULTS = false;
 
     private static ExecutorService executor;
@@ -45,11 +45,11 @@ public class ReasonnerStreamed {
     private ReasonnerStreamed() {
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         long fail = 0;
 
-        List<String> files = new ArrayList<String>();
+        final List<String> files = new ArrayList<String>();
 
         // files.add("tiny_subclassof.nt");
         files.add("subclassof.nt");
@@ -65,7 +65,7 @@ public class ReasonnerStreamed {
 
         try {
 
-            int max = 10;
+            final int max = 1;
 
             for (int file = 0; file < files.size(); file++) {
 
@@ -82,31 +82,31 @@ public class ReasonnerStreamed {
                 }
             }
             if (fail > 0) {
-                logger.warn("FAIL" + (fail > 0 ? "S" : "") + ": " + fail + "(" + ((int) (fail * 100 / max)) + "%)");
+                logger.warn("FAIL" + (fail > 0 ? "S" : "") + ": " + fail + "(" + ((int) ((fail * 100) / max)) + "%)");
             } else {
                 logger.info("NO FAIL");
             }
             shutdownAndAwaitTermination(executor);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         }
 
     }
 
-    private static boolean infere(String input) {
+    private static boolean infere(final String input) {
 
         boolean success = false;
 
         logger.debug("********************************NEW RUN********************************");
 
         /* Initialize structures */
-        TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-        Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        TripleManager tripleManager = new TripleManager();
-        Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+        final TripleManager tripleManager = new TripleManager();
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
-        AtomicInteger phaser = new AtomicInteger();
+        final AtomicInteger phaser = new AtomicInteger();
 
         /* File parsing */
         parser.parse(input);
@@ -115,13 +115,13 @@ public class ReasonnerStreamed {
             logger.trace("---DICTIONARY---");
             logger.trace(dictionary.printDico());
             logger.trace("----TRIPLES-----");
-            for (Triple triple : tripleStore.getAll()) {
+            for (final Triple triple : tripleStore.getAll()) {
                 logger.trace(triple + " " + dictionary.printTriple(triple));
             }
             logger.trace("-------------");
         }
 
-        long debugBeginNbTriples = tripleStore.size();
+        final long debugBeginNbTriples = tripleStore.size();
 
         /* Initialize rules used for inference on RhoDF */
 
@@ -135,7 +135,7 @@ public class ReasonnerStreamed {
         // tripleStore, phaser), executor));
         // tripleManager.addRule(new Rule(new RunPRP_SPO1(dictionary,
         // tripleStore, phaser), executor));
-        tripleManager.addRule(new Rule(new RunSCM_SCO(dictionary, tripleStore, phaser), executor));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore));
         // tripleManager.addRule(new Rule(new RunSCM_EQC2(dictionary,
         // tripleStore, phaser), executor));
         // tripleManager.addRule(new Rule(new RunSCM_SPO(dictionary,
@@ -156,14 +156,14 @@ public class ReasonnerStreamed {
         }
 
         if (logger.isTraceEnabled()) {
-            for (Rule rule : tripleManager.getRules()) {
+            for (final Rule rule : tripleManager.getRules()) {
                 logger.trace(rule.getTripleDistributor().subscribers(rule.name(), dictionary));
             }
         }
 
         logger.debug("********************************START INFERENCE********************************");
 
-        long debugStartTime = System.nanoTime();
+        final long debugStartTime = System.nanoTime();
 
         /********************
          * LAUNCH INFERENCE *
@@ -195,7 +195,7 @@ public class ReasonnerStreamed {
                 while (still_runnning > 0) {
                     try {
                         phaser.wait();
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
                     still_runnning = phaser.get();
@@ -219,19 +219,20 @@ public class ReasonnerStreamed {
         executor.shutdown();
         try {
             executor.awaitTermination(1, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             logger.error("", e);
         }
 
-        long debugEndTime = System.nanoTime();
+        final long debugEndTime = System.nanoTime();
 
         logger.debug("*********************************END INFERENCE*********************************");
 
         logger.debug("Reasoning is finished");
 
-        for (Rule rule : tripleManager.getRules()) {
-            logger.debug(rule.getRun().getRuleName() + " launched " + rule.getRun().getThreads() + " time" + (rule.getRun().getThreads() > 1 ? "s" : ""));
-        }
+        // for (Rule rule : tripleManager.getRules()) {
+        // logger.debug(rule.name() + " launched " + rule.getRun().getThreads()
+        // + " time" + (rule.getRun().getThreads() > 1 ? "s" : ""));
+        // }
 
         /*
          * Some information display
@@ -242,26 +243,26 @@ public class ReasonnerStreamed {
             logger.info("-----------------------------------------");
             logger.info(input + ": " + debugBeginNbTriples + " -> " + (tripleStore.size() - debugBeginNbTriples) + " in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
 
-            Map<Integer, List<String>> diffTriples = Comparator.compare("jena_" + input, dictionary, tripleStore);
+            final Map<Integer, List<String>> diffTriples = Comparator.compare("jena_" + input, dictionary, tripleStore);
 
-            List<String> missingTriples = diffTriples.get(0);
-            List<String> tooTriples = diffTriples.get(1);
+            final List<String> missingTriples = diffTriples.get(0);
+            final List<String> tooTriples = diffTriples.get(1);
 
             // for (Triple t : tripleStore.getAll()) {
             // System.out.println(dictionary.printTriple(t));
             // }
-            if (missingTriples.size() + tooTriples.size() == 0) {
+            if ((missingTriples.size() + tooTriples.size()) == 0) {
                 logger.info("Results match");
                 success = true;
             } else {
                 logger.info("-" + missingTriples.size() + " +" + tooTriples.size());
 
-                for (String string : missingTriples) {
-                    logger.info("- " + string);
-                }
-                for (String string : tooTriples) {
-                    logger.info("+ " + string);
-                }
+                // for (final String string : missingTriples) {
+                // logger.info("- " + string);
+                // }
+                // for (final String string : tooTriples) {
+                // logger.info("+ " + string);
+                // }
                 /* Must disappear */
                 // System.exit(-1);
             }
@@ -278,7 +279,7 @@ public class ReasonnerStreamed {
 
     }
 
-    static void shutdownAndAwaitTermination(ExecutorService pool) {
+    static void shutdownAndAwaitTermination(final ExecutorService pool) {
         System.exit(-1);
         // Disable new tasks from being submitted
         pool.shutdown();
@@ -292,7 +293,7 @@ public class ReasonnerStreamed {
                     logger.error("Pool did not terminate");
                 }
             }
-        } catch (InterruptedException ie) {
+        } catch (final InterruptedException ie) {
             // (Re-)Cancel if current thread also interrupted
             logger.error("", ie);
             pool.shutdownNow();

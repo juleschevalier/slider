@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -26,29 +28,30 @@ public class RunSCM_RNG2 extends AbstractRun {
     private static final Logger logger = Logger.getLogger(RunSCM_RNG2.class);
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.range, AbstractDictionary.subPropertyOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.range };
+    public static final String ruleName = "SCM_RNG2";
 
-    public RunSCM_RNG2(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
-        super(dictionary, tripleStore, phaser, "SCM_RNG2");
+    public RunSCM_RNG2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+        super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
 
     @Override
-    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        long subPropertyOf = AbstractDictionary.subPropertyOf;
-        long range = AbstractDictionary.range;
+        final long subPropertyOf = AbstractDictionary.subPropertyOf;
+        final long range = AbstractDictionary.range;
 
         int loops = 0;
 
-        Multimap<Long, Long> rangeMultimap = ts1.getMultiMapForPredicate(range);
-        if (rangeMultimap != null && !rangeMultimap.isEmpty()) {
+        final Multimap<Long, Long> rangeMultimap = ts1.getMultiMapForPredicate(range);
+        if ((rangeMultimap != null) && !rangeMultimap.isEmpty()) {
 
-            Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
+            final Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 
-            HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            final HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
             /* For each type triple */
-            for (Triple triple : subpropertyTriples) {
+            for (final Triple triple : subpropertyTriples) {
                 /*
                  * Get all objects (c2) of subClassOf triples with range triples
                  * objects as subject
@@ -63,9 +66,9 @@ public class RunSCM_RNG2 extends AbstractRun {
                 }
 
                 loops++;
-                for (Long c : cs) {
+                for (final Long c : cs) {
 
-                    Triple result = new ImmutableTriple(triple.getSubject(), range, c);
+                    final Triple result = new ImmutableTriple(triple.getSubject(), range, c);
                     outputTriples.add(result);
 
                     logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), range, c)) + " -> " + dictionary.printTriple(result));
@@ -83,13 +86,8 @@ public class RunSCM_RNG2 extends AbstractRun {
     }
 
     @Override
-    public long[] getInputMatchers() {
-        return INPUT_MATCHERS;
-    }
-
-    @Override
-    public long[] getOutputMatchers() {
-        return OUTPUT_MATCHERS;
+    public String toString() {
+        return this.ruleName;
     }
 
 }

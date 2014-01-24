@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -24,29 +26,29 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunCAX_SCO extends AbstractRun {
 
     private static final Logger logger = Logger.getLogger(RunCAX_SCO.class);
-    private static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf, AbstractDictionary.type };
-    private static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
+    public static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf, AbstractDictionary.type };
+    public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
+    public static final String ruleName = "CAX_SCO";
 
-    public RunCAX_SCO(Dictionary dictionary, TripleStore tripleStore, AtomicInteger phaser) {
-        super(dictionary, tripleStore, phaser, "CAX_SCO");
-
+    public RunCAX_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+        super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
     }
 
     @Override
-    protected int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples) {
+    protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        long subClassOf = AbstractDictionary.subClassOf;
-        long type = AbstractDictionary.type;
+        final long subClassOf = AbstractDictionary.subClassOf;
+        final long type = AbstractDictionary.type;
 
         int loops = 0;
 
-        Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
-        if (subclassMultimap != null && !subclassMultimap.isEmpty()) {
+        final Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
+        if ((subclassMultimap != null) && !subclassMultimap.isEmpty()) {
 
-            HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            final HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
-            Collection<Triple> types = ts2.getbyPredicate(type);
-            for (Triple typeTriple : types) {
+            final Collection<Triple> types = ts2.getbyPredicate(type);
+            for (final Triple typeTriple : types) {
 
                 Collection<Long> c2s;
                 if (!cachePredicates.containsKey(typeTriple.getObject())) {
@@ -57,10 +59,10 @@ public class RunCAX_SCO extends AbstractRun {
                 }
 
                 loops++;
-                for (Long c2 : c2s) {
+                for (final Long c2 : c2s) {
 
                     if (typeTriple.getSubject() >= 0) {
-                        Triple result = new ImmutableTriple(typeTriple.getSubject(), type, c2);
+                        final Triple result = new ImmutableTriple(typeTriple.getSubject(), type, c2);
                         outputTriples.add(result);
                         logTrace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type, typeTriple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
                     }
@@ -78,13 +80,8 @@ public class RunCAX_SCO extends AbstractRun {
     }
 
     @Override
-    public long[] getInputMatchers() {
-        return INPUT_MATCHERS;
-    }
-
-    @Override
-    public long[] getOutputMatchers() {
-        return OUTPUT_MATCHERS;
+    public String toString() {
+        return this.ruleName;
     }
 
 }
