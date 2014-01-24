@@ -52,8 +52,8 @@ public class ReasonnerStreamed {
         final List<String> files = new ArrayList<String>();
 
         // files.add("tiny_subclassof.nt");
-        files.add("subclassof.nt");
-        // files.add("sample1.nt");
+        // files.add("subclassof.nt");
+        files.add("sample1.nt");
         // files.add("univ-bench.nt");
         // files.add("geopolitical_200Ko.nt");
         // files.add("geopolitical_300Ko.nt");
@@ -73,6 +73,7 @@ public class ReasonnerStreamed {
                     logger.info(i);
                     if (!infere(files.get(file))) {
                         fail++;
+                        System.exit(-1);
                     }
                 }
             }
@@ -127,29 +128,18 @@ public class ReasonnerStreamed {
 
         executor = Executors.newFixedThreadPool(MAX_THREADS);
 
-        // tripleManager.addRule(new Rule(new RunCAX_SCO(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunPRP_DOM(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunPRP_RNG(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunPRP_SPO1(dictionary,
-        // tripleStore, phaser), executor));
+        tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQC2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQP2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore));
         tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore));
-        // tripleManager.addRule(new Rule(new RunSCM_EQC2(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_SPO(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_EQP2(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_DOM1(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_DOM2(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_RNG1(dictionary,
-        // tripleStore, phaser), executor));
-        // tripleManager.addRule(new Rule(new RunSCM_RNG2(dictionary,
-        // tripleStore, phaser), executor));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore));
 
         if (logger.isDebugEnabled()) {
             logger.debug(tripleManager.getRules().size() + " Rules initialized\n");
@@ -260,12 +250,12 @@ public class ReasonnerStreamed {
             } else {
                 logger.info("-" + missingTriples.size() + " +" + tooTriples.size());
 
-                // for (final String string : missingTriples) {
-                // logger.info("- " + string);
-                // }
-                // for (final String string : tooTriples) {
-                // logger.info("+ " + string);
-                // }
+                for (final String string : missingTriples) {
+                    logger.info("- " + string);
+                }
+                for (final String string : tooTriples) {
+                    logger.info("+ " + string);
+                }
                 /* Must disappear */
                 // System.exit(-1);
             }

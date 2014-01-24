@@ -122,32 +122,16 @@ public class TripleDistributor implements Runnable {
             long p = triple.getPredicate();
             for (TripleBuffer tripleBuffer : this.subscribers.get(p)) {
                 synchronized (tripleBuffer) {
-
-                    while (!tripleBuffer.add(triple)) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("TD buffer add failed");
-                        }
-                        try {
-                            tripleBuffer.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    if (!tripleBuffer.add(triple)) {
+                        logger.error("add fail");
                     }
                 }
                 debugDistributed++;
             }
             for (TripleBuffer tripleBuffer : this.universalSubscribers) {
                 synchronized (tripleBuffer) {
-
-                    while (!tripleBuffer.add(triple)) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("TD buffer add failed");
-                        }
-                        try {
-                            tripleBuffer.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    if (!tripleBuffer.add(triple)) {
+                        logger.error("add fail");
                     }
                 }
                 debugDistributed++;

@@ -93,4 +93,6 @@ public interface TripleBuffer {
      */
     String getDebugName();
 
+    long getOccupation();
+
 }

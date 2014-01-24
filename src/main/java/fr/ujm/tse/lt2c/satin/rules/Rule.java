@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -25,7 +25,7 @@ public class Rule implements BufferListener {
      * The distributor sends the new triples to the subscribers
      */
 
-    private final TripleBuffer tripleBuffer;
+    private final QueuedTripleBufferLock tripleBuffer;
     private final TripleDistributor tripleDistributor;
     private final AtomicInteger phaser;
     private final Dictionary dictionary;
@@ -42,7 +42,7 @@ public class Rule implements BufferListener {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
 
-        this.tripleBuffer = new TripleBufferLock();
+        this.tripleBuffer = new QueuedTripleBufferLock();
         this.tripleBuffer.addBufferListener(this);
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
 
@@ -53,7 +53,7 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && ((this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0)) {
+        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && ((this.tripleBuffer.getOccupation()) > 0)) {
             phaser.incrementAndGet();
             this.executor.submit(RunFactory.getRunInstance(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser));
             /*

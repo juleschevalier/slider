@@ -62,7 +62,7 @@ public abstract class AbstractRun implements RuleRun {
          * Buffer verification
          */
 
-        if ((this.tripleBuffer.mainBufferOccupation() + this.tripleBuffer.secondaryBufferOccupation()) == 0) {
+        if ((this.tripleBuffer.getOccupation()) == 0) {
             if (logger.isTraceEnabled()) {
                 logger.trace(this.ruleName + runId + " started for nothing");
                 logger.trace(this.ruleName + runId + " END");

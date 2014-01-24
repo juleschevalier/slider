@@ -21,6 +21,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
  * @author Jules Chevalier
  * @see TripleBuffer
  */
+@Deprecated
 public class TripleBufferLock implements TripleBuffer {
 
     private static Logger logger = Logger.getLogger(TripleBufferLock.class);
@@ -192,5 +193,10 @@ public class TripleBufferLock implements TripleBuffer {
     @Override
     public void setDebugName(String debugName) {
         this.debugName = debugName;
+    }
+
+    @Override
+    public long getOccupation() {
+        return mainBufferOccupation() + secondaryBufferOccupation();
     }
 }

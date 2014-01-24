@@ -100,11 +100,11 @@ public class TripleManager {
     public long flushBuffers() {
         long total = 0;
         for (Rule rule : this.rules) {
-            if ((rule.getTripleBuffer().mainBufferOccupation() + rule.getTripleBuffer().secondaryBufferOccupation()) > 0) {
+            if ((rule.getTripleBuffer().getOccupation()) > 0) {
                 total++;
             }
             if (logger.isTraceEnabled()) {
-                logger.trace("FinishThem " + rule.name() + " buffer : " + rule.getTripleBuffer().mainBufferOccupation() + "," + rule.getTripleBuffer().secondaryBufferOccupation());
+                logger.trace("FlushBuffers " + rule.name() + " buffer : " + rule.getTripleBuffer().getOccupation());
             }
             rule.bufferFull();
         }
