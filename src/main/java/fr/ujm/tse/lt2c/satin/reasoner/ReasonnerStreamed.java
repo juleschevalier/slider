@@ -32,9 +32,9 @@ public class ReasonnerStreamed {
     private static final Logger logger = Logger.getLogger(ReasonnerStreamed.class);
     public static final int SESSION_ID = UUID.randomUUID().hashCode();
     private static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
-    private static final int THREADS_PER_CORE = 1;
-    // public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
-    public static final int MAX_THREADS = 1;
+    private static final int THREADS_PER_CORE = 10;
+    public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
+    // public static final int MAX_THREADS = 1;
     private static final boolean PERSIST_RESULTS = false;
 
     private static ExecutorService executor;
@@ -65,7 +65,7 @@ public class ReasonnerStreamed {
 
         try {
 
-            final int max = 1;
+            final int max = 100;
 
             for (int file = 0; file < files.size(); file++) {
 
@@ -175,8 +175,8 @@ public class ReasonnerStreamed {
          * the end
          */
 
-        long still_nonempty_buffers = tripleManager.flushBuffers();
-        while (still_nonempty_buffers > 0) {
+        long nonEmptyBuffers = tripleManager.flushBuffers();
+        while (nonEmptyBuffers > 0) {
 
             if (logger.isTraceEnabled()) {
                 logger.trace("REASONNER Flush Buffers!");
@@ -185,24 +185,27 @@ public class ReasonnerStreamed {
             // still_nonempty_buffers = tripleManager.flushBuffers();
 
             if (logger.isTraceEnabled()) {
-                logger.trace("REASONER There are still " + still_nonempty_buffers + " non empty buffers");
+                logger.trace("REASONER There are still " + nonEmptyBuffers + " non empty buffers");
             }
 
             // while (phaser.get() > 0) {}
 
             synchronized (phaser) {
-                long still_runnning = phaser.get();
-                while (still_runnning > 0) {
+                long stillRunnning = phaser.get();
+                while (stillRunnning > 0) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("REASONER Running rules: " + stillRunnning);
+                    }
                     try {
                         phaser.wait();
                     } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
-                    still_runnning = phaser.get();
+                    stillRunnning = phaser.get();
                 }
             }
 
-            still_nonempty_buffers = tripleManager.flushBuffers();
+            nonEmptyBuffers = tripleManager.flushBuffers();
 
         }
 

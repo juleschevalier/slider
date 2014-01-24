@@ -67,6 +67,7 @@ public abstract class AbstractRun implements RuleRun {
                 logger.trace(this.ruleName + runId + " started for nothing");
                 logger.trace(this.ruleName + runId + " END");
             }
+            phaser.decrementAndGet();
             return;
         }
 
@@ -81,16 +82,6 @@ public abstract class AbstractRun implements RuleRun {
                 logger.error(this.ruleName + runId + " NULL usableTriples");
                 return;
             }
-
-            /*
-             * Register on phaser
-             * Notifies the Reasoner this thread infers
-             */
-            if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " increment phaser " + this.phaser);
-            }
-
-            this.phaser.incrementAndGet();
 
             this.debugThreads++;
 
@@ -160,8 +151,8 @@ public abstract class AbstractRun implements RuleRun {
             logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
         }
         // push data in queue threaded
-        distributor.getTripleQueue().addAll(newTriples);
-        // distributor.distribute(newTriples);
+        // distributor.getTripleQueue().addAll(newTriples);
+        distributor.distribute(newTriples);
         return duplicates;
     }
 

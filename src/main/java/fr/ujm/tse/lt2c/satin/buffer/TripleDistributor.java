@@ -110,7 +110,6 @@ public class TripleDistributor implements Runnable {
      * @param triples
      * @see Triple
      */
-    @Deprecated
     public void distribute(Collection<Triple> triples) {
         /*
          * ISSUE -> ALL BUFFERS WAIT FOR ONE BLOCKED

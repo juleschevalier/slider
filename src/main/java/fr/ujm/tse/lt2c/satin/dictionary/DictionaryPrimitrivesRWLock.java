@@ -82,8 +82,8 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (counter ^ (counter >>> 32));
-        result = prime * result + ((triples == null) ? 0 : triples.hashCode());
+        result = (prime * result) + (int) (counter ^ (counter >>> 32));
+        result = (prime * result) + ((triples == null) ? 0 : triples.hashCode());
         return result;
     }
 

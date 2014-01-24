@@ -1,7 +1,6 @@
 package fr.ujm.tse.lt2c.satin.rules;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -48,13 +47,14 @@ public class Rule implements BufferListener {
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
 
         this.tripleDistributor = new TripleDistributor();
-        Executors.newSingleThreadExecutor().submit(tripleDistributor);
+        // Executors.newSingleThreadExecutor().submit(tripleDistributor);
 
     }
 
     @Override
     public boolean bufferFull() {
-        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && (this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0) {
+        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && ((this.tripleBuffer.secondaryBufferOccupation() + this.tripleBuffer.mainBufferOccupation()) > 0)) {
+            phaser.incrementAndGet();
             this.executor.submit(RunFactory.getRunInstance(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser));
             /*
              * For monothread :
