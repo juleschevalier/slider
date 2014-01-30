@@ -64,7 +64,9 @@ public class RunPRP_RNG extends AbstractRun {
 
                         if (triple.getObject() >= 0) {
                             final Triple result = new ImmutableTriple(triple.getObject(), type, c);
-                            logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, range, c)) + " -> " + dictionary.printTriple(result));
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, range, c)) + " -> " + dictionary.printTriple(result));
+                            }
                             outputTriples.add(result);
                         }
                     }

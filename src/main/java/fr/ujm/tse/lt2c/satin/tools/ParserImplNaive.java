@@ -78,8 +78,8 @@ public class ParserImplNaive implements Parser {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((dictionary == null) ? 0 : dictionary.hashCode());
-        result = prime * result + ((tripleStore == null) ? 0 : tripleStore.hashCode());
+        result = (prime * result) + ((dictionary == null) ? 0 : dictionary.hashCode());
+        result = (prime * result) + ((tripleStore == null) ? 0 : tripleStore.hashCode());
         return result;
     }
 

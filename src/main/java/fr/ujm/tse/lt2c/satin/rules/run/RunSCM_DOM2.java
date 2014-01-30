@@ -71,7 +71,9 @@ public class RunSCM_DOM2 extends AbstractRun {
                     final Triple result = new ImmutableTriple(triple.getSubject(), domain, c);
                     outputTriples.add(result);
 
-                    logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), domain, c)) + " -> " + dictionary.printTriple(result));
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), domain, c)) + " -> " + dictionary.printTriple(result));
+                    }
                 }
             }
         }

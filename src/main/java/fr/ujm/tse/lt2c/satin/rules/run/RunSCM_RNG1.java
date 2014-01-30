@@ -70,7 +70,9 @@ public class RunSCM_RNG1 extends AbstractRun {
                     final Triple result = new ImmutableTriple(triple.getSubject(), range, c2);
                     outputTriples.add(result);
 
-                    logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), range, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), range, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+                    }
                 }
             }
         }

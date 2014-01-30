@@ -68,7 +68,9 @@ public class RunSCM_SPO extends AbstractRun {
                         final Triple result = new ImmutableTriple(triple.getSubject(), subPropertyOf, p3);
                         outputTriples.add(result);
 
-                        logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        }
                     }
                 }
             }

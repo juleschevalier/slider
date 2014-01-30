@@ -58,7 +58,9 @@ public class RunPRP_SPO1 extends AbstractRun {
                     for (final Long p2 : subPropertyOfMultiMap.get(p1)) {
 
                         final Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
-                        logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
+                        }
                         outputTriples.add(result);
                     }
 

@@ -144,7 +144,9 @@ public abstract class AbstractRun implements RuleRun {
                 tripleStore.add(triple);
                 newTriples.add(triple);
             } else {
-                logTrace(dictionary.printTriple(triple) + " already present");
+                if (logger.isTraceEnabled()) {
+                    logger.trace(dictionary.printTriple(triple) + " already present");
+                }
             }
         }
         if (logger.isTraceEnabled()) {

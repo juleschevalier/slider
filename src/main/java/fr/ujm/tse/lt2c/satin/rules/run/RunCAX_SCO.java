@@ -64,7 +64,9 @@ public class RunCAX_SCO extends AbstractRun {
                     if (typeTriple.getSubject() >= 0) {
                         final Triple result = new ImmutableTriple(typeTriple.getSubject(), type, c2);
                         outputTriples.add(result);
-                        logTrace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type, typeTriple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type, typeTriple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+                        }
                     }
                 }
             }

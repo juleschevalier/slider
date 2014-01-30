@@ -60,7 +60,9 @@ public class RunPRP_DOM extends AbstractRun {
 
                         if (triple.getSubject() >= 0) {
                             final Triple result = new ImmutableTriple(triple.getSubject(), type, c);
-                            logTrace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
+                            }
                             outputTriples.add(result);
                         }
                     }

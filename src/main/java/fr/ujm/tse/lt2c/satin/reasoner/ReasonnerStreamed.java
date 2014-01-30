@@ -1,5 +1,6 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,19 +54,18 @@ public class ReasonnerStreamed {
 
         // files.add("tiny_subclassof.nt");
         // files.add("subclassof.nt");
-        files.add("sample1.nt");
+        // files.add("sample1.nt");
         // files.add("univ-bench.nt");
         // files.add("geopolitical_200Ko.nt");
         // files.add("geopolitical_300Ko.nt");
         // files.add("geopolitical_500Ko.nt");
         // files.add("geopolitical_1Mo.nt");
         // files.add("geopolitical.nt");
-        // files.add("efo.nt");
-        // files.add("opencyc.nt");
+        // files.add("dbpedia_3.8.nt");
 
         try {
 
-            final int max = 100;
+            final int max = 1;
 
             for (int file = 0; file < files.size(); file++) {
 
@@ -97,6 +97,11 @@ public class ReasonnerStreamed {
 
     private static boolean infere(final String input) {
 
+        if ((new File(input)).canRead()) {
+            logger.error("File not found " + input);
+            return false;
+        }
+
         boolean success = false;
 
         logger.debug("********************************NEW RUN********************************");
@@ -112,12 +117,18 @@ public class ReasonnerStreamed {
         /* File parsing */
         parser.parse(input);
 
+        if (logger.isInfoEnabled()) {
+            logger.info("Parsing OK : " + tripleStore.size());
+        }
+
         if (logger.isTraceEnabled()) {
             logger.trace("---DICTIONARY---");
             logger.trace(dictionary.printDico());
             logger.trace("----TRIPLES-----");
             for (final Triple triple : tripleStore.getAll()) {
-                logger.trace(triple + " " + dictionary.printTriple(triple));
+                if (logger.isTraceEnabled()) {
+                    logger.trace(triple + " " + dictionary.printTriple(triple));
+                }
             }
             logger.trace("-------------");
         }
@@ -250,15 +261,16 @@ public class ReasonnerStreamed {
             } else {
                 logger.info("-" + missingTriples.size() + " +" + tooTriples.size());
 
-                for (final String string : missingTriples) {
-                    logger.info("- " + string);
-                }
-                for (final String string : tooTriples) {
-                    logger.info("+ " + string);
-                }
+                // for (final String string : missingTriples) {
+                // logger.info("- " + string);
+                // }
+                // for (final String string : tooTriples) {
+                // logger.info("+ " + string);
+                // }
                 /* Must disappear */
                 // System.exit(-1);
             }
+
         }
 
         /*************************

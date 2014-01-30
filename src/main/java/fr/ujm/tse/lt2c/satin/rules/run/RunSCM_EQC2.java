@@ -71,7 +71,9 @@ public class RunSCM_EQC2 extends AbstractRun {
                         final Triple result = new ImmutableTriple(triple.getSubject(), equivalentClass, triple.getObject());
                         outputTriples.add(result);
 
-                        logTrace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        }
                     }
                 }
             }
