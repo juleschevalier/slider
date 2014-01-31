@@ -302,6 +302,12 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return multimap;
     }
 
+    @Override
+    public Collection<Long> getPredicates() {
+
+        return internalstore.keySet();
+    }
+
     /*
      * (non-Javadoc)
      * 

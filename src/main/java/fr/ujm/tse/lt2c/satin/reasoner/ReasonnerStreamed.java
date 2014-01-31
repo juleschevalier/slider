@@ -1,6 +1,5 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +15,11 @@ import fr.ujm.tse.lt2c.satin.buffer.TripleManager;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
+import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfiles;
+import fr.ujm.tse.lt2c.satin.rules.run.RunRhoDFFinalizer;
 import fr.ujm.tse.lt2c.satin.tools.Comparator;
 import fr.ujm.tse.lt2c.satin.tools.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
@@ -31,11 +31,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 public class ReasonnerStreamed {
 
     private static final Logger logger = Logger.getLogger(ReasonnerStreamed.class);
-    public static final int SESSION_ID = UUID.randomUUID().hashCode();
+    private static final int SESSION_ID = UUID.randomUUID().hashCode();
     private static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
     private static final int THREADS_PER_CORE = 10;
     public static final int MAX_THREADS = AVAILABLE_CORES * THREADS_PER_CORE;
-    // public static final int MAX_THREADS = 1;
     private static final boolean PERSIST_RESULTS = false;
 
     private static ExecutorService executor;
@@ -55,13 +54,18 @@ public class ReasonnerStreamed {
         // files.add("tiny_subclassof.nt");
         // files.add("subclassof.nt");
         // files.add("sample1.nt");
-        // files.add("univ-bench.nt");
+        files.add("univ-bench.nt");
         // files.add("geopolitical_200Ko.nt");
         // files.add("geopolitical_300Ko.nt");
         // files.add("geopolitical_500Ko.nt");
         // files.add("geopolitical_1Mo.nt");
         // files.add("geopolitical.nt");
         // files.add("dbpedia_3.8.nt");
+        // files.add("dataset_100k.nt");
+        // files.add("dataset_200k.nt");
+        // files.add("dataset_500k.nt");
+        // files.add("dataset_1M.nt");
+        // files.add("dataset_5M.nt");
 
         try {
 
@@ -70,10 +74,12 @@ public class ReasonnerStreamed {
             for (int file = 0; file < files.size(); file++) {
 
                 for (int i = 0; i < max; i++) {
-                    logger.info(i);
+                    if (max > 1) {
+                        logger.info(i);
+                    }
                     if (!infere(files.get(file))) {
                         fail++;
-                        System.exit(-1);
+                        // System.exit(-1);
                     }
                 }
             }
@@ -97,72 +103,33 @@ public class ReasonnerStreamed {
 
     private static boolean infere(final String input) {
 
-        if ((new File(input)).canRead()) {
-            logger.error("File not found " + input);
-            return false;
-        }
-
         boolean success = false;
 
-        logger.debug("********************************NEW RUN********************************");
+        if (logger.isDebugEnabled()) {
+            logger.debug("********************************NEW RUN********************************");
+        }
 
         /* Initialize structures */
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+
         final TripleManager tripleManager = new TripleManager();
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-
         final AtomicInteger phaser = new AtomicInteger();
+        executor = Executors.newFixedThreadPool(MAX_THREADS);
 
         /* File parsing */
         parser.parse(input);
-
-        if (logger.isInfoEnabled()) {
-            logger.info("Parsing OK : " + tripleStore.size());
-        }
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("---DICTIONARY---");
-            logger.trace(dictionary.printDico());
-            logger.trace("----TRIPLES-----");
-            for (final Triple triple : tripleStore.getAll()) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(triple + " " + dictionary.printTriple(triple));
-                }
-            }
-            logger.trace("-------------");
-        }
 
         final long debugBeginNbTriples = tripleStore.size();
 
         /* Initialize rules used for inference on RhoDF */
 
-        executor = Executors.newFixedThreadPool(MAX_THREADS);
-
-        tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM1, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQC2, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQP2, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore));
-        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore));
+        initialiseReasoner(tripleStore, dictionary, tripleManager, phaser);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(tripleManager.getRules().size() + " Rules initialized\n");
+            logger.debug("********************************START INFERENCE********************************");
         }
-
-        if (logger.isTraceEnabled()) {
-            for (final Rule rule : tripleManager.getRules()) {
-                logger.trace(rule.getTripleDistributor().subscribers(rule.name(), dictionary));
-            }
-        }
-
-        logger.debug("********************************START INFERENCE********************************");
 
         final long debugStartTime = System.nanoTime();
 
@@ -183,13 +150,9 @@ public class ReasonnerStreamed {
                 logger.trace("REASONNER Flush Buffers!");
             }
 
-            // still_nonempty_buffers = tripleManager.flushBuffers();
-
             if (logger.isTraceEnabled()) {
                 logger.trace("REASONER There are still " + nonEmptyBuffers + " non empty buffers");
             }
-
-            // while (phaser.get() > 0) {}
 
             synchronized (phaser) {
                 long stillRunnning = phaser.get();
@@ -213,8 +176,12 @@ public class ReasonnerStreamed {
         /* Reasoning must be ended */
 
         if (tripleManager.flushBuffers() > 0) {
-            logger.error("Non empty buffers after the end");
+            logger.error("Non-empty buffers after the end");
         }
+
+        final long goodthings = tripleStore.size();
+
+        bullshitting(tripleStore, dictionary, phaser);
 
         if (logger.isDebugEnabled()) {
             logger.debug("REASONNER FAtality!");
@@ -227,11 +194,19 @@ public class ReasonnerStreamed {
             logger.error("", e);
         }
 
+        if (logger.isInfoEnabled()) {
+            logger.info("Bullshit stuff : " + (tripleStore.size() - goodthings));
+        }
+
         final long debugEndTime = System.nanoTime();
 
-        logger.debug("*********************************END INFERENCE*********************************");
+        if (logger.isDebugEnabled()) {
+            logger.debug("*********************************END INFERENCE*********************************");
+        }
 
-        logger.debug("Reasoning is finished");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Reasoning is finished");
+        }
 
         // for (Rule rule : tripleManager.getRules()) {
         // logger.debug(rule.name() + " launched " + rule.getRun().getThreads()
@@ -245,7 +220,7 @@ public class ReasonnerStreamed {
         if (logger.isInfoEnabled()) {
 
             logger.info("-----------------------------------------");
-            logger.info(input + ": " + debugBeginNbTriples + " -> " + (tripleStore.size() - debugBeginNbTriples) + " in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
+            logger.info(input + ": " + debugBeginNbTriples + " -> " + tripleStore.size() + "(+" + (tripleStore.size() - debugBeginNbTriples) + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
 
             final Map<Integer, List<String>> diffTriples = Comparator.compare("jena_" + input, dictionary, tripleStore);
 
@@ -267,8 +242,6 @@ public class ReasonnerStreamed {
                 // for (final String string : tooTriples) {
                 // logger.info("+ " + string);
                 // }
-                /* Must disappear */
-                // System.exit(-1);
             }
 
         }
@@ -282,6 +255,51 @@ public class ReasonnerStreamed {
         }
         return success;
 
+    }
+
+    private static void initialiseReasoner(final TripleStore tripleStore, final Dictionary dictionary, final TripleManager tripleManager, final AtomicInteger phaser) {
+
+        tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQC2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQP2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore));
+        tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(tripleManager.getRules().size() + " rules initialized\n");
+        }
+
+        if (logger.isTraceEnabled()) {
+            for (final Rule rule : tripleManager.getRules()) {
+                logger.trace(rule.getTripleDistributor().subscribers(rule.name(), dictionary));
+            }
+        }
+    }
+
+    private static void bullshitting(final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
+        logger.info(dictionary.size());
+        final RunRhoDFFinalizer finalizer = new RunRhoDFFinalizer(tripleStore, dictionary, ReasonerProfiles.GRhoDF, executor, phaser);
+        finalizer.addTriples(tripleStore.getAll());
+        finalizer.clearBuffer();
+
+        synchronized (phaser) {
+            long running = phaser.get();
+            while (running > 0) {
+                try {
+                    phaser.wait();
+                } catch (final InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                running = phaser.get();
+            }
+        }
     }
 
     static void shutdownAndAwaitTermination(final ExecutorService pool) {

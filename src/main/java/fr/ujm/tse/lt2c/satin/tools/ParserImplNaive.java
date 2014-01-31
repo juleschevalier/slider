@@ -27,7 +27,7 @@ public class ParserImplNaive implements Parser {
      * @param f
      *            the file to parse
      */
-    public ParserImplNaive(Dictionary dictionary, TripleStore tripleStore) {
+    public ParserImplNaive(final Dictionary dictionary, final TripleStore tripleStore) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
     }
@@ -39,11 +39,17 @@ public class ParserImplNaive implements Parser {
      */
     @Override
     public void parse(final String fileInput) {
-        PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
+
+        // if (!(new File(fileInput)).canRead()) {
+        // logger.error("File not found " + fileInput);
+        // return;
+        // }
+
+        final PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         final PipedRDFStream<Triple> inputStream = new PipedTriplesStream(iter);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Runnable parser = new Runnable() {
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
+        final Runnable parser = new Runnable() {
 
             @Override
             public void run() {
@@ -54,22 +60,35 @@ public class ParserImplNaive implements Parser {
 
         executor.submit(parser);
         while (iter.hasNext()) {
-            Triple next = iter.next();
-            addTriple(next);
+            final Triple next = iter.next();
+            this.addTriple(next);
         }
+
         if (logger.isDebugEnabled()) {
-            logger.debug("Parsing done");
+            logger.debug("Parsing OK : " + this.tripleStore.size());
+        }
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("---DICTIONARY---");
+            logger.trace(this.dictionary.printDico());
+            logger.trace("----TRIPLES-----");
+            for (final fr.ujm.tse.lt2c.satin.interfaces.Triple triple : this.tripleStore.getAll()) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(triple + " " + this.dictionary.printTriple(triple));
+                }
+            }
+            logger.trace("-------------");
         }
     }
 
-    private void addTriple(Triple next) {
-        String s = next.getSubject().toString();
-        String p = next.getPredicate().toString();
-        String o = next.getObject().toString();
+    private void addTriple(final Triple next) {
+        final String s = next.getSubject().toString();
+        final String p = next.getPredicate().toString();
+        final String o = next.getObject().toString();
 
-        long si = this.dictionary.add(s);
-        long pi = this.dictionary.add(p);
-        long oi = this.dictionary.add(o);
+        final long si = this.dictionary.add(s);
+        final long pi = this.dictionary.add(p);
+        final long oi = this.dictionary.add(o);
 
         this.tripleStore.add(new ImmutableTriple(si, pi, oi));
     }
@@ -78,35 +97,35 @@ public class ParserImplNaive implements Parser {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((dictionary == null) ? 0 : dictionary.hashCode());
-        result = (prime * result) + ((tripleStore == null) ? 0 : tripleStore.hashCode());
+        result = (prime * result) + ((this.dictionary == null) ? 0 : this.dictionary.hashCode());
+        result = (prime * result) + ((this.tripleStore == null) ? 0 : this.tripleStore.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
-        ParserImplNaive other = (ParserImplNaive) obj;
-        if (dictionary == null) {
+        final ParserImplNaive other = (ParserImplNaive) obj;
+        if (this.dictionary == null) {
             if (other.dictionary != null) {
                 return false;
             }
-        } else if (!dictionary.equals(other.dictionary)) {
+        } else if (!this.dictionary.equals(other.dictionary)) {
             return false;
         }
-        if (tripleStore == null) {
+        if (this.tripleStore == null) {
             if (other.tripleStore != null) {
                 return false;
             }
-        } else if (!tripleStore.equals(other.tripleStore)) {
+        } else if (!this.tripleStore.equals(other.tripleStore)) {
             return false;
         }
         return true;

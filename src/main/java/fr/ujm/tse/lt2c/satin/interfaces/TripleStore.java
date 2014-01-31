@@ -11,6 +11,10 @@ import com.google.common.collect.Multimap;
  *         Use Triple interface
  * @see Triple
  */
+/**
+ * @author Jules Chevalier
+ * 
+ */
 public interface TripleStore {
 
     /**
@@ -101,5 +105,10 @@ public interface TripleStore {
 
     @Override
     boolean equals(Object obj);
+
+    /**
+     * @return all the predicates in a Collection
+     */
+    Collection<Long> getPredicates();
 
 }
