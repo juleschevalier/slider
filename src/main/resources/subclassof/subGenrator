@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $# -lt 1 ]]; then
+	echo "usage : $0 <size>";
+	exit -1;
+fi;
+
+i=2;
+
+echo "<http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> ." > subClassOf$1.nt;
+
+while [[ $i -lt $1 ]]; do
+	echo "<http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#$i> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> ." >> subClassOf$1.nt;
+	echo "<http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#$i> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#"$(($i+1))"> ." >> subClassOf$1.nt;
+	i=$(($i+1));
+done
+echo "<http://www.semanticweb.org/jules/ontologies/2014/0/tiny_subclassof#$i> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> ." >> subClassOf$1.nt;

@@ -2,6 +2,8 @@
 /build/
 /bin/
 target/
+# Ontology files #
+*.nt
 # Output files #
 *.out
 *.csv

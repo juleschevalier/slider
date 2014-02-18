@@ -24,6 +24,9 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 @Deprecated
 public class TripleBufferLock implements TripleBuffer {
 
+    /* Limit of the main buffer (adding the last triple calls bufferfull) */
+    static final long BUFFER_SIZE = 100;
+
     private static Logger logger = Logger.getLogger(TripleBufferLock.class);
 
     TripleStore mainBuffer;
@@ -34,9 +37,6 @@ public class TripleBufferLock implements TripleBuffer {
     String debugName;
 
     long lastFlush;
-
-    /* Limit of the main buffer (adding the last triple calls bufferfull) */
-    static final long BUFFER_SIZE = 100;
 
     /**
      * Constructor
@@ -52,7 +52,7 @@ public class TripleBufferLock implements TripleBuffer {
     public boolean add(final Triple triple) {
         boolean success = false;
         try {
-            rwlock.writeLock().lock();
+            this.rwlock.writeLock().lock();
             if (this.mainBuffer.size() < BUFFER_SIZE) {
                 this.mainBuffer.add(triple);
                 success = true;
@@ -60,8 +60,8 @@ public class TripleBufferLock implements TripleBuffer {
                 logger.trace(this.hashCode() + " is full");
                 if (this.secondaryBuffer.isEmpty()) {
                     logger.trace(this.hashCode() + " switch buffers");
-                    switchBuffers();
-                    for (BufferListener bufferListener : bufferListeners) {
+                    this.switchBuffers();
+                    for (final BufferListener bufferListener : this.bufferListeners) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("Buffer really full");
                         }
@@ -72,10 +72,10 @@ public class TripleBufferLock implements TripleBuffer {
                 }
 
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
         }
         if (!success && logger.isTraceEnabled()) {
             logger.trace(this.hashCode() + "Add failed");
@@ -87,39 +87,39 @@ public class TripleBufferLock implements TripleBuffer {
      * Switch the main and the secondary buffers
      */
     private void switchBuffers() {
-        TripleStore temp = mainBuffer;
-        mainBuffer = secondaryBuffer;
-        secondaryBuffer = temp;
+        final TripleStore temp = this.mainBuffer;
+        this.mainBuffer = this.secondaryBuffer;
+        this.secondaryBuffer = temp;
     }
 
     @Override
     public TripleStore clear() {
-        if ((mainBufferOccupation() + secondaryBufferOccupation()) == 0) {
+        if ((this.mainBufferOccupation() + this.secondaryBufferOccupation()) == 0) {
             logger.warn(this.debugName + " clear an empty buffer");
         }
 
-        rwlock.writeLock().lock();
-        if (secondaryBuffer.isEmpty()) {
-            switchBuffers();
+        this.rwlock.writeLock().lock();
+        if (this.secondaryBuffer.isEmpty()) {
+            this.switchBuffers();
         }
         TripleStore temp = null;
         try {
-            temp = secondaryBuffer;
-            secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
-        } catch (Exception e) {
+            temp = this.secondaryBuffer;
+            this.secondaryBuffer = new VerticalPartioningTripleStoreRWLock();
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.lastFlush = System.nanoTime();
             synchronized (this) {
                 this.notifyAll();
             }
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
         }
         return temp;
     }
 
     @Override
-    public void addBufferListener(BufferListener bufferListener) {
+    public void addBufferListener(final BufferListener bufferListener) {
         this.bufferListeners.add(bufferListener);
     }
 
@@ -129,15 +129,15 @@ public class TripleBufferLock implements TripleBuffer {
     @Override
     @Deprecated
     public TripleStore flush() {
-        TripleStore temp = this.mainBuffer;
+        final TripleStore temp = this.mainBuffer;
         this.lastFlush = System.nanoTime();
-        mainBuffer = new VerticalPartioningTripleStoreRWLock();
+        this.mainBuffer = new VerticalPartioningTripleStoreRWLock();
         return temp;
     }
 
     @Override
     public Collection<Triple> getCollection() {
-        return mainBuffer.getAll();
+        return this.mainBuffer.getAll();
     }
 
     @Override
@@ -147,13 +147,13 @@ public class TripleBufferLock implements TripleBuffer {
 
     @Override
     public long mainBufferOccupation() {
-        return mainBuffer.size();
+        return this.mainBuffer.size();
     }
 
     @Override
     public long secondaryBufferOccupation() {
 
-        return secondaryBuffer.size();
+        return this.secondaryBuffer.size();
     }
 
     @Override
@@ -168,35 +168,35 @@ public class TripleBufferLock implements TripleBuffer {
 
     @Override
     public void sendFullBuffer() {
-        rwlock.writeLock().lock();
+        this.rwlock.writeLock().lock();
         try {
             if (!this.mainBuffer.isEmpty() && this.secondaryBuffer.isEmpty()) {
                 logger.trace(this.hashCode() + " switch buffers because of timeout");
-                switchBuffers();
-                for (BufferListener bufferListener : bufferListeners) {
+                this.switchBuffers();
+                for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
         }
 
     }
 
     @Override
     public String getDebugName() {
-        return debugName;
+        return this.debugName;
     }
 
     @Override
-    public void setDebugName(String debugName) {
+    public void setDebugName(final String debugName) {
         this.debugName = debugName;
     }
 
     @Override
     public long getOccupation() {
-        return mainBufferOccupation() + secondaryBufferOccupation();
+        return this.mainBufferOccupation() + this.secondaryBufferOccupation();
     }
 }

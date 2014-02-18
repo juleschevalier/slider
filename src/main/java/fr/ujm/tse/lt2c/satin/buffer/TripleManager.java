@@ -20,6 +20,9 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  */
 public class TripleManager {
 
+    // Timeout
+    private static final long TIMEOUT = 100;
+
     private static Logger logger = Logger.getLogger(TripleManager.class);
 
     List<Rule> rules;
@@ -27,7 +30,6 @@ public class TripleManager {
     TripleDistributor generalDistributor;
 
     private static final boolean enableTimeout = false;
-    private static final long TIMEOUT = 100; // Timeout
 
     /**
      * Constructor
@@ -35,7 +37,7 @@ public class TripleManager {
     public TripleManager() {
         super();
         this.rules = new ArrayList<>();
-        debugLinks = HashMultimap.create();
+        this.debugLinks = HashMultimap.create();
         this.generalDistributor = new TripleDistributor();
         this.generalDistributor.setName("T_MANAGER");
         // if (logger.isTraceEnabled()) {
@@ -43,7 +45,7 @@ public class TripleManager {
         // }
         // Executors.newSingleThreadExecutor().submit(generalDistributor);
         if (enableTimeout) {
-            timeoutChecker();
+            this.timeoutChecker();
         }
     }
 
@@ -54,25 +56,25 @@ public class TripleManager {
      * @param newRule
      * @see Rule
      */
-    public void addRule(Rule newRule) {
+    public void addRule(final Rule newRule) {
         this.rules.add(newRule);
-        generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
+        this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
         if (logger.isTraceEnabled()) {
             logger.trace("Triple Manager : -- ADD RULE " + newRule.name() + " --");
             logger.trace("Triple Manager : General -> " + newRule.name());
         }
-        for (Rule rule : this.rules) {
-            if (match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
-                long[] matchers = extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
+        for (final Rule rule : this.rules) {
+            if (this.match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
+                final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
                 newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
-                debugLinks.put(newRule.name(), rule.name());
+                this.debugLinks.put(newRule.name(), rule.name());
                 if (logger.isTraceEnabled()) {
                     logger.trace("Triple Manager : " + rule.name() + " -> " + newRule.name());
                 }
             }
-            if ((rule != newRule) && match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
+            if ((rule != newRule) && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
                 rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
-                debugLinks.put(rule.name(), newRule.name());
+                this.debugLinks.put(rule.name(), newRule.name());
                 if (logger.isTraceEnabled()) {
                     logger.trace("Triple Manager : " + newRule.name() + " -> " + rule.name());
                 }
@@ -85,7 +87,7 @@ public class TripleManager {
      * 
      * @param triples
      */
-    public void addTriples(Collection<Triple> triples) {
+    public void addTriples(final Collection<Triple> triples) {
         this.generalDistributor.distribute(triples);
         // this.generalDistributor.getTripleQueue().addAll(triples);
     }
@@ -99,7 +101,7 @@ public class TripleManager {
      */
     public long flushBuffers() {
         long total = 0;
-        for (Rule rule : this.rules) {
+        for (final Rule rule : this.rules) {
             if ((rule.getTripleBuffer().getOccupation()) > 0) {
                 total++;
             }
@@ -127,13 +129,13 @@ public class TripleManager {
      * @return true if the two lists have at least one long in common. False
      *         else
      */
-    private boolean match(long[] in, long[] out) {
+    private boolean match(final long[] in, final long[] out) {
         if ((in.length == 0) || (out.length == 0)) {
             return true;
         }
         // Broken loops
-        for (long l1 : out) {
-            for (long l2 : in) {
+        for (final long l1 : out) {
+            for (final long l2 : in) {
                 if (l1 == l2) {
                     return true;
                 }
@@ -151,21 +153,21 @@ public class TripleManager {
      * @return the common longs
      * @see #match(long[], long[])
      */
-    private long[] extractMatchers(long[] out, long[] in) {
+    private long[] extractMatchers(final long[] out, final long[] in) {
         if ((in.length == 0) || (out.length == 0)) {
             return new long[] {};
         }
 
-        List<Long> matchers = new ArrayList<Long>();
-        for (long l1 : out) {
-            for (long l2 : in) {
+        final List<Long> matchers = new ArrayList<Long>();
+        for (final long l1 : out) {
+            for (final long l2 : in) {
                 if (l1 == l2) {
                     matchers.add(l1);
                 }
             }
         }
 
-        long[] ms = new long[matchers.size()];
+        final long[] ms = new long[matchers.size()];
 
         for (int i = 0; i < matchers.size(); i++) {
             ms[i] = matchers.get(i);
@@ -179,17 +181,17 @@ public class TripleManager {
      * buffer signal if needed
      */
     private void timeoutChecker() {
-        Runnable checker = new Runnable() {
+        final Runnable checker = new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(10);
-                    for (Rule rule : rules) {
+                    for (final Rule rule : TripleManager.this.rules) {
                         if ((rule.getTripleBuffer().getLastFlush() - System.nanoTime()) > (TIMEOUT * 1000000)) {
                             rule.getTripleBuffer().sendFullBuffer();
                         }
                     }
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     logger.error("", e);
                 }
             }

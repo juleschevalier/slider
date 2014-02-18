@@ -11,7 +11,6 @@ import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.reasoner.ReasonnerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.RunFactory;
 
@@ -31,18 +30,20 @@ public class Rule implements BufferListener {
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
     private final AvaibleRuns run;
+    private final int maxThreads;
 
     ExecutorService executor;
 
-    public Rule(AvaibleRuns run, ExecutorService executor, AtomicInteger phaser, Dictionary dictionary, TripleStore tripleStore) {
+    public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
         super();
         this.run = run;
         this.executor = executor;
         this.phaser = phaser;
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
+        this.maxThreads = maxThreads;
 
-        this.tripleBuffer = new QueuedTripleBufferLock();
+        this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
         this.tripleBuffer.addBufferListener(this);
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
 
@@ -53,9 +54,9 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        if ((this.phaser.get() < ReasonnerStreamed.MAX_THREADS) && ((this.tripleBuffer.getOccupation()) > 0)) {
-            phaser.incrementAndGet();
-            this.executor.submit(RunFactory.getRunInstance(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser));
+        if ((this.phaser.get() < this.maxThreads) && ((this.tripleBuffer.getOccupation()) > 0)) {
+            this.phaser.incrementAndGet();
+            this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
             /*
              * For monothread :
              * this.ruleRun.run();
@@ -63,17 +64,17 @@ public class Rule implements BufferListener {
             return true;
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(name() + " Missing space or no more necessary");
+            logger.trace(this.name() + " Missing space or no more necessary");
         }
         return false;
     }
 
     public long[] getInputMatchers() {
-        return RunFactory.getInputMatchers(run);
+        return RunFactory.getInputMatchers(this.run);
     }
 
     public long[] getOutputMatchers() {
-        return RunFactory.getOutputMatchers(run);
+        return RunFactory.getOutputMatchers(this.run);
     }
 
     public TripleBuffer getTripleBuffer() {
@@ -85,6 +86,6 @@ public class Rule implements BufferListener {
     }
 
     public String name() {
-        return RunFactory.getRuleName(run);
+        return RunFactory.getRuleName(this.run);
     }
 }

@@ -13,6 +13,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 
 public abstract class AbstractRun implements RuleRun {
 
@@ -46,7 +47,7 @@ public abstract class AbstractRun implements RuleRun {
         this.phaser = phaser;
 
         this.ruleName = this.toString();
-        this.distributor.setName(ruleName + " Distributor");
+        this.distributor.setName(this.ruleName + " Distributor");
     }
 
     @Override
@@ -67,7 +68,7 @@ public abstract class AbstractRun implements RuleRun {
                 logger.trace(this.ruleName + runId + " started for nothing");
                 logger.trace(this.ruleName + runId + " END");
             }
-            phaser.decrementAndGet();
+            this.phaser.decrementAndGet();
             return;
         }
 
@@ -84,6 +85,7 @@ public abstract class AbstractRun implements RuleRun {
             }
 
             this.debugThreads++;
+            GlobalValues.incRunsByRule(this.ruleName);
 
             long debugLoops = 0;
 
@@ -95,14 +97,14 @@ public abstract class AbstractRun implements RuleRun {
             if (usableTriples.isEmpty()) {
                 logger.warn(this.ruleName + runId + " run without triples");
             } else {
-                debugLoops += process(usableTriples, tripleStore, outputTriples);
-                debugLoops += process(tripleStore, usableTriples, outputTriples);
+                debugLoops += this.process(usableTriples, this.tripleStore, outputTriples);
+                debugLoops += this.process(this.tripleStore, usableTriples, outputTriples);
             }
 
             /*
              * Add new triples to the TripleStore
              */
-            addNewTriples(outputTriples);
+            this.addNewTriples(outputTriples);
 
             if (logger.isDebugEnabled()) {
                 logger.debug(this.ruleName + runId + " : " + outputTriples.size() + " triples generated (" + debugLoops + " loops)");
@@ -118,7 +120,7 @@ public abstract class AbstractRun implements RuleRun {
             if (logger.isTraceEnabled()) {
                 logger.trace(this.ruleName + runId + " decrement phaser " + this.phaser);
             }
-            synchronized (phaser) {
+            synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
             }
@@ -132,6 +134,9 @@ public abstract class AbstractRun implements RuleRun {
     protected abstract int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
 
     protected int addNewTriples(final Collection<Triple> outputTriples) {
+
+        GlobalValues.incInferedByRule(this.ruleName, outputTriples.size());
+
         final int duplicates = 0;
 
         if (outputTriples.isEmpty()) {
@@ -140,12 +145,12 @@ public abstract class AbstractRun implements RuleRun {
 
         final ArrayList<Triple> newTriples = new ArrayList<>();
         for (final Triple triple : outputTriples) {
-            if (!tripleStore.contains(triple)) {
-                tripleStore.add(triple);
+            if (!this.tripleStore.contains(triple)) {
+                this.tripleStore.add(triple);
                 newTriples.add(triple);
             } else {
                 if (logger.isTraceEnabled()) {
-                    logger.trace(dictionary.printTriple(triple) + " already present");
+                    logger.trace(this.dictionary.printTriple(triple) + " already present");
                 }
             }
         }
@@ -154,26 +159,27 @@ public abstract class AbstractRun implements RuleRun {
         }
         // push data in queue threaded
         // distributor.getTripleQueue().addAll(newTriples);
-        distributor.distribute(newTriples);
+        this.distributor.distribute(newTriples);
+        GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
         return duplicates;
     }
 
     protected void logDebug(final String message) {
-        if (getLogger().isDebugEnabled()) {
+        if (this.getLogger().isDebugEnabled()) {
             final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
-            getLogger().debug(ruleName + runId + " " + message);
+            this.getLogger().debug(this.ruleName + runId + " " + message);
         }
     }
 
     protected void logTrace(final String message) {
-        if (getLogger().isTraceEnabled()) {
+        if (this.getLogger().isTraceEnabled()) {
             final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
-            getLogger().trace(ruleName + runId + " " + message);
+            this.getLogger().trace(this.ruleName + runId + " " + message);
         }
     }
 
     public String getRuleName() {
-        return ruleName;
+        return this.ruleName;
     }
 
     public TripleBuffer getTripleBuffer() {
@@ -185,7 +191,7 @@ public abstract class AbstractRun implements RuleRun {
     }
 
     public int getThreads() {
-        return debugThreads;
+        return this.debugThreads;
     }
 
     @Override

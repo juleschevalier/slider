@@ -22,6 +22,9 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
  */
 public class QueuedTripleBufferLock implements TripleBuffer {
 
+    /* Limit of the main buffer (adding the last triple calls bufferfull) */
+    public long bufferSize;
+
     private static Logger logger = Logger.getLogger(QueuedTripleBufferLock.class);
 
     Queue<Triple> tripleQueue;
@@ -34,37 +37,35 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     long lastFlush;
 
-    /* Limit of the main buffer (adding the last triple calls bufferfull) */
-    static final long BUFFER_SIZE = 100;
-
     /**
      * Constructor
      */
-    public QueuedTripleBufferLock() {
+    public QueuedTripleBufferLock(final long bufferSize) {
         this.tripleQueue = new ConcurrentLinkedQueue<>();
         this.bufferListeners = new HashSet<>();
         this.lastFlush = System.nanoTime();
         this.currentBuffer = new AtomicInteger();
+        this.bufferSize = bufferSize;
     }
 
     @Override
     public boolean add(final Triple triple) {
         boolean success = false;
         try {
-            rwlock.writeLock().lock();
+            this.rwlock.writeLock().lock();
 
-            success = tripleQueue.add(triple);
-            if (this.currentBuffer.incrementAndGet() > BUFFER_SIZE) {
-                for (BufferListener bufferListener : bufferListeners) {
+            success = this.tripleQueue.add(triple);
+            if (this.currentBuffer.incrementAndGet() > this.bufferSize) {
+                for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();
                 }
                 this.currentBuffer.set(0);
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
         }
         return success;
     }
@@ -74,17 +75,17 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
         TripleStore ts = null;
         try {
-            rwlock.writeLock().lock();
+            this.rwlock.writeLock().lock();
             ts = new VerticalPartioningTripleStoreRWLock();
-            for (int i = 0; ((i < tripleQueue.size()) && (i < BUFFER_SIZE)); i++) {
-                ts.add(tripleQueue.poll());
+            for (int i = 0; ((i < this.tripleQueue.size()) && (i < this.bufferSize)); i++) {
+                ts.add(this.tripleQueue.poll());
             }
             this.currentBuffer.set(0);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.lastFlush = System.nanoTime();
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
             synchronized (this) {
                 this.notifyAll();
             }
@@ -93,7 +94,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     }
 
     @Override
-    public void addBufferListener(BufferListener bufferListener) {
+    public void addBufferListener(final BufferListener bufferListener) {
         this.bufferListeners.add(bufferListener);
     }
 
@@ -104,12 +105,12 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     @Override
     public long getBufferLimit() {
-        return BUFFER_SIZE;
+        return this.bufferSize;
     }
 
     @Override
     public long getOccupation() {
-        return tripleQueue.size();
+        return this.tripleQueue.size();
     }
 
     @Override
@@ -125,28 +126,28 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public void sendFullBuffer() {
         try {
-            rwlock.writeLock().lock();
-            if (!(this.size.get() > BUFFER_SIZE)) {
+            this.rwlock.writeLock().lock();
+            if (!(this.size.get() > this.bufferSize)) {
                 logger.trace(this.hashCode() + " switch buffers because of timeout");
-                for (BufferListener bufferListener : bufferListeners) {
+                for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            rwlock.writeLock().unlock();
+            this.rwlock.writeLock().unlock();
         }
 
     }
 
     @Override
     public String getDebugName() {
-        return debugName;
+        return this.debugName;
     }
 
     @Override
-    public void setDebugName(String debugName) {
+    public void setDebugName(final String debugName) {
         this.debugName = debugName;
     }
 

@@ -32,12 +32,12 @@ public class RunRhoDFFinalizer implements BufferListener {
     ExecutorService executor;
     AtomicInteger phaser;
 
-    public RunRhoDFFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfiles profile, final ExecutorService executor, final AtomicInteger phaser) {
+    public RunRhoDFFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor, final AtomicInteger phaser, final int bufferSize) {
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
         this.executor = executor;
         this.phaser = phaser;
-        this.tripleBuffer = new QueuedTripleBufferLock();
+        this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
         this.tripleBuffer.addBufferListener(this);
     }
 

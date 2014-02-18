@@ -88,6 +88,15 @@ public interface TripleStore {
     boolean contains(Triple triple);
 
     /**
+     * @param s
+     * @param p
+     * @param o
+     * @return true if the TripleStore contains triple <s,p,o>, false else
+     * @see Triple
+     */
+    boolean contains(long s, long p, long o);
+
+    /**
      * Remove all the triples
      */
     void clear();
