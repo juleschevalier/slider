@@ -1,8 +1,10 @@
 package fr.ujm.tse.lt2c.satin.main;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -23,7 +25,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
-import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.utils.Configuration;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
@@ -52,6 +54,26 @@ public class Main {
         Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
 
+        if (logger.isInfoEnabled()) {
+            logger.info("Files :");
+            int maxLenght = 0;
+            for (final File file : arguments.getFiles()) {
+                if (file.getName().length() > maxLenght) {
+                    maxLenght = file.getName().length();
+                }
+            }
+            for (final File file : arguments.getFiles()) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("       ");
+                sb.append(file.getName());
+                for (int i = file.getName().length(); i < (maxLenght + 2); i++) {
+                    sb.append(" ");
+                }
+                sb.append(humanReadableSize(file.length()));
+                logger.info(sb.toString());
+            }
+        }
+
         if (arguments.getFiles().isEmpty()) {
             logger.warn("Well, without files I can't do anything, you know ?");
             return;
@@ -61,18 +83,17 @@ public class Main {
             if (logger.isInfoEnabled()) {
                 logger.info("Iteration: " + loop);
             }
-            for (final String file : arguments.getFiles()) {
+            for (final File file : arguments.getFiles()) {
 
-                final RunEntity runEntity = reasoner.infere(file);
+                final RunEntity runEntity = reasoner.infere(file.getAbsolutePath());
 
                 if (arguments.isDumpMode()) {
-                    final File input = new File(file);
-                    final String newFile = "infered_" + input.getName();
+                    final String newFile = "infered_" + (arguments.isBullshitMode() ? "bs_" : "") + file.getName();
                     tripleStore.writeToFile(newFile, dictionary);
                 }
 
                 /* Reset log tracers */
-                GlobalValues.reset();
+                Configuration.reset();
 
                 if (arguments.isPersistMode()) {
                     MongoClient client;
@@ -145,7 +166,7 @@ public class Main {
         // options.addOption("directory", false,
         // "parameters are directories instead of files. Inferes on all files in it");
         final Option directoryO = new Option("d", "infere on all ontologies in the indicated directory");
-        directoryO.setArgName("d");
+        directoryO.setArgName("directory");
         directoryO.setArgs(1);
         directoryO.setType(File.class);
         options.addOption(directoryO);
@@ -198,9 +219,9 @@ public class Main {
                 final String arg = cmd.getOptionValue("buffer");
                 try {
                     bufferSize = Integer.parseInt(arg);
-                    logger.warn("buffer : " + bufferSize);
+                    logger.info("buffer : " + bufferSize);
                 } catch (final NumberFormatException e) {
-                    logger.error("Buffer size must be a number");
+                    logger.error("Buffer size must be a number. Option ignored");
                 }
             }
             /* bullshit */
@@ -281,7 +302,7 @@ public class Main {
                 }
             }
 
-            final Set<String> files = new HashSet<>();
+            final List<File> files = new ArrayList<>();
             if (dir != null) {
                 final File directory = new File(dir);
                 final File[] listOfFiles = directory.listFiles();
@@ -289,25 +310,43 @@ public class Main {
                 for (final File file : listOfFiles) {
                     // Maybe other extensions ?
                     if (file.isFile() && file.getName().endsWith(".nt")) {
-                        files.add(file.getAbsolutePath());
-                    }
-                }
-            } else {
-                for (final Object o : cmd.getArgList()) {
-                    String arg = o.toString();
-                    if (arg.startsWith("~" + File.separator)) {
-                        arg = System.getProperty("user.home") + arg.substring(1);
-                    }
-                    final File file = new File(arg);
-                    if (!file.exists()) {
-                        logger.warn("**Cant not find " + file);
-                    } else if (file.isDirectory()) {
-                        logger.warn("**" + file + " is a directory");
-                    } else {
-                        files.add(arg);
+                        files.add(file);
                     }
                 }
             }
+            for (final Object o : cmd.getArgList()) {
+                String arg = o.toString();
+                if (arg.startsWith("~" + File.separator)) {
+                    arg = System.getProperty("user.home") + arg.substring(1);
+                }
+                final File file = new File(arg);
+                if (!file.exists()) {
+                    logger.warn("**Cant not find " + file);
+                } else if (file.isDirectory()) {
+                    logger.warn("**" + file + " is a directory");
+                } else {
+                    files.add(file);
+                }
+            }
+
+            // final List<String> sorted_files = new ArrayList<>();
+
+            Collections.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(final File f1, final File f2) {
+                    if (f1.length() > f2.length()) {
+                        return 1;
+                    }
+                    if (f2.length() > f1.length()) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
+
+            // for (final File file : files) {
+            // sorted_files.add(file.getAbsolutePath());
+            // }
 
             return new ReasoningArguments(threadsPerCore, bufferSize, timeout, iteration, bullshitMode, cumulativeMode, profile, persistMode, dumpMode, files);
 
@@ -315,5 +354,15 @@ public class Main {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String humanReadableSize(final long bytes) {
+        final int unit = 1024;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        final int exp = (int) (Math.log(bytes) / Math.log(unit));
+        final String pre = ("KMGTPE").charAt(exp - 1) + "";
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 }

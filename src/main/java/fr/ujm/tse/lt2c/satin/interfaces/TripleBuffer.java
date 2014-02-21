@@ -95,4 +95,6 @@ public interface TripleBuffer {
 
     long getOccupation();
 
+    boolean addAll(Collection<Triple> triples);
+
 }

@@ -58,23 +58,27 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
     public void add(final Triple t) {
         this.rwlock.writeLock().lock();
         try {
-            if (!this.internalstore.containsKey(t.getPredicate())) {
-                final Multimap<Long, Long> newmap = HashMultimap.create();
-                newmap.put(t.getSubject(), t.getObject());
-                this.internalstore.put(t.getPredicate(), newmap);
-                this.triples++;
-
-            } else {
-                if (!(this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject())) && (this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))) {
-                    this.triples++;
-                }
-            }
+            this.addNoLock(t);
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
 
+    }
+
+    private void addNoLock(final Triple t) {
+        if (!this.internalstore.containsKey(t.getPredicate())) {
+            final Multimap<Long, Long> newmap = HashMultimap.create();
+            newmap.put(t.getSubject(), t.getObject());
+            this.internalstore.put(t.getPredicate(), newmap);
+            this.triples++;
+
+        } else {
+            if (!(this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject())) && (this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))) {
+                this.triples++;
+            }
+        }
     }
 
     /*
@@ -84,11 +88,37 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
      * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#addAll(java.util.Collection)
      */
     @Override
-    public void addAll(final Collection<Triple> t) {
-        for (final Triple triple : t) {
-            this.add(triple);
+    public void addAll(final Collection<Triple> triples) {
+
+        this.rwlock.writeLock().lock();
+        try {
+            for (final Triple triple : triples) {
+                this.addNoLock(triple);
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
         }
 
+    }
+
+    @Override
+    public void merge(final Collection<Triple> newTriples, final Collection<Triple> inferred) {
+        this.rwlock.writeLock().lock();
+        try {
+            for (final Triple triple : inferred) {
+                if (!this.containsNoLock(triple.getSubject(), triple.getPredicate(), triple.getObject())) {
+                    newTriples.add(triple);
+                    this.addNoLock(triple);
+                }
+
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
+        }
     }
 
     /*
@@ -292,9 +322,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         this.rwlock.readLock().lock();
         boolean result = false;
         try {
-            if (this.internalstore.containsKey(triple.getPredicate())) {
-                result = (this.internalstore.get(triple.getPredicate()).containsEntry(triple.getSubject(), triple.getObject()));
-            }
+            result = this.containsNoLock(triple.getSubject(), triple.getPredicate(), triple.getObject());
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -316,14 +344,20 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         this.rwlock.readLock().lock();
         boolean result = false;
         try {
-            if (this.internalstore.containsKey(p)) {
-                result = (this.internalstore.get(p).containsEntry(s, o));
-            }
+            result = this.containsNoLock(s, p, o);
 
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
+        }
+        return result;
+    }
+
+    private boolean containsNoLock(final long s, final long p, final long o) {
+        boolean result = false;
+        if (this.internalstore.containsKey(p)) {
+            result = (this.internalstore.get(p).containsEntry(s, o));
         }
         return result;
     }
@@ -372,6 +406,30 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             logger.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
+        }
+
+    }
+
+    @Override
+    public void add(final long s, final long p, final long o) {
+
+        this.rwlock.writeLock().lock();
+        try {
+            if (!this.internalstore.containsKey(p)) {
+                final Multimap<Long, Long> newmap = HashMultimap.create();
+                newmap.put(s, o);
+                this.internalstore.put(p, newmap);
+                this.triples++;
+
+            } else {
+                if (!(this.internalstore.get(p).containsEntry(s, o)) && (this.internalstore.get(p).put(s, o))) {
+                    this.triples++;
+                }
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
         }
 
     }

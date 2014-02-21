@@ -8,9 +8,7 @@ import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +24,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import fr.ujm.tse.lt2c.satin.buffer.TripleManager;
-import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
@@ -35,8 +32,7 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.rules.run.RunRhoDFFinalizer;
-import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
-import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.utils.Configuration;
 import fr.ujm.tse.lt2c.satin.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
@@ -61,88 +57,6 @@ public class ReasonerStreamed {
     private static ExecutorService executor;
     private final TripleStore tripleStore;
     private final Dictionary dictionary;
-
-    public static void main(final String[] args) {
-
-        final List<String> files = new ArrayList<String>();
-
-        // files.add("tiny_subclassof.nt");
-        // files.add("subclassof.nt");
-        // files.add("sample1.nt");
-        // files.add("univ-bench.nt");
-        // files.add("geopolitical_200Ko.nt");
-        // files.add("geopolitical_300Ko.nt");
-        // files.add("geopolitical_500Ko.nt");
-        // files.add("geopolitical_1Mo.nt");
-        // files.add("geopolitical.nt");
-        // files.add("dbpedia_3.8.nt");
-        // files.add("dataset_100k.nt");
-        // files.add("dataset_200k.nt");
-        // files.add("dataset_500k.nt");
-        // files.add("dataset_1M.nt");
-        // files.add("dataset_5M.nt");
-        // files.add("subclassof/subClassOf10.nt");
-        // files.add("subclassof/subClassOf50.nt");
-        // files.add("subclassof/subClassOf100.nt");
-        // files.add("subclassof/subClassOf200.nt");
-        // files.add("subclassof/subClassOf500.nt");
-        // files.add("subclassof/subClassOf1000.nt");
-        files.add("wikipediaOntology.nt");
-
-        try {
-
-            final int max = 1;
-
-            for (int file = 0; file < files.size(); file++) {
-
-                for (int i = 0; i < max; i++) {
-                    if (max > 1) {
-                        logger.info("Run " + i);
-                    }
-                    final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-                    final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-                    final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RhoDF, 10, 100, 100, false, false);
-
-                    final RunEntity runEntity = reasoner.infere(files.get(file));
-
-                    // Save results in Mongo
-                    // if (false) {
-                    // MongoClient client;
-                    // try {
-                    // client = new MongoClient();
-                    // final Morphia morphia = new Morphia();
-                    // morphia.map(RunEntity.class);
-                    // final Datastore ds = morphia.createDatastore(client,
-                    // "RunResults");
-                    // ds.save(runEntity);
-                    //
-                    // } catch (final Exception e) {
-                    // e.printStackTrace();
-                    // }
-                }
-
-                // Print TripleStore in n-triples format
-                // ReasonnerStreamed.outputToFile(tripleStore, dictionary,
-                // "infered_" + files.get(file));
-                // if (logger.isInfoEnabled()) {
-                // logger.info("Writting to " + "infered_" + files.get(file)
-                // + " Ok");
-                // }
-                // }
-            }
-            // final Print results
-            // if (false) {
-            // if (logger.isInfoEnabled()) {
-            // logger.info("SESSION ID : " + SESSION_ID);
-            // }
-            // }
-            shutdownAndAwaitTermination(executor);
-
-        } catch (final Exception e) {
-            logger.error("", e);
-        }
-
-    }
 
     /*
      * Constructors
@@ -173,10 +87,10 @@ public class ReasonerStreamed {
 
     public RunEntity infere(final String input) {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("-----------------------------------------");
-            logger.info(input);
-        }
+        // if (logger.isInfoEnabled()) {
+        // logger.info("-----------------------------------------");
+        // logger.info(input);
+        // }
 
         if (logger.isDebugEnabled()) {
             logger.debug("********************************NEW RUN********************************");
@@ -209,6 +123,7 @@ public class ReasonerStreamed {
         /********************
          * LAUNCH INFERENCE *
          ********************/
+        // tripleManager.addTriples(this.tripleStore);
         tripleManager.addTriples(this.tripleStore.getAll());
 
         /*
@@ -263,12 +178,13 @@ public class ReasonerStreamed {
             logger.debug("REASONNER FAtality!");
         }
 
-        executor.shutdown();
-        try {
-            executor.awaitTermination(1, TimeUnit.DAYS);
-        } catch (final InterruptedException e) {
-            logger.error("", e);
-        }
+        // executor.shutdown();
+        // try {
+        // executor.awaitTermination(1, TimeUnit.DAYS);
+        // } catch (final InterruptedException e) {
+        // logger.error("", e);
+        // }
+        shutdownAndAwaitTermination(executor);
 
         final long debugEndTime = System.nanoTime();
 
@@ -293,11 +209,11 @@ public class ReasonerStreamed {
         }
         machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
         final long ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
-        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", SESSION_ID, input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "", GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule());
+        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", SESSION_ID, input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "", Configuration.getRunsByRule(), Configuration.getDuplicatesByRule(), Configuration.getInferedByRule());
 
         if (logger.isInfoEnabled()) {
 
-            logger.info("-------------------");
+            // logger.info("-------------------");
             logger.info((new File(input)).getName() + ": " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples) + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
 
         }
@@ -387,7 +303,7 @@ public class ReasonerStreamed {
     }
 
     static void shutdownAndAwaitTermination(final ExecutorService pool) {
-        System.exit(-1);
+        // System.exit(-1);
         // Disable new tasks from being submitted
         pool.shutdown();
         try {

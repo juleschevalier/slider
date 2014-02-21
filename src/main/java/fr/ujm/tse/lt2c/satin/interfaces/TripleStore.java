@@ -26,6 +26,16 @@ public interface TripleStore {
     void add(Triple t);
 
     /**
+     * Add the triple <s,p,o> to the TripleStore
+     * 
+     * @param s
+     * @param p
+     * @param o
+     * @see Triple
+     */
+    void add(long s, long p, long o);
+
+    /**
      * Calls add for each triple in the collection
      * 
      * @param t
@@ -119,5 +129,13 @@ public interface TripleStore {
      * @return all the predicates in a Collection
      */
     Collection<Long> getPredicates();
+
+    /**
+     * TODO Comment
+     * 
+     * @param newTriples
+     * @param inferred
+     */
+    void merge(Collection<Triple> newTriples, Collection<Triple> inferred);
 
 }

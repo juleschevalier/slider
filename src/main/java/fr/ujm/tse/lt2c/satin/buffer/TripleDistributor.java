@@ -43,14 +43,14 @@ public class TripleDistributor implements Runnable {
      * @param predicates
      * @see TripleBuffer
      */
-    public void addSubscriber(TripleBuffer tripleBuffer, long[] predicates) {
+    public void addSubscriber(final TripleBuffer tripleBuffer, final long[] predicates) {
         if (predicates.length == 0) {
             if (!this.universalSubscribers.contains(tripleBuffer)) {
                 this.universalSubscribers.add(tripleBuffer);
             }
             return;
         }
-        for (Long predicate : predicates) {
+        for (final Long predicate : predicates) {
             if (!this.subscribers.containsEntry(predicate, tripleBuffer)) {
                 this.subscribers.put(predicate, tripleBuffer);
             }
@@ -61,13 +61,13 @@ public class TripleDistributor implements Runnable {
     public void run() {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(debugName + " Distributor run");
+            logger.trace(this.debugName + " Distributor run");
         }
 
-        while (running) {
+        while (this.running) {
             try {
-                Triple triple = this.tripleQueue.poll(1, TimeUnit.DAYS);
-                for (TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
+                final Triple triple = this.tripleQueue.poll(1, TimeUnit.DAYS);
+                for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
                     synchronized (tripleBuffer) {
 
                         while (!tripleBuffer.add(triple)) {
@@ -76,13 +76,13 @@ public class TripleDistributor implements Runnable {
                             }
                             try {
                                 tripleBuffer.wait();
-                            } catch (InterruptedException e) {
+                            } catch (final InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
                 }
-                for (TripleBuffer tripleBuffer : this.universalSubscribers) {
+                for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
                     synchronized (tripleBuffer) {
 
                         while (!tripleBuffer.add(triple)) {
@@ -91,13 +91,13 @@ public class TripleDistributor implements Runnable {
                             }
                             try {
                                 tripleBuffer.wait();
-                            } catch (InterruptedException e) {
+                            } catch (final InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
                 }
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -110,42 +110,79 @@ public class TripleDistributor implements Runnable {
      * @param triples
      * @see Triple
      */
-    public void distribute(Collection<Triple> triples) {
+    // public long distributeAll(final TripleStore triples) {
+    // long debugDistributed = 0;
+    // Collection<Triple> toDistribute;
+    // for (final long predicate : triples.getPredicates()) {
+    // toDistribute = triples.getbyPredicate(predicate);
+    // for (final TripleBuffer tripleBuffer : this.subscribers.get(predicate)) {
+    // tripleBuffer.addAll(toDistribute);
+    // debugDistributed++;
+    // }
+    // for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+    // tripleBuffer.addAll(toDistribute);
+    // debugDistributed++;
+    // }
+    // }
+    // return debugDistributed;
+    // }
+
+    public void distributeAll(final Collection<Triple> triples) {
         /*
          * ISSUE -> ALL BUFFERS WAIT FOR ONE BLOCKED
+         * => NO MORE WITH QUEUES
          */
         long debugDistributed = 0;
-        for (Triple triple : triples) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("TD send " + triple);
-            }
-            long p = triple.getPredicate();
-            for (TripleBuffer tripleBuffer : this.subscribers.get(p)) {
-                synchronized (tripleBuffer) {
-                    if (!tripleBuffer.add(triple)) {
-                        logger.error("add fail");
-                    }
-                }
-                debugDistributed++;
-            }
-            for (TripleBuffer tripleBuffer : this.universalSubscribers) {
-                synchronized (tripleBuffer) {
-                    if (!tripleBuffer.add(triple)) {
-                        logger.error("add fail");
-                    }
-                }
-                debugDistributed++;
-            }
+        for (final Triple triple : triples) {
+            debugDistributed += this.ditribute(triple);
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(debugName + " " + debugDistributed + " triples sent (" + triples.size() + " unique triples, " + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
+            logger.trace(this.debugName + " " + debugDistributed + " triples sent (" + triples.size() + " unique triples, " + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
         }
+    }
+
+    public long ditribute(final Triple triple) {
+        // long debugDistributed = 0;
+        // if (logger.isTraceEnabled()) {
+        // logger.trace("TD send " + triple);
+        // }
+        // final long p = triple.getPredicate();
+        // for (final TripleBuffer tripleBuffer : this.subscribers.get(p)) {
+        // synchronized (tripleBuffer) {
+        // if (!tripleBuffer.add(triple)) {
+        // logger.error("add fail");
+        // }
+        // }
+        // debugDistributed++;
+        // }
+        // for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+        // synchronized (tripleBuffer) {
+        // if (!tripleBuffer.add(triple)) {
+        // logger.error("add fail");
+        // }
+        // }
+        // debugDistributed++;
+        // }
+        long debugDistributed = 0;
+        if (logger.isTraceEnabled()) {
+            logger.trace("TD send " + triple);
+        }
+        final long p = triple.getPredicate();
+        for (final TripleBuffer tripleBuffer : this.subscribers.get(p)) {
+            tripleBuffer.add(triple);
+            debugDistributed++;
+        }
+        for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+            tripleBuffer.add(triple);
+            debugDistributed++;
+        }
+        return debugDistributed;
     }
 
     /**
      * @param name
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.debugName = name;
     }
 
@@ -163,14 +200,14 @@ public class TripleDistributor implements Runnable {
      *         debugging
      * @see Dictionary
      */
-    public String subscribers(String name, Dictionary dictionary) {
-        StringBuilder subs = new StringBuilder();
+    public String subscribers(final String name, final Dictionary dictionary) {
+        final StringBuilder subs = new StringBuilder();
         subs.append("\n");
-        for (TripleBuffer buffer : universalSubscribers) {
+        for (final TripleBuffer buffer : this.universalSubscribers) {
             subs.append(name + " send to " + buffer.getDebugName() + " for *\n");
         }
-        for (Long predicate : subscribers.keySet()) {
-            for (TripleBuffer buffer : subscribers.get(predicate)) {
+        for (final Long predicate : this.subscribers.keySet()) {
+            for (final TripleBuffer buffer : this.subscribers.get(predicate)) {
                 subs.append(name + " send to " + buffer.getDebugName() + " for " + dictionary.printConcept(dictionary.get(predicate)) + "\n");
             }
         }
@@ -178,7 +215,7 @@ public class TripleDistributor implements Runnable {
     }
 
     public BlockingQueue<Triple> getTripleQueue() {
-        return tripleQueue;
+        return this.tripleQueue;
     }
 
 }

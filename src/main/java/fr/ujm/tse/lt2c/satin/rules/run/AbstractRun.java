@@ -1,6 +1,5 @@
 package fr.ujm.tse.lt2c.satin.rules.run;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,7 +12,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.utils.Configuration;
 
 public abstract class AbstractRun implements RuleRun {
 
@@ -85,7 +84,7 @@ public abstract class AbstractRun implements RuleRun {
             }
 
             this.debugThreads++;
-            GlobalValues.incRunsByRule(this.ruleName);
+            Configuration.incRunsByRule(this.ruleName);
 
             long debugLoops = 0;
 
@@ -135,15 +134,20 @@ public abstract class AbstractRun implements RuleRun {
 
     protected int addNewTriples(final Collection<Triple> outputTriples) {
 
-        GlobalValues.incInferedByRule(this.ruleName, outputTriples.size());
+        Configuration.incInferedByRule(this.ruleName, outputTriples.size());
 
         final int duplicates = 0;
 
         if (outputTriples.isEmpty()) {
             return duplicates;
         }
+        // final ArrayList<Triple> newTriples = new ArrayList<>();
+        // this.tripleStore.merge(newTriples, outputTriples);
 
-        final ArrayList<Triple> newTriples = new ArrayList<>();
+        // final TripleStore newTriples = new
+        // VerticalPartioningTripleStoreRWLock();
+        final Collection<Triple> newTriples = new HashSet<>();
+
         for (final Triple triple : outputTriples) {
             if (!this.tripleStore.contains(triple)) {
                 this.tripleStore.add(triple);
@@ -159,8 +163,8 @@ public abstract class AbstractRun implements RuleRun {
         }
         // push data in queue threaded
         // distributor.getTripleQueue().addAll(newTriples);
-        this.distributor.distribute(newTriples);
-        GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
+        this.distributor.distributeAll(newTriples);
+        Configuration.incDuplicatesByRule(this.ruleName, duplicates);
         return duplicates;
     }
 

@@ -49,6 +49,15 @@ public class TripleBufferLock implements TripleBuffer {
     }
 
     @Override
+    public boolean addAll(final Collection<Triple> triples) {
+        // TODO Avoid locks if object still useful
+        for (final Triple triple : triples) {
+            this.add(triple);
+        }
+        return false;
+    }
+
+    @Override
     public boolean add(final Triple triple) {
         boolean success = false;
         try {

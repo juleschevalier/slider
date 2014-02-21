@@ -87,8 +87,9 @@ public class TripleManager {
      * 
      * @param triples
      */
+    // public void addTriples(final TripleStore triples) {
     public void addTriples(final Collection<Triple> triples) {
-        this.generalDistributor.distribute(triples);
+        this.generalDistributor.distributeAll(triples);
         // this.generalDistributor.getTripleQueue().addAll(triples);
     }
 

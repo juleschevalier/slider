@@ -1,12 +1,13 @@
 package fr.ujm.tse.lt2c.satin.utils;
 
-import java.util.Set;
+import java.io.File;
+import java.util.List;
 
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 
 public class ReasoningArguments {
 
-    public ReasoningArguments(final int threadsPerCore, final int bufferSize, final long timeout, final int iteration, final boolean bullshitMode, final boolean cumulativeMode, final ReasonerProfile profile, final boolean persistMode, final boolean dumpMode, final Set<String> files) {
+    public ReasoningArguments(final int threadsPerCore, final int bufferSize, final long timeout, final int iteration, final boolean bullshitMode, final boolean cumulativeMode, final ReasonerProfile profile, final boolean persistMode, final boolean dumpMode, final List<File> files) {
         super();
         this.threadsPerCore = threadsPerCore;
         this.bufferSize = bufferSize;
@@ -32,7 +33,7 @@ public class ReasoningArguments {
     /* Extra fields */
     private final boolean persistMode;
     private final boolean dumpMode;
-    private final Set<String> files;
+    private final List<File> files;
 
     public int getThreadsPerCore() {
         return this.threadsPerCore;
@@ -44,6 +45,10 @@ public class ReasoningArguments {
 
     public long getTimeout() {
         return this.timeout;
+    }
+
+    public int getIteration() {
+        return this.iteration;
     }
 
     public boolean isBullshitMode() {
@@ -66,12 +71,8 @@ public class ReasoningArguments {
         return this.dumpMode;
     }
 
-    public Set<String> getFiles() {
+    public List<File> getFiles() {
         return this.files;
-    }
-
-    public int getIteration() {
-        return this.iteration;
     }
 
     @Override

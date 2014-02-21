@@ -54,18 +54,43 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         try {
             this.rwlock.writeLock().lock();
 
-            success = this.tripleQueue.add(triple);
-            if (this.currentBuffer.incrementAndGet() > this.bufferSize) {
-                for (final BufferListener bufferListener : this.bufferListeners) {
-                    bufferListener.bufferFull();
+            success = this.addNoLock(triple);
+
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
+        }
+        return success;
+    }
+
+    @Override
+    public boolean addAll(final Collection<Triple> triples) {
+        boolean success = true;
+        try {
+            this.rwlock.writeLock().lock();
+            for (final Triple triple : triples) {
+                if (!this.addNoLock(triple)) {
+                    success = false;
                 }
-                this.currentBuffer.set(0);
             }
 
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
+        }
+        return success;
+    }
+
+    private boolean addNoLock(final Triple triple) {
+        boolean success;
+        success = this.tripleQueue.add(triple);
+        if (this.currentBuffer.incrementAndGet() > this.bufferSize) {
+            for (final BufferListener bufferListener : this.bufferListeners) {
+                bufferListener.bufferFull();
+            }
+            this.currentBuffer.set(0);
         }
         return success;
     }

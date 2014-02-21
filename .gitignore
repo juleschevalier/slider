@@ -4,12 +4,30 @@
 target/
 # Ontology files #
 *.nt
+*.owl
+*.rdf
+*.rdfs
+*.ttl
+*.n3
 # Output files #
 *.out
 *.csv
 *.log*
+# Latex #
+*.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
 catalog-v*.xml
 # OS Files #
+*~
 .DS_Store
 *.class
 # Package Files #

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class GlobalValues {
+public class Configuration {
 
     private static Map<String, AtomicLong> runsByRule;
     private static Map<String, AtomicLong> duplicatesByRule;
