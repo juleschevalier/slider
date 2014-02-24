@@ -32,7 +32,7 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.rules.run.RunRhoDFFinalizer;
-import fr.ujm.tse.lt2c.satin.utils.Configuration;
+import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
@@ -61,7 +61,8 @@ public class ReasonerStreamed {
     /*
      * Constructors
      */
-    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int threadsPerCore, final int bufferSize, final long timeout, final boolean bullshitMode, final boolean cumulativeMode) {
+    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int threadsPerCore,
+            final int bufferSize, final long timeout, final boolean bullshitMode, final boolean cumulativeMode) {
         super();
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
@@ -87,10 +88,9 @@ public class ReasonerStreamed {
 
     public RunEntity infere(final String input) {
 
-        // if (logger.isInfoEnabled()) {
-        // logger.info("-----------------------------------------");
-        // logger.info(input);
-        // }
+        if (logger.isInfoEnabled()) {
+            logger.info("** " + (new File(input)).getName() + " **");
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("********************************NEW RUN********************************");
@@ -209,20 +209,25 @@ public class ReasonerStreamed {
         }
         machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
         final long ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
-        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", SESSION_ID, input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "", Configuration.getRunsByRule(), Configuration.getDuplicatesByRule(), Configuration.getInferedByRule());
+        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", SESSION_ID, input, new Date(),
+                debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "",
+                GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule());
 
         if (logger.isInfoEnabled()) {
 
             // logger.info("-------------------");
-            logger.info((new File(input)).getName() + ": " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples) + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
+            logger.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
+                    + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
 
         }
+        GlobalValues.addTimeForFile(input, (debugEndTime - debugStartTime));
 
         return runEntity;
 
     }
 
-    private void initialiseReasoner(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final TripleManager tripleManager, final AtomicInteger phaser, final ExecutorService executor) {
+    private void initialiseReasoner(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary,
+            final TripleManager tripleManager, final AtomicInteger phaser, final ExecutorService executor) {
         switch (profile) {
         case RhoDF:
             tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));

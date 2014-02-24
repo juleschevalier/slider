@@ -28,7 +28,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     private static Logger logger = Logger.getLogger(QueuedTripleBufferLock.class);
 
     Queue<Triple> tripleQueue;
-    AtomicInteger size;
     ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
     Collection<BufferListener> bufferListeners;
     AtomicInteger currentBuffer;
@@ -105,7 +104,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             for (int i = 0; ((i < this.tripleQueue.size()) && (i < this.bufferSize)); i++) {
                 ts.add(this.tripleQueue.poll());
             }
-            this.currentBuffer.set(0);
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -152,7 +150,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public void sendFullBuffer() {
         try {
             this.rwlock.writeLock().lock();
-            if (!(this.size.get() > this.bufferSize)) {
+            if (!(this.tripleQueue.size() > this.bufferSize)) {
                 logger.trace(this.hashCode() + " switch buffers because of timeout");
                 for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();

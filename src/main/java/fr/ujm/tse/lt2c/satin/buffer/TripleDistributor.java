@@ -14,6 +14,7 @@ import com.google.common.collect.Multimap;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
 public class TripleDistributor implements Runnable {
 
@@ -110,23 +111,29 @@ public class TripleDistributor implements Runnable {
      * @param triples
      * @see Triple
      */
-    // public long distributeAll(final TripleStore triples) {
-    // long debugDistributed = 0;
-    // Collection<Triple> toDistribute;
-    // for (final long predicate : triples.getPredicates()) {
-    // toDistribute = triples.getbyPredicate(predicate);
-    // for (final TripleBuffer tripleBuffer : this.subscribers.get(predicate)) {
-    // tripleBuffer.addAll(toDistribute);
-    // debugDistributed++;
-    // }
-    // for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
-    // tripleBuffer.addAll(toDistribute);
-    // debugDistributed++;
-    // }
-    // }
-    // return debugDistributed;
-    // }
+    public long distributeAll(final TripleStore triples) {
+        long debugDistributed = 0;
+        Collection<Triple> toDistribute;
+        for (final long predicate : triples.getPredicates()) {
+            toDistribute = triples.getbyPredicate(predicate);
+            for (final TripleBuffer tripleBuffer : this.subscribers.get(predicate)) {
+                tripleBuffer.addAll(toDistribute);
+                debugDistributed++;
+            }
+            for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+                tripleBuffer.addAll(toDistribute);
+                debugDistributed++;
+            }
+        }
+        return debugDistributed;
+    }
 
+    /**
+     * Send all the triples to all matching subscribers
+     * 
+     * @param triples
+     * @see Triple
+     */
     public void distributeAll(final Collection<Triple> triples) {
         /*
          * ISSUE -> ALL BUFFERS WAIT FOR ONE BLOCKED
@@ -137,32 +144,12 @@ public class TripleDistributor implements Runnable {
             debugDistributed += this.ditribute(triple);
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(this.debugName + " " + debugDistributed + " triples sent (" + triples.size() + " unique triples, " + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
+            logger.trace(this.debugName + " " + debugDistributed + " triples sent (" + triples.size() + " unique triples, "
+                    + (this.subscribers.size() + this.universalSubscribers.size()) + " subscribers)");
         }
     }
 
     public long ditribute(final Triple triple) {
-        // long debugDistributed = 0;
-        // if (logger.isTraceEnabled()) {
-        // logger.trace("TD send " + triple);
-        // }
-        // final long p = triple.getPredicate();
-        // for (final TripleBuffer tripleBuffer : this.subscribers.get(p)) {
-        // synchronized (tripleBuffer) {
-        // if (!tripleBuffer.add(triple)) {
-        // logger.error("add fail");
-        // }
-        // }
-        // debugDistributed++;
-        // }
-        // for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
-        // synchronized (tripleBuffer) {
-        // if (!tripleBuffer.add(triple)) {
-        // logger.error("add fail");
-        // }
-        // }
-        // debugDistributed++;
-        // }
         long debugDistributed = 0;
         if (logger.isTraceEnabled()) {
             logger.trace("TD send " + triple);

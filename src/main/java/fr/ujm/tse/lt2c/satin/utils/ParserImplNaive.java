@@ -62,7 +62,7 @@ public class ParserImplNaive implements Parser {
         final long debugEndTime = System.nanoTime();
 
         if (logger.isInfoEnabled()) {
-            logger.info("Parsing OK : " + this.tripleStore.size() + " triples in " + ((debugEndTime - debugStartTime) / 1000000) + "ms");
+            logger.info("Parsing : " + this.tripleStore.size() + " triples in " + ((debugEndTime - debugStartTime) / 1000000) + "ms");
         }
 
         if (logger.isTraceEnabled()) {

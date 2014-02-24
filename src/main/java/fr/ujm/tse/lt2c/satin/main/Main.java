@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -25,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
-import fr.ujm.tse.lt2c.satin.utils.Configuration;
+import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
@@ -80,8 +81,8 @@ public class Main {
         }
 
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Iteration: " + loop);
+            if ((arguments.getIteration() > 1) && logger.isInfoEnabled()) {
+                logger.info("\tIteration: " + loop);
             }
             for (final File file : arguments.getFiles()) {
 
@@ -93,8 +94,9 @@ public class Main {
                 }
 
                 /* Reset log tracers */
-                Configuration.reset();
+                GlobalValues.reset();
 
+                // logger.info(runEntity);
                 if (arguments.isPersistMode()) {
                     MongoClient client;
                     try {
@@ -113,6 +115,13 @@ public class Main {
                     dictionary = new DictionaryPrimitrivesRWLock();
                     reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
                 }
+            }
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("--------AVERAGE TIMES--------");
+            for (final String file : GlobalValues.getTimeByFile().keySet()) {
+                logger.info(file + " " + (TimeUnit.MILLISECONDS.convert(GlobalValues.getTimeByFile().get(file), TimeUnit.NANOSECONDS)) + " ms");
             }
         }
 
@@ -363,6 +372,6 @@ public class Main {
         }
         final int exp = (int) (Math.log(bytes) / Math.log(unit));
         final String pre = ("KMGTPE").charAt(exp - 1) + "";
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+        return String.format("%4.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 }

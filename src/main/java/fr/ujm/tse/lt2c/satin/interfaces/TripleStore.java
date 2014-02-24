@@ -5,15 +5,11 @@ import java.util.Collection;
 import com.google.common.collect.Multimap;
 
 /**
- * @author jules
+ * @author Jules Chevalier
  * 
  *         Interface of a triplestore
  *         Use Triple interface
  * @see Triple
- */
-/**
- * @author Jules Chevalier
- * 
  */
 public interface TripleStore {
 
@@ -23,7 +19,7 @@ public interface TripleStore {
      * @param t
      * @see Triple
      */
-    void add(Triple t);
+    boolean add(Triple t);
 
     /**
      * Add the triple <s,p,o> to the TripleStore
@@ -42,7 +38,7 @@ public interface TripleStore {
      * @see Triple
      * @see #add(Triple)
      */
-    void addAll(Collection<Triple> t);
+    Collection<Triple> addAll(Collection<Triple> t);
 
     /**
      * @return all the triples in the TripleStore in a Collection

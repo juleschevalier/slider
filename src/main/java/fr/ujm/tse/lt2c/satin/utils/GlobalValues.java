@@ -4,16 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Configuration {
+public class GlobalValues {
 
     private static Map<String, AtomicLong> runsByRule;
     private static Map<String, AtomicLong> duplicatesByRule;
     private static Map<String, AtomicLong> inferedByRule;
+    private static Map<String, Long> timeByFile;
 
     static {
         runsByRule = new HashMap<String, AtomicLong>();
         duplicatesByRule = new HashMap<String, AtomicLong>();
         inferedByRule = new HashMap<String, AtomicLong>();
+        timeByFile = new HashMap<String, Long>();
     }
 
     public static void reset() {
@@ -58,4 +60,17 @@ public class Configuration {
         return inferedByRule;
     }
 
+    public static Map<String, Long> getTimeByFile() {
+        return timeByFile;
+    }
+
+    public static void addTimeForFile(final String file, final long time) {
+        if (!timeByFile.containsKey(file)) {
+            timeByFile.put(file, time);
+        } else {
+            final long new_time = (timeByFile.get(file) + time) / 2;
+            timeByFile.put(file, new_time);
+        }
+
+    }
 }

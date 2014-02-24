@@ -12,7 +12,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.utils.Configuration;
+import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 
 public abstract class AbstractRun implements RuleRun {
 
@@ -37,7 +37,8 @@ public abstract class AbstractRun implements RuleRun {
      * @see Dictionary
      * @see TripleStore
      */
-    public AbstractRun(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public AbstractRun(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
         this.distributor = tripleDistributor;
@@ -84,7 +85,7 @@ public abstract class AbstractRun implements RuleRun {
             }
 
             this.debugThreads++;
-            Configuration.incRunsByRule(this.ruleName);
+            GlobalValues.incRunsByRule(this.ruleName);
 
             long debugLoops = 0;
 
@@ -134,37 +135,24 @@ public abstract class AbstractRun implements RuleRun {
 
     protected int addNewTriples(final Collection<Triple> outputTriples) {
 
-        Configuration.incInferedByRule(this.ruleName, outputTriples.size());
-
-        final int duplicates = 0;
+        int duplicates = 0;
 
         if (outputTriples.isEmpty()) {
             return duplicates;
         }
-        // final ArrayList<Triple> newTriples = new ArrayList<>();
-        // this.tripleStore.merge(newTriples, outputTriples);
 
-        // final TripleStore newTriples = new
-        // VerticalPartioningTripleStoreRWLock();
-        final Collection<Triple> newTriples = new HashSet<>();
+        final Collection<Triple> newTriples = this.tripleStore.addAll(outputTriples);
 
-        for (final Triple triple : outputTriples) {
-            if (!this.tripleStore.contains(triple)) {
-                this.tripleStore.add(triple);
-                newTriples.add(triple);
-            } else {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(this.dictionary.printTriple(triple) + " already present");
-                }
-            }
-        }
         if (logger.isTraceEnabled()) {
             logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
         }
-        // push data in queue threaded
-        // distributor.getTripleQueue().addAll(newTriples);
+
+        /* End choice */
         this.distributor.distributeAll(newTriples);
-        Configuration.incDuplicatesByRule(this.ruleName, duplicates);
+
+        duplicates = outputTriples.size() - newTriples.size();
+        GlobalValues.incInferedByRule(this.ruleName, newTriples.size());
+        GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
         return duplicates;
     }
 

@@ -45,7 +45,10 @@ public class RunEntity {
         super();
     }
 
-    public RunEntity(final String machineName, final int coresNb, final long ram, final int threadsNb, final long bufferSize, final String version, final int sessionId, final String fileInput, final Date date, final long parsingTime, final long inferenceTime, final long nbInitialTriples, final long nbInferedTriples, final String perfStat, final Map<String, AtomicLong> runsByRule, final Map<String, AtomicLong> duplicatesByRule, final Map<String, AtomicLong> inferedByRule) {
+    public RunEntity(final String machineName, final int coresNb, final long ram, final int threadsNb, final long bufferSize, final String version,
+            final int sessionId, final String fileInput, final Date date, final long parsingTime, final long inferenceTime, final long nbInitialTriples,
+            final long nbInferedTriples, final String perfStat, final Map<String, AtomicLong> runsByRule, final Map<String, AtomicLong> duplicatesByRule,
+            final Map<String, AtomicLong> inferedByRule) {
         super();
         this.machineName = machineName;
         this.coresNb = coresNb;
@@ -338,6 +341,49 @@ public class RunEntity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("RunEntity [id=");
+        builder.append(this.id);
+        builder.append("\n machineName=");
+        builder.append(this.machineName);
+        builder.append("\n coresNb=");
+        builder.append(this.coresNb);
+        builder.append("\n ram=");
+        builder.append(this.ram);
+        builder.append("\n threadsNb=");
+        builder.append(this.threadsNb);
+        builder.append("\n bufferSize=");
+        builder.append(this.bufferSize);
+        builder.append("\n version=");
+        builder.append(this.version);
+        builder.append("\n sessionId=");
+        builder.append(this.sessionId);
+        builder.append("\n fileInput=");
+        builder.append(this.fileInput);
+        builder.append("\n date=");
+        builder.append(this.date);
+        builder.append("\n parsingTime=");
+        builder.append(this.parsingTime);
+        builder.append("\n inferenceTime=");
+        builder.append(this.inferenceTime);
+        builder.append("\n nbInitialTriples=");
+        builder.append(this.nbInitialTriples);
+        builder.append("\n nbInferedTriples=");
+        builder.append(this.nbInferedTriples);
+        builder.append("\n perfStat=");
+        builder.append(this.perfStat);
+        builder.append("\n runsByRule=");
+        builder.append(this.runsByRule);
+        builder.append("\n duplicatesByRule=");
+        builder.append(this.duplicatesByRule);
+        builder.append("\n inferedByRule=");
+        builder.append(this.inferedByRule);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

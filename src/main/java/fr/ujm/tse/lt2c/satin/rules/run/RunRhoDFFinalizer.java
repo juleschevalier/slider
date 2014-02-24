@@ -42,9 +42,10 @@ public class RunRhoDFFinalizer implements BufferListener {
     }
 
     public void addTriples(final Collection<Triple> triples) {
-        for (final Triple triple : triples) {
-            this.tripleBuffer.add(triple);
-        }
+        this.tripleBuffer.addAll(triples);
+        // for (final Triple triple : triples) {
+        // this.tripleBuffer.add(triple);
+        // }
     }
 
     @Override

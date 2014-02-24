@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -55,19 +56,22 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
      * .interfaces.Triple)
      */
     @Override
-    public void add(final Triple t) {
+    public boolean add(final Triple t) {
         this.rwlock.writeLock().lock();
+        boolean exists = false;
         try {
-            this.addNoLock(t);
+            exists = this.addNoLock(t);
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
+        return exists;
 
     }
 
-    private void addNoLock(final Triple t) {
+    private boolean addNoLock(final Triple t) {
+        boolean exists = false;
         if (!this.internalstore.containsKey(t.getPredicate())) {
             final Multimap<Long, Long> newmap = HashMultimap.create();
             newmap.put(t.getSubject(), t.getObject());
@@ -75,10 +79,14 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             this.triples++;
 
         } else {
-            if (!(this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject())) && (this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))) {
+            if (!(this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject()))
+                    && (this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))) {
                 this.triples++;
+            } else {
+                exists = true;
             }
         }
+        return exists;
     }
 
     /*
@@ -88,18 +96,21 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
      * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#addAll(java.util.Collection)
      */
     @Override
-    public void addAll(final Collection<Triple> triples) {
-
+    public Collection<Triple> addAll(final Collection<Triple> triples) {
         this.rwlock.writeLock().lock();
+        final Collection<Triple> newTriples = new HashSet<>();
         try {
             for (final Triple triple : triples) {
-                this.addNoLock(triple);
+                if (!this.addNoLock(triple)) {
+                    newTriples.add(triple);
+                }
             }
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
+        return newTriples;
 
     }
 
