@@ -56,7 +56,8 @@ public class Main {
         ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
 
         if (logger.isInfoEnabled()) {
-            logger.info("Files :");
+            logger.info("******** OPTIONS ********");
+            logger.info("Files:");
             int maxLenght = 0;
             for (final File file : arguments.getFiles()) {
                 if (file.getName().length() > maxLenght) {
@@ -228,7 +229,9 @@ public class Main {
                 final String arg = cmd.getOptionValue("buffer");
                 try {
                     bufferSize = Integer.parseInt(arg);
-                    logger.info("buffer : " + bufferSize);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("buffer: " + bufferSize);
+                    }
                 } catch (final NumberFormatException e) {
                     logger.error("Buffer size must be a number. Option ignored");
                 }
@@ -236,14 +239,23 @@ public class Main {
             /* bullshit */
             if (cmd.hasOption("bullshit")) {
                 bullshitMode = true;
+                if (logger.isInfoEnabled()) {
+                    logger.info("Bullshit mode enabled");
+                }
             }
             /* cumulative */
             if (cmd.hasOption("cumulative")) {
                 cumulativeMode = true;
+                if (logger.isInfoEnabled()) {
+                    logger.info("Cumulative mode enabled");
+                }
             }
             /* dump */
             if (cmd.hasOption("dump")) {
                 dumpMode = true;
+                if (logger.isInfoEnabled()) {
+                    logger.info("Dump mode enabled");
+                }
             }
             /* directory */
             String dir = null;
@@ -266,6 +278,9 @@ public class Main {
             /* persist */
             if (cmd.hasOption("persist")) {
                 persistMode = true;
+                if (logger.isInfoEnabled()) {
+                    logger.info("Persist mode enabled");
+                }
             }
             /* profile */
             if (cmd.hasOption("profile")) {
@@ -282,12 +297,18 @@ public class Main {
                     profile = DEFAULT_PROFILE;
                     break;
                 }
+                if (logger.isInfoEnabled()) {
+                    logger.info("Profile: " + profile);
+                }
             }
             /* threads */
             if (cmd.hasOption("threads")) {
                 final String arg = cmd.getOptionValue("threads");
                 try {
                     threadsPerCore = Integer.parseInt(arg);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Threads: " + iteration);
+                    }
                 } catch (final NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -306,6 +327,9 @@ public class Main {
                 final String arg = cmd.getOptionValue("iteration");
                 try {
                     iteration = Integer.parseInt(arg);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Iterations: " + iteration);
+                    }
                 } catch (final NumberFormatException e) {
                     e.printStackTrace();
                 }
