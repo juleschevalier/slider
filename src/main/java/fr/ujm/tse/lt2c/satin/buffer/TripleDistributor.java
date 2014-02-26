@@ -3,7 +3,6 @@ package fr.ujm.tse.lt2c.satin.buffer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.util.BlockingArrayQueue;
@@ -61,47 +60,47 @@ public class TripleDistributor implements Runnable {
     @Override
     public void run() {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(this.debugName + " Distributor run");
-        }
-
-        while (this.running) {
-            try {
-                final Triple triple = this.tripleQueue.poll(1, TimeUnit.DAYS);
-                for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
-                    synchronized (tripleBuffer) {
-
-                        while (!tripleBuffer.add(triple)) {
-                            if (logger.isTraceEnabled()) {
-                                logger.trace("TD buffer add failed");
-                            }
-                            try {
-                                tripleBuffer.wait();
-                            } catch (final InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
-                    synchronized (tripleBuffer) {
-
-                        while (!tripleBuffer.add(triple)) {
-                            if (logger.isTraceEnabled()) {
-                                logger.trace("TD buffer add failed");
-                            }
-                            try {
-                                tripleBuffer.wait();
-                            } catch (final InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        // if (logger.isTraceEnabled()) {
+        // logger.trace(this.debugName + " Distributor run");
+        // }
+        //
+        // while (this.running) {
+        // try {
+        // final Triple triple = this.tripleQueue.poll(1, TimeUnit.DAYS);
+        // for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
+        // synchronized (tripleBuffer) {
+        //
+        // while (!tripleBuffer.add(triple)) {
+        // if (logger.isTraceEnabled()) {
+        // logger.trace("TD buffer add failed");
+        // }
+        // try {
+        // tripleBuffer.wait();
+        // } catch (final InterruptedException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // }
+        // }
+        // for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+        // synchronized (tripleBuffer) {
+        //
+        // while (!tripleBuffer.add(triple)) {
+        // if (logger.isTraceEnabled()) {
+        // logger.trace("TD buffer add failed");
+        // }
+        // try {
+        // tripleBuffer.wait();
+        // } catch (final InterruptedException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // }
+        // }
+        // } catch (final InterruptedException e) {
+        // e.printStackTrace();
+        // }
+        // }
 
     }
 

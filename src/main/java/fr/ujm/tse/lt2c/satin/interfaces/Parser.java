@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.interfaces;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 /**
  * @author jules
  * 
@@ -19,5 +21,7 @@ public interface Parser {
 
     @Override
     boolean equals(Object obj);
+
+    void parse(Model model);
 
 }

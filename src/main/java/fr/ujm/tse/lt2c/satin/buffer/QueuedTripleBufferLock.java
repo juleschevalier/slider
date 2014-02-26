@@ -101,9 +101,16 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         try {
             this.rwlock.writeLock().lock();
             ts = new VerticalPartioningTripleStoreRWLock();
-            for (int i = 0; ((i < this.tripleQueue.size()) && (i < this.bufferSize)); i++) {
-                ts.add(this.tripleQueue.poll());
+
+            int i = 0;
+            Triple triple = this.tripleQueue.poll();
+            while ((triple != null) && (i++ < this.bufferSize)) {
+                ts.add(triple);
+                triple = this.tripleQueue.poll();
             }
+            // for (int i = 0; ((i < this.tripleQueue.size()) && (i < this.bufferSize)); i++) {
+            // ts.add(this.tripleQueue.poll());
+            // }
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -113,6 +120,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 this.notifyAll();
             }
         }
+
         return ts;
     }
 

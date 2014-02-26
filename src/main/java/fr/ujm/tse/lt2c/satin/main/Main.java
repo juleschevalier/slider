@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -56,7 +55,6 @@ public class Main {
         ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
 
         if (logger.isInfoEnabled()) {
-            logger.info("******** OPTIONS ********");
             logger.info("Files:");
             int maxLenght = 0;
             for (final File file : arguments.getFiles()) {
@@ -80,6 +78,9 @@ public class Main {
             logger.warn("Well, without files I can't do anything, you know ?");
             return;
         }
+        if (logger.isInfoEnabled()) {
+            logger.info("******** LET'S GO ********");
+        }
 
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
             if ((arguments.getIteration() > 1) && logger.isInfoEnabled()) {
@@ -87,7 +88,7 @@ public class Main {
             }
             for (final File file : arguments.getFiles()) {
 
-                final RunEntity runEntity = reasoner.infere(file.getAbsolutePath());
+                final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
 
                 if (arguments.isDumpMode()) {
                     final String newFile = "infered_" + (arguments.isBullshitMode() ? "bs_" : "") + file.getName();
@@ -101,7 +102,8 @@ public class Main {
                 if (arguments.isPersistMode()) {
                     MongoClient client;
                     try {
-                        client = new MongoClient("10.20.0.57");
+                        // client = new MongoClient("10.20.0.57");
+                        client = new MongoClient();
                         final Morphia morphia = new Morphia();
                         morphia.map(RunEntity.class);
                         final Datastore ds = morphia.createDatastore(client, "RunResults");
@@ -122,9 +124,13 @@ public class Main {
         if (logger.isInfoEnabled()) {
             logger.info("--------AVERAGE TIMES--------");
             for (final String file : GlobalValues.getTimeByFile().keySet()) {
-                logger.info(file + " " + (TimeUnit.MILLISECONDS.convert(GlobalValues.getTimeByFile().get(file), TimeUnit.NANOSECONDS)) + " ms");
+                // logger.info(file + " " +
+                // (TimeUnit.MILLISECONDS.convert(GlobalValues.getTimeByFile().get(file),
+                // TimeUnit.NANOSECONDS)) + " ms");
+                logger.info(file + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
             }
         }
+        System.exit(-1);
 
     }
 
@@ -222,6 +228,10 @@ public class Main {
                 final HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp("main", options);
                 return null;
+            }
+
+            if (logger.isInfoEnabled()) {
+                logger.info("******** OPTIONS ********");
             }
 
             /* buffer */
@@ -396,6 +406,35 @@ public class Main {
         }
         final int exp = (int) (Math.log(bytes) / Math.log(unit));
         final String pre = ("KMGTPE").charAt(exp - 1) + "";
-        return String.format("%4.1f %sB", bytes / Math.pow(unit, exp), pre);
+        return String.format("%6.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static String nsToTime(final long timeInNs) {
+
+        long left = timeInNs;
+
+        final long hours = left / new Long("3600000000000");
+        left -= hours * new Long("3600000000000");
+
+        final long minutes = left / new Long("60000000000");
+        left -= minutes * new Long("60000000000");
+
+        final long secondes = left / new Long("1000000000");
+        left -= secondes * new Long("1000000000");
+
+        final long msecondes = left / new Long("1000000");
+        left -= msecondes * new Long("1000000");
+        final StringBuilder result = new StringBuilder();
+
+        if (hours > 0) {
+            result.append(hours + ":");
+        }
+        if (minutes > 0) {
+            result.append(minutes + ":");
+        }
+        result.append(secondes + ".");
+        result.append(msecondes);
+
+        return result.toString();
     }
 }

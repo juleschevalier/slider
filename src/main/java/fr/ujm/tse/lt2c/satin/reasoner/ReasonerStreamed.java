@@ -86,7 +86,37 @@ public class ReasonerStreamed {
         this.bullshitMode = arguments.isBullshitMode();
     }
 
-    public RunEntity infere(final String input) {
+    public void loadFile(final String input) {
+    }
+
+    public void loadModel(final Model model) {
+    }
+
+    public RunEntity infereFromFile(final String input) {
+
+        /* File parsing */
+        long debugParsingTime = System.nanoTime();
+        final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
+        parser.parse(input);
+        debugParsingTime = System.nanoTime() - debugParsingTime;
+
+        return this.infere(input, debugParsingTime);
+
+    }
+
+    public RunEntity infereFromModel(final Model model) {
+
+        /* Model parsing */
+        long debugParsingTime = System.nanoTime();
+        final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
+        parser.parse(model);
+        debugParsingTime = System.nanoTime() - debugParsingTime;
+
+        return this.infere("Model", debugParsingTime);
+
+    }
+
+    private RunEntity infere(final String input, final long debugParsingTime) {
 
         if (logger.isInfoEnabled()) {
             logger.info("** " + (new File(input)).getName() + " **");
@@ -99,20 +129,14 @@ public class ReasonerStreamed {
         /* Initialize structures */
 
         final TripleManager tripleManager = new TripleManager();
-        final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
         final AtomicInteger phaser = new AtomicInteger();
         executor = Executors.newFixedThreadPool(this.maxThreads);
-
-        long debugParsingTime = System.nanoTime();
-        /* File parsing */
-        parser.parse(input);
-        debugParsingTime = System.nanoTime() - debugParsingTime;
 
         final long debugBeginNbTriples = this.tripleStore.size();
 
         /* Initialize rules used for inference on RhoDF */
 
-        this.initialiseReasoner(ReasonerProfile.RhoDF, this.tripleStore, this.dictionary, tripleManager, phaser, executor);
+        this.initialiseReasoner(this.profile, this.tripleStore, this.dictionary, tripleManager, phaser, executor);
 
         if (logger.isDebugEnabled()) {
             logger.debug("********************************START INFERENCE********************************");
@@ -223,7 +247,6 @@ public class ReasonerStreamed {
         GlobalValues.addTimeForFile(input, (debugEndTime - debugStartTime));
 
         return runEntity;
-
     }
 
     private void initialiseReasoner(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary,
