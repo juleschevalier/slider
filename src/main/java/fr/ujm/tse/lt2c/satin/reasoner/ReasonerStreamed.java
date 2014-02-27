@@ -52,7 +52,6 @@ public class ReasonerStreamed {
     private int maxThreads = AVAILABLE_CORES;
     private final int bufferSize;
     private final long timeout;
-    private final boolean bullshitMode;
     private final ReasonerProfile profile;
     private static ExecutorService executor;
     private final TripleStore tripleStore;
@@ -62,7 +61,7 @@ public class ReasonerStreamed {
      * Constructors
      */
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int threadsPerCore,
-            final int bufferSize, final long timeout, final boolean bullshitMode, final boolean cumulativeMode) {
+            final int bufferSize, final long timeout, final boolean cumulativeMode) {
         super();
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
@@ -71,7 +70,6 @@ public class ReasonerStreamed {
         this.maxThreads = AVAILABLE_CORES * this.threadsPerCore;
         this.bufferSize = bufferSize;
         this.timeout = timeout;
-        this.bullshitMode = bullshitMode;
     }
 
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasoningArguments arguments) {
@@ -83,16 +81,13 @@ public class ReasonerStreamed {
         this.maxThreads = AVAILABLE_CORES * arguments.getThreadsPerCore();
         this.bufferSize = arguments.getBufferSize();
         this.timeout = arguments.getTimeout();
-        this.bullshitMode = arguments.isBullshitMode();
-    }
-
-    public void loadFile(final String input) {
-    }
-
-    public void loadModel(final Model model) {
     }
 
     public RunEntity infereFromFile(final String input) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info("** " + (new File(input)).getName() + " **");
+        }
 
         /* File parsing */
         long debugParsingTime = System.nanoTime();
@@ -106,6 +101,10 @@ public class ReasonerStreamed {
 
     public RunEntity infereFromModel(final Model model) {
 
+        if (logger.isInfoEnabled()) {
+            logger.info("** From Model **");
+        }
+
         /* Model parsing */
         long debugParsingTime = System.nanoTime();
         final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
@@ -117,10 +116,6 @@ public class ReasonerStreamed {
     }
 
     private RunEntity infere(final String input, final long debugParsingTime) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info("** " + (new File(input)).getName() + " **");
-        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("********************************NEW RUN********************************");
@@ -147,7 +142,7 @@ public class ReasonerStreamed {
         /********************
          * LAUNCH INFERENCE *
          ********************/
-        // tripleManager.addTriples(this.tripleStore);
+
         tripleManager.addTriples(this.tripleStore.getAll());
 
         /*
@@ -194,20 +189,12 @@ public class ReasonerStreamed {
         }
 
         /* Infere last triples */
-        if (this.bullshitMode) {
-            this.finalyze(ReasonerProfile.GRhoDF, this.tripleStore, this.dictionary, phaser);
-        }
+        this.finalyze(this.profile, this.tripleStore, this.dictionary, phaser);
 
         if (logger.isDebugEnabled()) {
             logger.debug("REASONNER FAtality!");
         }
 
-        // executor.shutdown();
-        // try {
-        // executor.awaitTermination(1, TimeUnit.DAYS);
-        // } catch (final InterruptedException e) {
-        // logger.error("", e);
-        // }
         shutdownAndAwaitTermination(executor);
 
         final long debugEndTime = System.nanoTime();
@@ -233,8 +220,8 @@ public class ReasonerStreamed {
         }
         machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
         final long ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
-        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", SESSION_ID, input, new Date(),
-                debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "",
+        final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", this.profile.name(), SESSION_ID,
+                input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "",
                 GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule());
 
         if (logger.isInfoEnabled()) {
@@ -262,6 +249,16 @@ public class ReasonerStreamed {
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQC2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_EQP2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            break;
+        case GRhoDF:
+            tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
@@ -301,8 +298,8 @@ public class ReasonerStreamed {
             }
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Bullshit stuff : " + (tripleStore.size() - goodthings));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Bullshit stuff : " + (tripleStore.size() - goodthings));
         }
     }
 

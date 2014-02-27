@@ -36,7 +36,6 @@ public class Main {
     private final static int DEFAULT_THREADS_PER_CORE = 10;
     private final static int DEFAULT_BUFFER_SIZE = 100;
     private final static long DEFAULT_TIMEOUT = 100;
-    private final static boolean DEFAULT_BULLSHIT_MODE = false;
     private final static boolean DEFAULT_CUMULATIVE_MODE = false;
     private final static boolean DEFAULT_DUMP_MODE = false;
     private final static boolean DEFAULT_PERSIST_MODE = false;
@@ -91,16 +90,18 @@ public class Main {
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
 
                 if (arguments.isDumpMode()) {
-                    final String newFile = "infered_" + (arguments.isBullshitMode() ? "bs_" : "") + file.getName();
+                    final String newFile = "infered_" + arguments.getProfile() + "_" + file.getName();
                     tripleStore.writeToFile(newFile, dictionary);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Dumped in " + newFile);
+                    }
                 }
 
                 /* Reset log tracers */
                 GlobalValues.reset();
 
-                // logger.info(runEntity);
                 if (arguments.isPersistMode()) {
-                    MongoClient client;
+                    final MongoClient client;
                     try {
                         // client = new MongoClient("10.20.0.57");
                         client = new MongoClient();
@@ -124,9 +125,6 @@ public class Main {
         if (logger.isInfoEnabled()) {
             logger.info("--------AVERAGE TIMES--------");
             for (final String file : GlobalValues.getTimeByFile().keySet()) {
-                // logger.info(file + " " +
-                // (TimeUnit.MILLISECONDS.convert(GlobalValues.getTimeByFile().get(file),
-                // TimeUnit.NANOSECONDS)) + " ms");
                 logger.info(file + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
             }
         }
@@ -141,20 +139,12 @@ public class Main {
         int bufferSize = DEFAULT_BUFFER_SIZE;
         long timeout = DEFAULT_TIMEOUT;
         int iteration = 1;
-        boolean bullshitMode = DEFAULT_BULLSHIT_MODE;
         boolean cumulativeMode = DEFAULT_CUMULATIVE_MODE;
         ReasonerProfile profile = DEFAULT_PROFILE;
 
         /* Extra fields */
         boolean persistMode = DEFAULT_PERSIST_MODE;
         boolean dumpMode = DEFAULT_DUMP_MODE;
-
-        // final StringBuilder sb = new StringBuilder();
-        // for (final String arg : args) {
-        // sb.append(arg);
-        // sb.append(" ");
-        // }
-        // System.out.println(sb.toString());
 
         /*
          * Options
@@ -175,8 +165,6 @@ public class Main {
         iterationO.setType(Number.class);
         options.addOption(iterationO);
 
-        options.addOption("bullshit", false, "enable inference of bullshit stuff");
-
         options.addOption("cumulative", false, "does not reinit data for each file");
 
         // options.addOption("directory", false,
@@ -195,7 +183,7 @@ public class Main {
 
         // options.addOption("profile", true,
         // "set the fragment (RDFS, RhoDF, ...)");
-        final Option profileO = new Option("profile", "set the fragment (RDFS, RhoDF, GRhoDF)");
+        final Option profileO = new Option("profile", "set the fragment (RhoDF, GRhoDF)");
         profileO.setArgName("profile");
         profileO.setArgs(1);
         options.addOption(profileO);
@@ -244,13 +232,6 @@ public class Main {
                     }
                 } catch (final NumberFormatException e) {
                     logger.error("Buffer size must be a number. Option ignored");
-                }
-            }
-            /* bullshit */
-            if (cmd.hasOption("bullshit")) {
-                bullshitMode = true;
-                if (logger.isInfoEnabled()) {
-                    logger.info("Bullshit mode enabled");
                 }
             }
             /* cumulative */
@@ -372,8 +353,6 @@ public class Main {
                 }
             }
 
-            // final List<String> sorted_files = new ArrayList<>();
-
             Collections.sort(files, new Comparator<File>() {
                 @Override
                 public int compare(final File f1, final File f2) {
@@ -387,11 +366,7 @@ public class Main {
                 }
             });
 
-            // for (final File file : files) {
-            // sorted_files.add(file.getAbsolutePath());
-            // }
-
-            return new ReasoningArguments(threadsPerCore, bufferSize, timeout, iteration, bullshitMode, cumulativeMode, profile, persistMode, dumpMode, files);
+            return new ReasoningArguments(threadsPerCore, bufferSize, timeout, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
 
         } catch (final ParseException e) {
             e.printStackTrace();

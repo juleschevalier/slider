@@ -108,9 +108,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 ts.add(triple);
                 triple = this.tripleQueue.poll();
             }
-            // for (int i = 0; ((i < this.tripleQueue.size()) && (i < this.bufferSize)); i++) {
-            // ts.add(this.tripleQueue.poll());
-            // }
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -180,23 +177,5 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public void setDebugName(final String debugName) {
         this.debugName = debugName;
-    }
-
-    @Override
-    public TripleStore flush() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public long mainBufferOccupation() {
-        // TODO Auto-generated method stub
-        return -1;
-    }
-
-    @Override
-    public long secondaryBufferOccupation() {
-        // TODO Auto-generated method stub
-        return -1;
     }
 }

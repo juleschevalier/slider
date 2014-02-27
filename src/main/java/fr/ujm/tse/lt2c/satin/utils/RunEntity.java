@@ -23,6 +23,7 @@ public class RunEntity {
     private int threadsNb;
     private long bufferSize;
     private String version;
+    private String profile;
 
     /* Results */
     private int sessionId;
@@ -46,9 +47,9 @@ public class RunEntity {
     }
 
     public RunEntity(final String machineName, final int coresNb, final long ram, final int threadsNb, final long bufferSize, final String version,
-            final int sessionId, final String fileInput, final Date date, final long parsingTime, final long inferenceTime, final long nbInitialTriples,
-            final long nbInferedTriples, final String perfStat, final Map<String, AtomicLong> runsByRule, final Map<String, AtomicLong> duplicatesByRule,
-            final Map<String, AtomicLong> inferedByRule) {
+            final String profile, final int sessionId, final String fileInput, final Date date, final long parsingTime, final long inferenceTime,
+            final long nbInitialTriples, final long nbInferedTriples, final String perfStat, final Map<String, AtomicLong> runsByRule,
+            final Map<String, AtomicLong> duplicatesByRule, final Map<String, AtomicLong> inferedByRule) {
         super();
         this.machineName = machineName;
         this.coresNb = coresNb;
@@ -56,6 +57,7 @@ public class RunEntity {
         this.threadsNb = threadsNb;
         this.bufferSize = bufferSize;
         this.version = version;
+        this.profile = profile;
         this.sessionId = sessionId;
         this.fileInput = fileInput;
         this.date = date;
@@ -97,7 +99,7 @@ public class RunEntity {
         return this.ram;
     }
 
-    public void setRam(final int ram) {
+    public void setRam(final long ram) {
         this.ram = ram;
     }
 
@@ -113,7 +115,7 @@ public class RunEntity {
         return this.bufferSize;
     }
 
-    public void setBufferSize(final int bufferSize) {
+    public void setBufferSize(final long bufferSize) {
         this.bufferSize = bufferSize;
     }
 
@@ -123,6 +125,14 @@ public class RunEntity {
 
     public void setVersion(final String version) {
         this.version = version;
+    }
+
+    public String getProfile() {
+        return this.profile;
+    }
+
+    public void setProfile(final String profile) {
+        this.profile = profile;
     }
 
     public int getSessionId() {
@@ -230,6 +240,7 @@ public class RunEntity {
         result = (prime * result) + (int) (this.nbInitialTriples ^ (this.nbInitialTriples >>> 32));
         result = (prime * result) + (int) (this.parsingTime ^ (this.parsingTime >>> 32));
         result = (prime * result) + ((this.perfStat == null) ? 0 : this.perfStat.hashCode());
+        result = (prime * result) + ((this.profile == null) ? 0 : this.profile.hashCode());
         result = (prime * result) + (int) (this.ram ^ (this.ram >>> 32));
         result = (prime * result) + ((this.runsByRule == null) ? 0 : this.runsByRule.hashCode());
         result = (prime * result) + this.sessionId;
@@ -317,6 +328,13 @@ public class RunEntity {
         } else if (!this.perfStat.equals(other.perfStat)) {
             return false;
         }
+        if (this.profile == null) {
+            if (other.profile != null) {
+                return false;
+            }
+        } else if (!this.profile.equals(other.profile)) {
+            return false;
+        }
         if (this.ram != other.ram) {
             return false;
         }
@@ -348,39 +366,41 @@ public class RunEntity {
         final StringBuilder builder = new StringBuilder();
         builder.append("RunEntity [id=");
         builder.append(this.id);
-        builder.append("\n machineName=");
+        builder.append(", machineName=");
         builder.append(this.machineName);
-        builder.append("\n coresNb=");
+        builder.append(", coresNb=");
         builder.append(this.coresNb);
-        builder.append("\n ram=");
+        builder.append(", ram=");
         builder.append(this.ram);
-        builder.append("\n threadsNb=");
+        builder.append(", threadsNb=");
         builder.append(this.threadsNb);
-        builder.append("\n bufferSize=");
+        builder.append(", bufferSize=");
         builder.append(this.bufferSize);
-        builder.append("\n version=");
+        builder.append(", version=");
         builder.append(this.version);
-        builder.append("\n sessionId=");
+        builder.append(", profile=");
+        builder.append(this.profile);
+        builder.append(", sessionId=");
         builder.append(this.sessionId);
-        builder.append("\n fileInput=");
+        builder.append(", fileInput=");
         builder.append(this.fileInput);
-        builder.append("\n date=");
+        builder.append(", date=");
         builder.append(this.date);
-        builder.append("\n parsingTime=");
+        builder.append(", parsingTime=");
         builder.append(this.parsingTime);
-        builder.append("\n inferenceTime=");
+        builder.append(", inferenceTime=");
         builder.append(this.inferenceTime);
-        builder.append("\n nbInitialTriples=");
+        builder.append(", nbInitialTriples=");
         builder.append(this.nbInitialTriples);
-        builder.append("\n nbInferedTriples=");
+        builder.append(", nbInferedTriples=");
         builder.append(this.nbInferedTriples);
-        builder.append("\n perfStat=");
+        builder.append(", perfStat=");
         builder.append(this.perfStat);
-        builder.append("\n runsByRule=");
+        builder.append(", runsByRule=");
         builder.append(this.runsByRule);
-        builder.append("\n duplicatesByRule=");
+        builder.append(", duplicatesByRule=");
         builder.append(this.duplicatesByRule);
-        builder.append("\n inferedByRule=");
+        builder.append(", inferedByRule=");
         builder.append(this.inferedByRule);
         builder.append("]");
         return builder.toString();

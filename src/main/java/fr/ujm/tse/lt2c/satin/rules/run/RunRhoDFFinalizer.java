@@ -26,30 +26,39 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunRhoDFFinalizer implements BufferListener {
 
     private static final Logger logger = Logger.getLogger(RunRhoDFFinalizer.class);
-    TripleStore tripleStore;
-    Dictionary dictionary;
-    TripleBuffer tripleBuffer;
-    ExecutorService executor;
-    AtomicInteger phaser;
+    private final TripleStore tripleStore;
+    private final Dictionary dictionary;
+    private final TripleBuffer tripleBuffer;
+    private final ExecutorService executor;
+    private final AtomicInteger phaser;
+    private final ReasonerProfile profile;
 
-    public RunRhoDFFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor, final AtomicInteger phaser, final int bufferSize) {
+    public RunRhoDFFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor,
+            final AtomicInteger phaser, final int bufferSize) {
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
         this.executor = executor;
         this.phaser = phaser;
         this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
         this.tripleBuffer.addBufferListener(this);
+        this.profile = profile;
     }
 
     public void addTriples(final Collection<Triple> triples) {
         this.tripleBuffer.addAll(triples);
-        // for (final Triple triple : triples) {
-        // this.tripleBuffer.add(triple);
-        // }
     }
 
     @Override
     public boolean bufferFull() {
+        switch (this.profile) {
+        case GRhoDF:
+            return this.bufferFullGRhoDF();
+        default:
+            return true;
+        }
+    }
+
+    public boolean bufferFullGRhoDF() {
         final Runnable run = new Runnable() {
             @Override
             public void run() {

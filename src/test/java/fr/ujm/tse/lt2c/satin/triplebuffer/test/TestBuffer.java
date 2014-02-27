@@ -1,8 +1,9 @@
 package fr.ujm.tse.lt2c.satin.triplebuffer.test;
+
 import java.util.ArrayList;
 import java.util.Random;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
@@ -11,18 +12,18 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class TestBuffer {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
-        TripleBuffer tripleBuffer = new TripleBufferLock();
-        ArrayList<Triple> triples = new ArrayList<>();
+        final TripleBuffer tripleBuffer = new QueuedTripleBufferLock(100);
+        final ArrayList<Triple> triples = new ArrayList<>();
 
-        BF bf = (new TestBuffer()).new BF(tripleBuffer);
+        final BF bf = (new TestBuffer()).new BF(tripleBuffer);
 
         tripleBuffer.addBufferListener(bf);
 
         for (int i = 0; i < 1000; i++) {
-            Random rnd = new Random();
-            Triple t = new ImmutableTriple(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
+            final Random rnd = new Random();
+            final Triple t = new ImmutableTriple(rnd.nextLong(), rnd.nextLong(), rnd.nextLong());
             while (!tripleBuffer.add(t)) {
                 ;
             }
@@ -30,11 +31,11 @@ public class TestBuffer {
         }
         try {
             Thread.sleep(30000);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
         long sum = 0;
-        for (Triple triple : triples) {
+        for (final Triple triple : triples) {
             sum += triple.getSubject();
             sum += triple.getPredicate();
             sum += triple.getObject();
@@ -50,17 +51,17 @@ public class TestBuffer {
         TripleBuffer tb;
         public long total_sum = 0;
 
-        public BF(TripleBuffer tb) {
+        public BF(final TripleBuffer tb) {
             this.tb = tb;
         }
 
         @Override
         public boolean bufferFull() {
-            Thread t = new Thread(new Runnable() {
+            final Thread t = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    count();
+                    BF.this.count();
 
                 }
             });
@@ -69,20 +70,20 @@ public class TestBuffer {
         }
 
         private void count() {
-            TripleStore triples = this.tb.clear();
+            final TripleStore triples = this.tb.clear();
 
             long sum = 0;
-            for (Triple triple : triples.getAll()) {
+            for (final Triple triple : triples.getAll()) {
                 sum += triple.getSubject();
                 sum += triple.getPredicate();
                 sum += triple.getObject();
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            total_sum += sum;
+            this.total_sum += sum;
             System.out.println("SUM: " + sum);
         }
 

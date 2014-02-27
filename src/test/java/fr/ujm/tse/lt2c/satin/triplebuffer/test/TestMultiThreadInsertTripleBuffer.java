@@ -12,11 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleBufferLock;
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class TestMultiThreadInsertTripleBuffer {
@@ -27,14 +26,14 @@ public class TestMultiThreadInsertTripleBuffer {
     @Test
     public void test() {
         for (int k = 0; k < 150; k++) {
-            TripleBuffer tb = new TripleBufferLock();
-            SimpleBufferListener listener = new SimpleBufferListener(tb);
+            final TripleBuffer tb = new QueuedTripleBufferLock(100);
+            final SimpleBufferListener listener = new SimpleBufferListener(tb);
             tb.addBufferListener(listener);
-            Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
+            final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
 
             // Test buffer flush
-            ExecutorService executor = Executors.newCachedThreadPool();
-            int maxvalue = 45000;
+            final ExecutorService executor = Executors.newCachedThreadPool();
+            final int maxvalue = 45000;
             for (int j = 0; j < THREADS; j++) {
                 executor.submit(new RunnableAdder(generated, tb, maxvalue));
             }
@@ -42,11 +41,11 @@ public class TestMultiThreadInsertTripleBuffer {
             try {
                 executor.awaitTermination(1, TimeUnit.DAYS);
                 // Thread.sleep(10000);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
             // Assert set equality
-            long listenerf = listener.finish();
+            final long listenerf = listener.finish();
             // System.out.println(listenerf);
             assertEquals(generated.size(), listenerf);
 
@@ -59,7 +58,7 @@ public class TestMultiThreadInsertTripleBuffer {
         TripleBuffer tb;
         int max;
 
-        public RunnableAdder(Set<Triple> generated, TripleBuffer tb, int max) {
+        public RunnableAdder(final Set<Triple> generated, final TripleBuffer tb, final int max) {
             super();
             this.generated = generated;
             this.tb = tb;
@@ -68,11 +67,11 @@ public class TestMultiThreadInsertTripleBuffer {
 
         @Override
         public void run() {
-            Random random = new Random();
-            while (generated.size() < max) {
-                Triple newTriple = new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA));
-                generated.add(newTriple);
-                while (!tb.add(newTriple)) {
+            final Random random = new Random();
+            while (this.generated.size() < this.max) {
+                final Triple newTriple = new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA));
+                this.generated.add(newTriple);
+                while (!this.tb.add(newTriple)) {
                     ;
                 }
             }
@@ -85,26 +84,26 @@ public class TestMultiThreadInsertTripleBuffer {
         TripleBuffer tb;
         long counter;
 
-        public SimpleBufferListener(TripleBuffer tb) {
+        public SimpleBufferListener(final TripleBuffer tb) {
             super();
             this.tb = tb;
-            counter = 0;
+            this.counter = 0;
         }
 
         @Override
         public boolean bufferFull() {
-            assertEquals(0, tb.mainBufferOccupation());
-            assertEquals(tb.getBufferLimit(), tb.secondaryBufferOccupation());
-            TripleStore emptyedBuffer = tb.clear();
-            assertEquals(emptyedBuffer.size(), tb.getBufferLimit());
-            // TODO possible shit here
-            assertEquals(0, tb.secondaryBufferOccupation());
-            counter += emptyedBuffer.size();
+            // assertEquals(0, this.tb.mainBufferOccupation());
+            // assertEquals(this.tb.getBufferLimit(), this.tb.secondaryBufferOccupation());
+            // final TripleStore emptyedBuffer = this.tb.clear();
+            // assertEquals(emptyedBuffer.size(), this.tb.getBufferLimit());
+            // // TODO possible shit here
+            // assertEquals(0, this.tb.secondaryBufferOccupation());
+            // this.counter += emptyedBuffer.size();
             return true;
         }
 
         public long finish() {
-            return counter + tb.flush().size();
+            return this.counter + this.tb.clear().size();
         }
 
     }

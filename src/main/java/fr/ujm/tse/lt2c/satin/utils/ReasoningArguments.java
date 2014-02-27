@@ -7,13 +7,13 @@ import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
 
 public class ReasoningArguments {
 
-    public ReasoningArguments(final int threadsPerCore, final int bufferSize, final long timeout, final int iteration, final boolean bullshitMode, final boolean cumulativeMode, final ReasonerProfile profile, final boolean persistMode, final boolean dumpMode, final List<File> files) {
+    public ReasoningArguments(final int threadsPerCore, final int bufferSize, final long timeout, final int iteration, final boolean cumulativeMode,
+            final ReasonerProfile profile, final boolean persistMode, final boolean dumpMode, final List<File> files) {
         super();
         this.threadsPerCore = threadsPerCore;
         this.bufferSize = bufferSize;
         this.timeout = timeout;
         this.iteration = iteration;
-        this.bullshitMode = bullshitMode;
         this.cumulativeMode = cumulativeMode;
         this.profile = profile;
         this.persistMode = persistMode;
@@ -26,7 +26,6 @@ public class ReasoningArguments {
     private final int bufferSize;
     private final long timeout;
     private final int iteration;
-    private final boolean bullshitMode;
     private final boolean cumulativeMode;
     private final ReasonerProfile profile;
 
@@ -49,10 +48,6 @@ public class ReasoningArguments {
 
     public int getIteration() {
         return this.iteration;
-    }
-
-    public boolean isBullshitMode() {
-        return this.bullshitMode;
     }
 
     public boolean isCumulativeMode() {
@@ -80,7 +75,6 @@ public class ReasoningArguments {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + this.bufferSize;
-        result = (prime * result) + (this.bullshitMode ? 1231 : 1237);
         result = (prime * result) + (this.cumulativeMode ? 1231 : 1237);
         result = (prime * result) + (this.dumpMode ? 1231 : 1237);
         result = (prime * result) + ((this.files == null) ? 0 : this.files.hashCode());
@@ -105,9 +99,6 @@ public class ReasoningArguments {
         }
         final ReasoningArguments other = (ReasoningArguments) obj;
         if (this.bufferSize != other.bufferSize) {
-            return false;
-        }
-        if (this.bullshitMode != other.bullshitMode) {
             return false;
         }
         if (this.cumulativeMode != other.cumulativeMode) {

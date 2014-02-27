@@ -43,14 +43,6 @@ public interface TripleBuffer {
     Collection<BufferListener> getBufferListeners();
 
     /**
-     * Flush all remaining triples in this buffer. Calls this method when
-     * terminating the process
-     * 
-     * @return
-     */
-    TripleStore flush();
-
-    /**
      * 
      * @return the size limit of the main buffer
      */
@@ -67,16 +59,6 @@ public interface TripleBuffer {
      * Notifies all subscribers that the buffer is full
      */
     void sendFullBuffer();
-
-    /**
-     * @return the number of triples in the main buffer
-     */
-    long mainBufferOccupation();
-
-    /**
-     * @return the number of triples in the secondary buffer
-     */
-    long secondaryBufferOccupation();
 
     /**
      * @return the timestamp since the last time the buffer were flushed

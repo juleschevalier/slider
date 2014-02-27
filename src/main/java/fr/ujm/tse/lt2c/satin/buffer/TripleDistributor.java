@@ -2,10 +2,10 @@ package fr.ujm.tse.lt2c.satin.buffer;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.util.BlockingArrayQueue;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -21,7 +21,7 @@ public class TripleDistributor implements Runnable {
 
     private final Multimap<Long, TripleBuffer> subscribers;
     private final Collection<TripleBuffer> universalSubscribers;
-    private final BlockingQueue<Triple> tripleQueue;
+    private final Queue<Triple> tripleQueue;
     private String debugName = "";
     private final boolean running = true;
 
@@ -30,7 +30,7 @@ public class TripleDistributor implements Runnable {
      */
     public TripleDistributor() {
         super();
-        this.tripleQueue = new BlockingArrayQueue<>();
+        this.tripleQueue = new ConcurrentLinkedQueue<>();
 
         this.subscribers = HashMultimap.create();
         this.universalSubscribers = new HashSet<>();
@@ -200,7 +200,7 @@ public class TripleDistributor implements Runnable {
         return subs.toString();
     }
 
-    public BlockingQueue<Triple> getTripleQueue() {
+    public Queue<Triple> getTripleQueue() {
         return this.tripleQueue;
     }
 
