@@ -31,7 +31,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
-import fr.ujm.tse.lt2c.satin.rules.run.RunRhoDFFinalizer;
+import fr.ujm.tse.lt2c.satin.rules.run.RunFinalizer;
 import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
@@ -137,11 +137,11 @@ public class ReasonerStreamed {
             logger.debug("********************************START INFERENCE********************************");
         }
 
-        final long debugStartTime = System.nanoTime();
-
         /********************
          * LAUNCH INFERENCE *
          ********************/
+
+        final long debugStartTime = System.nanoTime();
 
         tripleManager.addTriples(this.tripleStore.getAll());
 
@@ -169,7 +169,7 @@ public class ReasonerStreamed {
                     try {
                         phaser.wait();
                     } catch (final InterruptedException e) {
-                        e.printStackTrace();
+                        logger.error("", e);
                     }
                     stillRunnning = phaser.get();
                 }
@@ -184,11 +184,11 @@ public class ReasonerStreamed {
 
         /* Reasoning must be ended */
 
-        if (tripleManager.flushBuffers() > 0) {
-            logger.error("Non-empty buffers after the end");
+        if ((tripleManager.flushBuffers() > 0) || (phaser.get() > 0)) {
+            logger.error("Unfinished business");
         }
 
-        /* Infere last triples */
+        /* Infer last triples */
         this.finalyze(this.profile, this.tripleStore, this.dictionary, phaser);
 
         if (logger.isDebugEnabled()) {
@@ -216,7 +216,7 @@ public class ReasonerStreamed {
         try {
             machine = InetAddress.getLocalHost().getHostName();
         } catch (final UnknownHostException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
         machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
         final long ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
@@ -226,7 +226,6 @@ public class ReasonerStreamed {
 
         if (logger.isInfoEnabled()) {
 
-            // logger.info("-------------------");
             logger.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
                     + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
 
@@ -281,8 +280,9 @@ public class ReasonerStreamed {
     }
 
     private void finalyze(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
+        // TODO Watch for useless finalizations
         final long goodthings = tripleStore.size();
-        final RunRhoDFFinalizer finalizer = new RunRhoDFFinalizer(tripleStore, dictionary, profile, executor, phaser, this.bufferSize);
+        final RunFinalizer finalizer = new RunFinalizer(tripleStore, dictionary, profile, executor, phaser, this.bufferSize);
         finalizer.addTriples(tripleStore.getAll());
         finalizer.clearBuffer();
 
@@ -292,7 +292,7 @@ public class ReasonerStreamed {
                 try {
                     phaser.wait();
                 } catch (final InterruptedException e1) {
-                    e1.printStackTrace();
+                    logger.error("", e1);
                 }
                 running = phaser.get();
             }
@@ -321,9 +321,9 @@ public class ReasonerStreamed {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("", e);
         } catch (final IOException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
     }
 

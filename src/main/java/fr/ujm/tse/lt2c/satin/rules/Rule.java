@@ -34,7 +34,8 @@ public class Rule implements BufferListener {
 
     ExecutorService executor;
 
-    public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
+    public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
+            final int bufferSize, final int maxThreads) {
         super();
         this.run = run;
         this.executor = executor;
@@ -56,11 +57,12 @@ public class Rule implements BufferListener {
     public boolean bufferFull() {
         if ((this.phaser.get() < this.maxThreads) && ((this.tripleBuffer.getOccupation()) > 0)) {
             this.phaser.incrementAndGet();
-            this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
-            /*
-             * For monothread :
-             * this.ruleRun.run();
-             */
+            this.executor
+                    .submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
+
+            // For monothread :
+            // (RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer,
+            // this.tripleDistributor, this.phaser)).run();
             return true;
         }
         if (logger.isTraceEnabled()) {

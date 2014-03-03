@@ -20,7 +20,7 @@ public class TestTripleBuffer {
 
     @Test
     public void test() {
-        TripleBuffer tb = new QueuedTripleBufferLock(100);
+        TripleBuffer tb = new QueuedTripleBufferLock(10);
         final Set<Triple> generated = new HashSet<>();
 
         // Test buffer flush
@@ -51,14 +51,7 @@ public class TestTripleBuffer {
         generated.clear();
         while (generated.size() < ((tb.getBufferLimit() * 3) + 3)) {
             final Triple t = new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA));
-            boolean ok = false;
-            while (!tb.add(t)) {
-                System.out.print(".");
-                ok = true;
-            }
-            if (ok) {
-                System.out.println();
-            }
+            tb.add(t);
             generated.add(t);
         }
         assertEquals(3, tb.getOccupation());

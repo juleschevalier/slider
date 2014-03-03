@@ -81,6 +81,8 @@ public class Main {
             logger.info("******** LET'S GO ********");
         }
 
+        long infered = 0;
+
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
             if ((arguments.getIteration() > 1) && logger.isInfoEnabled()) {
                 logger.info("\tIteration: " + loop);
@@ -90,11 +92,18 @@ public class Main {
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
 
                 if (arguments.isDumpMode()) {
-                    final String newFile = "infered_" + arguments.getProfile() + "_" + file.getName();
-                    tripleStore.writeToFile(newFile, dictionary);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Dumped in " + newFile);
+                    final File newFile = new File("infered_" + arguments.getProfile() + "_" + runEntity.getNbInferedTriples() + "_" + file.getName());
+                    if (!newFile.exists()) {
+                        tripleStore.writeToFile(newFile.getName(), dictionary);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("Dumped in " + newFile);
+                        }
                     }
+                }
+
+                if (runEntity.getNbInferedTriples() != infered) {
+                    infered = runEntity.getNbInferedTriples();
+                    System.out.println(infered);
                 }
 
                 /* Reset log tracers */
@@ -103,14 +112,14 @@ public class Main {
                 if (arguments.isPersistMode()) {
                     final MongoClient client;
                     try {
-                        // client = new MongoClient("10.20.0.57");
-                        client = new MongoClient();
+                        client = new MongoClient("10.20.0.57");
+                        // client = new MongoClient();
                         final Morphia morphia = new Morphia();
                         morphia.map(RunEntity.class);
                         final Datastore ds = morphia.createDatastore(client, "RunResults");
                         ds.save(runEntity);
                     } catch (final Exception e) {
-                        e.printStackTrace();
+                        logger.error("", e);
                     }
                 }
 
@@ -183,7 +192,7 @@ public class Main {
 
         // options.addOption("profile", true,
         // "set the fragment (RDFS, RhoDF, ...)");
-        final Option profileO = new Option("profile", "set the fragment (RhoDF, GRhoDF)");
+        final Option profileO = new Option("profile", "set the fragment " + ReasonerProfile.values());
         profileO.setArgName("profile");
         profileO.setArgs(1);
         options.addOption(profileO);
@@ -301,7 +310,7 @@ public class Main {
                         logger.info("Threads: " + iteration);
                     }
                 } catch (final NumberFormatException e) {
-                    e.printStackTrace();
+                    logger.error("Threads must be a number. Option ignored");
                 }
             }
             /* timeout */
@@ -310,7 +319,7 @@ public class Main {
                 try {
                     timeout = Integer.parseInt(arg);
                 } catch (final NumberFormatException e) {
-                    e.printStackTrace();
+                    logger.error("Timeout must be a number. Option ignored");
                 }
             }
             /* iteration */
@@ -322,7 +331,7 @@ public class Main {
                         logger.info("Iterations: " + iteration);
                     }
                 } catch (final NumberFormatException e) {
-                    e.printStackTrace();
+                    logger.error("Iteration must be a number. Option ignored");
                 }
             }
 
@@ -369,7 +378,7 @@ public class Main {
             return new ReasoningArguments(threadsPerCore, bufferSize, timeout, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
 
         } catch (final ParseException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
         return null;
     }

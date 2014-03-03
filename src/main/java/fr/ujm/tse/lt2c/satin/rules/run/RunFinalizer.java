@@ -23,9 +23,9 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  * OUPUT
  * x rdf:type c2
  */
-public class RunRhoDFFinalizer implements BufferListener {
+public class RunFinalizer implements BufferListener {
 
-    private static final Logger logger = Logger.getLogger(RunRhoDFFinalizer.class);
+    private static final Logger logger = Logger.getLogger(RunFinalizer.class);
     private final TripleStore tripleStore;
     private final Dictionary dictionary;
     private final TripleBuffer tripleBuffer;
@@ -33,7 +33,7 @@ public class RunRhoDFFinalizer implements BufferListener {
     private final AtomicInteger phaser;
     private final ReasonerProfile profile;
 
-    public RunRhoDFFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor,
+    public RunFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor,
             final AtomicInteger phaser, final int bufferSize) {
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
@@ -71,7 +71,7 @@ public class RunRhoDFFinalizer implements BufferListener {
 
                 final Collection<Triple> outputTriples = new HashSet<>();
 
-                for (final Triple triple : RunRhoDFFinalizer.this.tripleBuffer.clear().getAll()) {
+                for (final Triple triple : RunFinalizer.this.tripleBuffer.clear().getAll()) {
                     final long s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
 
                     /* subproperty reflexivity */
@@ -113,22 +113,22 @@ public class RunRhoDFFinalizer implements BufferListener {
                     }
                 }
                 for (final Triple triple : outputTriples) {
-                    if (!RunRhoDFFinalizer.this.tripleStore.contains(triple)) {
-                        RunRhoDFFinalizer.this.tripleStore.add(triple);
+                    if (!RunFinalizer.this.tripleStore.contains(triple)) {
+                        RunFinalizer.this.tripleStore.add(triple);
                     } else {
                         if (logger.isTraceEnabled()) {
-                            logger.trace(RunRhoDFFinalizer.this.dictionary.printTriple(triple) + " already present");
+                            logger.trace(RunFinalizer.this.dictionary.printTriple(triple) + " already present");
                         }
                     }
                 }
-                synchronized (RunRhoDFFinalizer.this.phaser) {
-                    RunRhoDFFinalizer.this.phaser.decrementAndGet();
-                    RunRhoDFFinalizer.this.phaser.notifyAll();
+                synchronized (RunFinalizer.this.phaser) {
+                    RunFinalizer.this.phaser.decrementAndGet();
+                    RunFinalizer.this.phaser.notifyAll();
                 }
             }
         };
 
-        RunRhoDFFinalizer.this.phaser.incrementAndGet();
+        RunFinalizer.this.phaser.incrementAndGet();
         this.executor.submit(run);
         return true;
     }

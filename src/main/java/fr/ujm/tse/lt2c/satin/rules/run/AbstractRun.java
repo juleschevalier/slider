@@ -96,6 +96,7 @@ public abstract class AbstractRun implements RuleRun {
 
             if (usableTriples.isEmpty()) {
                 logger.warn(this.ruleName + runId + " run without triples");
+                logger.trace(this.ruleName + runId + " END");
             } else {
                 debugLoops += this.process(usableTriples, this.tripleStore, outputTriples);
                 debugLoops += this.process(this.tripleStore, usableTriples, outputTriples);
