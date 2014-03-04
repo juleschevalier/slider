@@ -3,12 +3,6 @@ package fr.ujm.tse.lt2c.satin.buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-
-import org.apache.log4j.Logger;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
@@ -20,16 +14,8 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  */
 public class TripleManager {
 
-    // Timeout
-    private static final long TIMEOUT = 100;
-
-    private static Logger logger = Logger.getLogger(TripleManager.class);
-
     List<Rule> rules;
-    Multimap<String, String> debugLinks;
     TripleDistributor generalDistributor;
-
-    private static final boolean enableTimeout = false;
 
     /**
      * Constructor
@@ -37,16 +23,8 @@ public class TripleManager {
     public TripleManager() {
         super();
         this.rules = new ArrayList<>();
-        this.debugLinks = HashMultimap.create();
         this.generalDistributor = new TripleDistributor();
         this.generalDistributor.setName("T_MANAGER");
-        // if (logger.isTraceEnabled()) {
-        // logger.trace("T_MANAGER launch distributor");
-        // }
-        // Executors.newSingleThreadExecutor().submit(generalDistributor);
-        if (enableTimeout) {
-            this.timeoutChecker();
-        }
     }
 
     /**
@@ -59,25 +37,14 @@ public class TripleManager {
     public void addRule(final Rule newRule) {
         this.rules.add(newRule);
         this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
-        if (logger.isTraceEnabled()) {
-            logger.trace("Triple Manager : -- ADD RULE " + newRule.name() + " --");
-            logger.trace("Triple Manager : General -> " + newRule.name());
-        }
+
         for (final Rule rule : this.rules) {
             if (this.match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
                 final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
                 newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
-                this.debugLinks.put(newRule.name(), rule.name());
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Triple Manager : " + rule.name() + " -> " + newRule.name());
-                }
             }
             if ((rule != newRule) && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
                 rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
-                this.debugLinks.put(rule.name(), newRule.name());
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Triple Manager : " + newRule.name() + " -> " + rule.name());
-                }
             }
         }
     }
@@ -103,11 +70,9 @@ public class TripleManager {
         for (final Rule rule : this.rules) {
             if ((rule.getTripleBuffer().getOccupation()) > 0) {
                 total++;
+                rule.bufferFull();
             }
-            if (logger.isTraceEnabled()) {
-                logger.trace("FlushBuffers " + rule.name() + " buffer : " + rule.getTripleBuffer().getOccupation());
-            }
-            rule.bufferFull();
+
         }
         return total;
 
@@ -173,29 +138,6 @@ public class TripleManager {
         }
 
         return ms;
-    }
-
-    /**
-     * Check every X ms for every TripleBuffer's last flush, and send full
-     * buffer signal if needed
-     */
-    private void timeoutChecker() {
-        final Runnable checker = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(10);
-                    for (final Rule rule : TripleManager.this.rules) {
-                        if ((rule.getTripleBuffer().getLastFlush() - System.nanoTime()) > (TIMEOUT * 1000000)) {
-                            rule.getTripleBuffer().sendFullBuffer();
-                        }
-                    }
-                } catch (final InterruptedException e) {
-                    logger.error("", e);
-                }
-            }
-        };
-        Executors.newSingleThreadExecutor().submit(checker);
     }
 
 }

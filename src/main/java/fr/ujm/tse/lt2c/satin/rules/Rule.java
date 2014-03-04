@@ -49,7 +49,6 @@ public class Rule implements BufferListener {
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
 
         this.tripleDistributor = new TripleDistributor();
-        // Executors.newSingleThreadExecutor().submit(tripleDistributor);
 
     }
 
@@ -59,14 +58,7 @@ public class Rule implements BufferListener {
             this.phaser.incrementAndGet();
             this.executor
                     .submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
-
-            // For monothread :
-            // (RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer,
-            // this.tripleDistributor, this.phaser)).run();
             return true;
-        }
-        if (logger.isTraceEnabled()) {
-            logger.trace(this.name() + " Missing space or no more necessary");
         }
         return false;
     }

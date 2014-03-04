@@ -23,7 +23,6 @@ public abstract class AbstractRun implements RuleRun {
     protected TripleDistributor distributor;
     protected TripleBuffer tripleBuffer;
     protected String ruleName = "";
-    protected int debugThreads;
     protected AtomicInteger phaser;
 
     /**
@@ -43,7 +42,6 @@ public abstract class AbstractRun implements RuleRun {
         this.tripleStore = tripleStore;
         this.distributor = tripleDistributor;
         this.tripleBuffer = tripleBuffer;
-        this.debugThreads = 0;
         this.phaser = phaser;
 
         this.ruleName = this.toString();
@@ -53,21 +51,11 @@ public abstract class AbstractRun implements RuleRun {
     @Override
     public void run() {
 
-        final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
-
-        if (logger.isTraceEnabled()) {
-            logger.trace(this.ruleName + runId + " START");
-        }
-
         /*
          * Buffer verification
          */
 
         if ((this.tripleBuffer.getOccupation()) == 0) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " started for nothing");
-                logger.trace(this.ruleName + runId + " END");
-            }
             this.phaser.decrementAndGet();
             return;
         }
@@ -80,26 +68,21 @@ public abstract class AbstractRun implements RuleRun {
             final TripleStore usableTriples = this.tripleBuffer.clear();
 
             if (usableTriples == null) {
-                logger.error(this.ruleName + runId + " NULL usableTriples");
+                this.phaser.decrementAndGet();
                 return;
             }
 
-            this.debugThreads++;
             GlobalValues.incRunsByRule(this.ruleName);
-
-            long debugLoops = 0;
 
             /*
              * Initialize structure and get new triples from process()
              */
             final Collection<Triple> outputTriples = new HashSet<>();
 
-            if (usableTriples.isEmpty()) {
-                logger.warn(this.ruleName + runId + " run without triples");
-                logger.trace(this.ruleName + runId + " END");
-            } else {
-                debugLoops += this.process(usableTriples, this.tripleStore, outputTriples);
-                debugLoops += this.process(this.tripleStore, usableTriples, outputTriples);
+            /* For rules with 2 components */
+            if (!usableTriples.isEmpty()) {
+                this.process(usableTriples, this.tripleStore, outputTriples);
+                this.process(this.tripleStore, usableTriples, outputTriples);
             }
 
             /*
@@ -107,68 +90,38 @@ public abstract class AbstractRun implements RuleRun {
              */
             this.addNewTriples(outputTriples);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(this.ruleName + runId + " : " + outputTriples.size() + " triples generated (" + debugLoops + " loops)");
-            }
-
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
             /*
-             * Unregister from phaser (notifies the Reasoner the inference is
-             * over)
+             * Unregister from phaser and notifies the Reasoner
              */
-            if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " decrement phaser " + this.phaser);
-            }
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
-            }
-
-            if (logger.isTraceEnabled()) {
-                logger.trace(this.ruleName + runId + " END");
             }
         }
     }
 
     protected abstract int process(TripleStore ts1, TripleStore ts2, Collection<Triple> outputTriples);
 
-    protected int addNewTriples(final Collection<Triple> outputTriples) {
+    protected void addNewTriples(final Collection<Triple> outputTriples) {
 
         int duplicates = 0;
 
         if (outputTriples.isEmpty()) {
-            return duplicates;
+            return;
         }
 
         final Collection<Triple> newTriples = this.tripleStore.addAll(outputTriples);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(this.ruleName + " distribute " + newTriples.size() + " new triples");
-        }
-
-        /* End choice */
-        this.distributor.distributeAll(newTriples);
-
         duplicates = outputTriples.size() - newTriples.size();
         GlobalValues.incInferedByRule(this.ruleName, newTriples.size());
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
-        return duplicates;
-    }
 
-    protected void logDebug(final String message) {
-        if (this.getLogger().isDebugEnabled()) {
-            final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
-            this.getLogger().debug(this.ruleName + runId + " " + message);
-        }
-    }
+        this.distributor.distributeAll(newTriples);
 
-    protected void logTrace(final String message) {
-        if (this.getLogger().isTraceEnabled()) {
-            final String runId = "(" + ((Thread.currentThread().hashCode() % 100) + 1000) + ")";
-            this.getLogger().trace(this.ruleName + runId + " " + message);
-        }
+        return;
     }
 
     public String getRuleName() {
@@ -181,10 +134,6 @@ public abstract class AbstractRun implements RuleRun {
 
     public TripleDistributor getDistributor() {
         return this.distributor;
-    }
-
-    public int getThreads() {
-        return this.debugThreads;
     }
 
     @Override

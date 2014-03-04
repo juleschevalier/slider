@@ -53,40 +53,12 @@ public class Main {
         Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Files:");
-            int maxLenght = 0;
-            for (final File file : arguments.getFiles()) {
-                if (file.getName().length() > maxLenght) {
-                    maxLenght = file.getName().length();
-                }
-            }
-            for (final File file : arguments.getFiles()) {
-                final StringBuilder sb = new StringBuilder();
-                sb.append("       ");
-                sb.append(file.getName());
-                for (int i = file.getName().length(); i < (maxLenght + 2); i++) {
-                    sb.append(" ");
-                }
-                sb.append(humanReadableSize(file.length()));
-                logger.info(sb.toString());
-            }
-        }
-
         if (arguments.getFiles().isEmpty()) {
             logger.warn("Well, without files I can't do anything, you know ?");
             return;
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("******** LET'S GO ********");
-        }
-
-        long infered = 0;
 
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
-            if ((arguments.getIteration() > 1) && logger.isInfoEnabled()) {
-                logger.info("\tIteration: " + loop);
-            }
             for (final File file : arguments.getFiles()) {
 
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
@@ -95,15 +67,7 @@ public class Main {
                     final File newFile = new File("infered_" + arguments.getProfile() + "_" + runEntity.getNbInferedTriples() + "_" + file.getName());
                     if (!newFile.exists()) {
                         tripleStore.writeToFile(newFile.getName(), dictionary);
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Dumped in " + newFile);
-                        }
                     }
-                }
-
-                if (runEntity.getNbInferedTriples() != infered) {
-                    infered = runEntity.getNbInferedTriples();
-                    System.out.println(infered);
                 }
 
                 /* Reset log tracers */
@@ -113,7 +77,6 @@ public class Main {
                     final MongoClient client;
                     try {
                         client = new MongoClient("10.20.0.57");
-                        // client = new MongoClient();
                         final Morphia morphia = new Morphia();
                         morphia.map(RunEntity.class);
                         final Datastore ds = morphia.createDatastore(client, "RunResults");

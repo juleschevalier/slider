@@ -1,6 +1,5 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.main.Main;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
@@ -51,7 +51,6 @@ public class ReasonerStreamed {
     private final int threadsPerCore;
     private int maxThreads = AVAILABLE_CORES;
     private final int bufferSize;
-    private final long timeout;
     private final ReasonerProfile profile;
     private static ExecutorService executor;
     private final TripleStore tripleStore;
@@ -61,7 +60,7 @@ public class ReasonerStreamed {
      * Constructors
      */
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int threadsPerCore,
-            final int bufferSize, final long timeout, final boolean cumulativeMode) {
+            final int bufferSize) {
         super();
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
@@ -69,25 +68,13 @@ public class ReasonerStreamed {
         this.threadsPerCore = threadsPerCore;
         this.maxThreads = AVAILABLE_CORES * this.threadsPerCore;
         this.bufferSize = bufferSize;
-        this.timeout = timeout;
     }
 
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasoningArguments arguments) {
-        super();
-        this.tripleStore = tripleStore;
-        this.dictionary = dictionary;
-        this.profile = arguments.getProfile();
-        this.threadsPerCore = arguments.getThreadsPerCore();
-        this.maxThreads = AVAILABLE_CORES * arguments.getThreadsPerCore();
-        this.bufferSize = arguments.getBufferSize();
-        this.timeout = arguments.getTimeout();
+        this(tripleStore, dictionary, arguments.getProfile(), arguments.getThreadsPerCore(), arguments.getBufferSize());
     }
 
     public RunEntity infereFromFile(final String input) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info("** " + (new File(input)).getName() + " **");
-        }
 
         /* File parsing */
         long debugParsingTime = System.nanoTime();
@@ -95,15 +82,12 @@ public class ReasonerStreamed {
         parser.parse(input);
         debugParsingTime = System.nanoTime() - debugParsingTime;
 
+        /* Inference */
         return this.infere(input, debugParsingTime);
 
     }
 
     public RunEntity infereFromModel(final Model model) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info("** From Model **");
-        }
 
         /* Model parsing */
         long debugParsingTime = System.nanoTime();
@@ -111,15 +95,12 @@ public class ReasonerStreamed {
         parser.parse(model);
         debugParsingTime = System.nanoTime() - debugParsingTime;
 
+        /* Inference */
         return this.infere("Model", debugParsingTime);
 
     }
 
     private RunEntity infere(final String input, final long debugParsingTime) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("********************************NEW RUN********************************");
-        }
 
         /* Initialize structures */
 
@@ -132,10 +113,6 @@ public class ReasonerStreamed {
         /* Initialize rules used for inference on RhoDF */
 
         this.initialiseReasoner(this.profile, this.tripleStore, this.dictionary, tripleManager, phaser, executor);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("********************************START INFERENCE********************************");
-        }
 
         /********************
          * LAUNCH INFERENCE *
@@ -150,22 +127,12 @@ public class ReasonerStreamed {
          * the end
          */
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("REASONNER Flush Buffers!");
-        }
         long nonEmptyBuffers = tripleManager.flushBuffers();
         while (nonEmptyBuffers > 0) {
-
-            if (logger.isTraceEnabled()) {
-                logger.trace("REASONER There are still " + nonEmptyBuffers + " non empty buffers");
-            }
 
             synchronized (phaser) {
                 long stillRunnning = phaser.get();
                 while (stillRunnning > 0) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("REASONER Running rules: " + stillRunnning);
-                    }
                     try {
                         phaser.wait();
                     } catch (final InterruptedException e) {
@@ -175,37 +142,18 @@ public class ReasonerStreamed {
                 }
             }
 
-            if (logger.isTraceEnabled()) {
-                logger.trace("REASONNER Flush Buffers!");
-            }
             nonEmptyBuffers = tripleManager.flushBuffers();
 
         }
 
         /* Reasoning must be ended */
 
-        if ((tripleManager.flushBuffers() > 0) || (phaser.get() > 0)) {
-            logger.error("Unfinished business");
-        }
-
         /* Infer last triples */
         this.finalyze(this.profile, this.tripleStore, this.dictionary, phaser);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("REASONNER FAtality!");
-        }
 
         shutdownAndAwaitTermination(executor);
 
         final long debugEndTime = System.nanoTime();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("*********************************END INFERENCE*********************************");
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Reasoning is finished");
-        }
 
         /*
          * Some information display
@@ -227,7 +175,7 @@ public class ReasonerStreamed {
         if (logger.isInfoEnabled()) {
 
             logger.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
-                    + ") in " + (TimeUnit.MILLISECONDS.convert(debugEndTime - debugStartTime, TimeUnit.NANOSECONDS)) + " ms");
+                    + ") in " + Main.nsToTime(debugEndTime - debugStartTime));
 
         }
         GlobalValues.addTimeForFile(input, (debugEndTime - debugStartTime));
@@ -267,21 +215,10 @@ public class ReasonerStreamed {
             break;
         }
 
-        /* Debugging */
-        if (logger.isDebugEnabled()) {
-            logger.debug(tripleManager.getRules().size() + " rules initialized\n");
-        }
-
-        if (logger.isTraceEnabled()) {
-            for (final Rule rule : tripleManager.getRules()) {
-                logger.trace(rule.getTripleDistributor().subscribers(rule.name(), dictionary));
-            }
-        }
     }
 
     private void finalyze(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
         // TODO Watch for useless finalizations
-        final long goodthings = tripleStore.size();
         final RunFinalizer finalizer = new RunFinalizer(tripleStore, dictionary, profile, executor, phaser, this.bufferSize);
         finalizer.addTriples(tripleStore.getAll());
         finalizer.clearBuffer();
@@ -298,9 +235,6 @@ public class ReasonerStreamed {
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Bullshit stuff : " + (tripleStore.size() - goodthings));
-        }
     }
 
     /**

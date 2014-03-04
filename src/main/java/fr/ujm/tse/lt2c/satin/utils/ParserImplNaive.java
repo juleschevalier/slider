@@ -7,7 +7,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
 import org.apache.jena.riot.lang.PipedTriplesStream;
-import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -19,8 +18,6 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class ParserImplNaive implements Parser {
-
-    private static Logger logger = Logger.getLogger(ParserImplNaive.class);
 
     Dictionary dictionary;
     TripleStore tripleStore;
@@ -55,29 +52,12 @@ public class ParserImplNaive implements Parser {
             }
         };
 
-        final long debugStartTime = System.nanoTime();
         executor.submit(parser);
         while (iter.hasNext()) {
             final Triple next = iter.next();
             this.addTriple(next);
         }
-        final long debugEndTime = System.nanoTime();
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Parsing : " + this.tripleStore.size() + " triples in " + ((debugEndTime - debugStartTime) / 1000000) + "ms");
-        }
-
-        // if (logger.isTraceEnabled()) {
-        // logger.trace("---DICTIONARY---");
-        // logger.trace(this.dictionary.printDico());
-        // logger.trace("----TRIPLES-----");
-        // for (final fr.ujm.tse.lt2c.satin.interfaces.Triple triple : this.tripleStore.getAll()) {
-        // if (logger.isTraceEnabled()) {
-        // logger.trace(triple + " " + this.dictionary.printTriple(triple));
-        // }
-        // }
-        // logger.trace("-------------");
-        // }
     }
 
     private void addTriple(final Triple next) {

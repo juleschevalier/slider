@@ -36,6 +36,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
     private static Logger logger = Logger.getLogger(VerticalPartioningTripleStoreRWLock.class);
+
     Map<Long, Multimap<Long, Long>> internalstore;
     ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
     int triples;
@@ -287,19 +288,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
      */
     @Override
     public void writeToFile(final String file, final Dictionary dictionary) {
-        // try {
-        // // Create file
-        // final FileWriter fstream = new FileWriter(file, false);
-        // final BufferedWriter out = new BufferedWriter(fstream);
-        // for (final Triple triple : this.getAll()) {
-        // out.write(dictionary.printTriple(triple) + "\n");
-        // }
-        // // Close the output stream
-        // out.close();
-        // } catch (final Exception e) {
-        // // Catch exception if any
-        // logger.error("", e);
-        // }
         // Create an empty model.
         final Model model = ModelFactory.createDefaultModel();
         // Add all the triples into the model
