@@ -23,10 +23,10 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
 
     @Test
     public void test() {
-        TripleStore ts = new VerticalPartioningTripleStoreRWLock();
-        Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
+        final TripleStore ts = new VerticalPartioningTripleStoreRWLock();
+        final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
 
-        ExecutorService executor = Executors.newCachedThreadPool();
+        final ExecutorService executor = Executors.newCachedThreadPool();
         for (int j = 0; j < THREADS; j++) {
             executor.submit(new RunnableAdder(generated, ts));
         }
@@ -34,7 +34,7 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
         try {
             executor.awaitTermination(1, TimeUnit.DAYS);
             // Thread.sleep(10000);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -47,7 +47,7 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
         Set<Triple> generated;
         TripleStore ts;
 
-        public RunnableAdder(Set<Triple> generated, TripleStore ts) {
+        public RunnableAdder(final Set<Triple> generated, final TripleStore ts) {
             super();
             this.generated = generated;
             this.ts = ts;
@@ -55,11 +55,11 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
 
         @Override
         public void run() {
-            Random random = new Random();
-            for (int i = 0; i < 100000; i++) {
-                Triple t = new ImmutableTriple(random.nextInt(100), random.nextInt(100), random.nextInt(100));
-                ts.add(t);
-                generated.add(t);
+            final Random random = new Random();
+            for (int i = 0; i < 10000; i++) {
+                final Triple t = new ImmutableTriple(random.nextInt(100), random.nextInt(100), random.nextInt(100));
+                this.ts.add(t);
+                this.generated.add(t);
             }
 
         }

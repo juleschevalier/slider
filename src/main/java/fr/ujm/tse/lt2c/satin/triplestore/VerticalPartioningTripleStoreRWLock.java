@@ -433,4 +433,38 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((this.internalstore == null) ? 0 : this.internalstore.hashCode());
+        result = (prime * result) + this.triples;
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final VerticalPartioningTripleStoreRWLock other = (VerticalPartioningTripleStoreRWLock) obj;
+        if (this.triples != other.triples) {
+            return false;
+        }
+        if (this.internalstore == null) {
+            if (other.internalstore != null) {
+                return false;
+            }
+        } else if (!this.internalstore.equals(other.internalstore)) {
+            return false;
+        }
+        return true;
+    }
+
 }

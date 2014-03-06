@@ -59,6 +59,7 @@ public class Main {
         }
 
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
+            logger.info(loop);
             for (final File file : arguments.getFiles()) {
 
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
@@ -257,6 +258,7 @@ public class Main {
                     break;
 
                 default:
+                    logger.warn("Profile unknown, default profile used: " + DEFAULT_PROFILE);
                     profile = DEFAULT_PROFILE;
                     break;
                 }

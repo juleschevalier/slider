@@ -5,6 +5,23 @@
 	<artifactId>DistributedReasoner</artifactId>
 	<version>0.9</version>
 	<name>Distributed Reasoner</name>
+	<url>https://github.com/telecom-se/distributed-reasoner</url>
+	<distributionManagement>
+		<repository>
+			<id>satin-artifactory</id>
+			<name>satin-releases</name>
+			<url>http://10.20.0.55:8081/artifactory/satin-public</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>satin-snapshots</name>
+			<url>http://10.20.0.55:8081/artifactory/satin-public</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -49,6 +66,13 @@
 
 	<build>
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.7</version>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -90,5 +114,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<url>https://github.com/telecom-se/distributed-reasoner</url>
+
+
 </project>

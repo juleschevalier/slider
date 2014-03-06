@@ -16,39 +16,40 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class TestTripleBuffer {
 
-    public final static int PROBA = 1000000;
+    public static final int PROBA = 100;
+    public static final int BUFFER_SIZE = 10;
+    public static final int MAX_VALUE = 1000;
 
     @Test
     public void test() {
-        TripleBuffer tb = new QueuedTripleBufferLock(10);
+        TripleBuffer tb = new QueuedTripleBufferLock(BUFFER_SIZE);
         final Set<Triple> generated = new HashSet<>();
 
         // Test buffer flush
         final Random random = new Random();
         while (generated.size() < (tb.getBufferLimit() - 1)) {
             final Triple t = new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA));
-            while (!tb.add(t)) {
-                ;
-            }
+            tb.add(t);
             generated.add(t);
         }
-        assertEquals(generated.size(), tb.clear().size());
+        assertEquals(generated.size(), tb.getOccupation());
 
         // ----Clear test
         final SimpleBufferListener sbl = new SimpleBufferListener(tb);
         tb.addBufferListener(sbl);
         assertEquals(1, tb.getBufferListeners().size());
+
         // Switchy must occur here
         tb.add(new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA)));
-        // System.out.println(tb.mainBufferOccupation()+" "+tb.secondaryBufferOccupation());
-        assertEquals(1, tb.getOccupation());
+        assertEquals(0, tb.getOccupation());
 
         // ---- Overflow test
-        tb = new QueuedTripleBufferLock(100);
+        tb = new QueuedTripleBufferLock(BUFFER_SIZE);
         final OverFlowListener ofl = new OverFlowListener(tb);
         tb.addBufferListener(ofl);
         assertEquals(1, tb.getBufferListeners().size());
         generated.clear();
+
         while (generated.size() < ((tb.getBufferLimit() * 3) + 3)) {
             final Triple t = new ImmutableTriple(random.nextInt(PROBA), random.nextInt(PROBA), random.nextInt(PROBA));
             tb.add(t);
@@ -69,13 +70,7 @@ public class TestTripleBuffer {
 
         @Override
         public boolean bufferFull() {
-            // System.out.println("BufferFull called");
-            // assertEquals(0, this.tb.mainBufferOccupation());
-            // assertEquals(this.tb.getBufferLimit(), this.tb.secondaryBufferOccupation());
-            // final TripleStore emptyedBuffer = this.tb.clear();
-            // assertEquals(emptyedBuffer.size(), this.tb.getBufferLimit());
-            // assertEquals(0, this.tb.mainBufferOccupation());
-            // assertEquals(0, this.tb.secondaryBufferOccupation());
+            this.tb.clear();
             return true;
         }
 
@@ -92,10 +87,9 @@ public class TestTripleBuffer {
 
         @Override
         public boolean bufferFull() {
-            // System.out.println("BufferFull called");
             // Do shit
             try {
-                Thread.sleep(500);
+                Thread.sleep(10);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }

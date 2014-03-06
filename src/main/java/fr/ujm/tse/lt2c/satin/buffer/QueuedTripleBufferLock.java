@@ -85,7 +85,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     private boolean addNoLock(final Triple triple) {
         boolean success;
         success = this.tripleQueue.add(triple);
-        if (this.currentBuffer.incrementAndGet() > this.bufferSize) {
+        if (this.currentBuffer.incrementAndGet() >= this.bufferSize) {
             for (final BufferListener bufferListener : this.bufferListeners) {
                 bufferListener.bufferFull();
             }
