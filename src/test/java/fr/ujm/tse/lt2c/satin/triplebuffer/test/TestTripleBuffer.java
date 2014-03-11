@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
@@ -19,6 +21,18 @@ public class TestTripleBuffer {
     public static final int PROBA = 100;
     public static final int BUFFER_SIZE = 10;
     public static final int MAX_VALUE = 1000;
+
+    @Test
+    public void basicTest() {
+        final TripleBuffer tb = new QueuedTripleBufferLock(1);
+        tb.add(new ImmutableTriple(0, 0, 0));
+        tb.add(new ImmutableTriple(0, 0, 0));
+        tb.add(new ImmutableTriple(0, 0, 0));
+        tb.add(new ImmutableTriple(0, 0, 0));
+        Assert.assertEquals(4, tb.getOccupation());
+        Assert.assertEquals(1, tb.clear().size());
+        Assert.assertEquals(3, tb.getOccupation());
+    }
 
     @Test
     public void test() {

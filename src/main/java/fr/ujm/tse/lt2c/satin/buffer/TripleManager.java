@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
 
@@ -13,6 +15,8 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  * @author Jules Chevalier
  */
 public class TripleManager {
+
+    private static final Logger logger = Logger.getLogger(TripleManager.class);
 
     List<Rule> rules;
     TripleDistributor generalDistributor;

@@ -14,6 +14,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
@@ -51,7 +52,7 @@ public class RunFinalizer implements BufferListener {
     @Override
     public boolean bufferFull() {
         switch (this.profile) {
-        case GRhoDF:
+        case RhoDFPP:
             return this.bufferFullGRhoDF();
         default:
             return true;

@@ -27,7 +27,8 @@ public class RunSCM_SPO extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
     public static final String ruleName = "SCM_SPO";
 
-    public RunSCM_SPO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunSCM_SPO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -68,9 +69,11 @@ public class RunSCM_SPO extends AbstractRun {
                         final Triple result = new ImmutableTriple(triple.getSubject(), subPropertyOf, p3);
                         outputTriples.add(result);
 
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
-                        }
+                        // if (logger.isTraceEnabled()) {
+                        // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf,
+                        // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
+                        // subPropertyOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        // }
                     }
                 }
             }

@@ -30,7 +30,8 @@ public class RunCAX_SCO extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
     public static final String ruleName = "CAX_SCO";
 
-    public RunCAX_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunCAX_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
     }
 
@@ -64,9 +65,12 @@ public class RunCAX_SCO extends AbstractRun {
                     if (typeTriple.getSubject() >= 0) {
                         final Triple result = new ImmutableTriple(typeTriple.getSubject(), type, c2);
                         outputTriples.add(result);
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type, typeTriple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
-                        }
+                        // if (logger.isTraceEnabled()) {
+                        // logger.trace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type,
+                        // typeTriple.getObject())) + " & " + dictionary.printTriple(new
+                        // ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " +
+                        // dictionary.printTriple(result));
+                        // }
                     }
                 }
             }

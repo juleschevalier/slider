@@ -53,6 +53,7 @@ public class ParserImplNaive implements Parser {
         };
 
         executor.submit(parser);
+        executor.shutdown();
         while (iter.hasNext()) {
             final Triple next = iter.next();
             this.addTriple(next);

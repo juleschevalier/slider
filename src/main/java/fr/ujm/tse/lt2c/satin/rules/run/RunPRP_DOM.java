@@ -26,7 +26,8 @@ public class RunPRP_DOM extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
     public static final String ruleName = "PRP_DOM";
 
-    public RunPRP_DOM(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunPRP_DOM(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -60,10 +61,11 @@ public class RunPRP_DOM extends AbstractRun {
 
                         if (triple.getSubject() >= 0) {
                             final Triple result = new ImmutableTriple(triple.getSubject(), type, c);
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
-                            }
                             outputTriples.add(result);
+                            // if (logger.isTraceEnabled()) {
+                            // logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new
+                            // ImmutableTriple(p, domain, c)) + " -> " + dictionary.printTriple(result));
+                            // }
                         }
                     }
                 }

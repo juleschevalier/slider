@@ -23,33 +23,36 @@ public class TestMultiThreadInsertTripleBuffer {
 
     public static final int PROBA = 100000;
     public static final int THREADS = 5;
-    public static final int BUFFER_SIZE = 100;
+    public static final int[] BUFFER_SIZES = { 1, 10, 100, 1000 };
     public static final int MAX_VALUE = 1020;
     public static final int TESTS = 10;
 
     @Test
     public void test() {
-        for (int k = 0; k < TESTS; k++) {
+        for (final int bufferSize : BUFFER_SIZES) {
+            for (int k = 0; k < TESTS; k++) {
 
-            final TripleBuffer tb = new QueuedTripleBufferLock(BUFFER_SIZE);
-            final SimpleBufferListener listener = new SimpleBufferListener(tb);
-            tb.addBufferListener(listener);
-            final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
+                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize);
+                final SimpleBufferListener listener = new SimpleBufferListener(tb);
+                tb.addBufferListener(listener);
+                final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
 
-            // Test buffer flush
-            final ExecutorService executor = Executors.newCachedThreadPool();
-            for (int j = 0; j < THREADS; j++) {
-                executor.submit(new RunnableAdder(generated, tb, MAX_VALUE));
+                // Test buffer flush
+                final ExecutorService executor = Executors.newCachedThreadPool();
+                for (int j = 0; j < THREADS; j++) {
+                    executor.submit(new RunnableAdder(generated, tb, MAX_VALUE));
+                }
+                executor.shutdown();
+                try {
+                    executor.awaitTermination(1, TimeUnit.DAYS);
+                } catch (final InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // Assert set equality
+                final long listenerf = listener.finish();
+                assertEquals(generated.size(), listenerf);
+
             }
-            executor.shutdown();
-            try {
-                executor.awaitTermination(1, TimeUnit.DAYS);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            // Assert set equality
-            final long listenerf = listener.finish();
-            assertEquals(generated.size(), listenerf);
 
         }
     }

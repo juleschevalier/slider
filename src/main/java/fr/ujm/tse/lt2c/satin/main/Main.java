@@ -23,7 +23,7 @@ import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
-import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
@@ -59,13 +59,12 @@ public class Main {
         }
 
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
-            logger.info(loop);
             for (final File file : arguments.getFiles()) {
 
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
 
                 if (arguments.isDumpMode()) {
-                    final File newFile = new File("infered_" + arguments.getProfile() + "_" + runEntity.getNbInferedTriples() + "_" + file.getName());
+                    final File newFile = new File("infered_" + arguments.getProfile() + "_" + file.getName());
                     if (!newFile.exists()) {
                         tripleStore.writeToFile(newFile.getName(), dictionary);
                     }
@@ -98,7 +97,7 @@ public class Main {
         if (logger.isInfoEnabled()) {
             logger.info("--------AVERAGE TIMES--------");
             for (final String file : GlobalValues.getTimeByFile().keySet()) {
-                logger.info(file + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
+                logger.info((new File(file).getName()) + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
             }
         }
         System.exit(-1);
@@ -255,6 +254,9 @@ public class Main {
                     break;
                 case "GRhoDF":
                     profile = ReasonerProfile.GRhoDF;
+                    break;
+                case "RhoDF++":
+                    profile = ReasonerProfile.RhoDFPP;
                     break;
 
                 default:

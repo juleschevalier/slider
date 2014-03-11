@@ -45,8 +45,8 @@ public class Rule implements BufferListener {
         this.maxThreads = maxThreads;
 
         this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
-        this.tripleBuffer.addBufferListener(this);
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
+        this.tripleBuffer.addBufferListener(this);
 
         this.tripleDistributor = new TripleDistributor();
 

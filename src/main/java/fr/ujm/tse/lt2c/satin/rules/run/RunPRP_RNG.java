@@ -30,7 +30,8 @@ public class RunPRP_RNG extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
     public static final String ruleName = "PRP_RNG";
 
-    public RunPRP_RNG(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunPRP_RNG(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -64,10 +65,11 @@ public class RunPRP_RNG extends AbstractRun {
 
                         if (triple.getObject() >= 0) {
                             final Triple result = new ImmutableTriple(triple.getObject(), type, c);
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p, range, c)) + " -> " + dictionary.printTriple(result));
-                            }
                             outputTriples.add(result);
+                            // if (logger.isTraceEnabled()) {
+                            // logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new
+                            // ImmutableTriple(p, range, c)) + " -> " + dictionary.printTriple(result));
+                            // }
                         }
                     }
                 }

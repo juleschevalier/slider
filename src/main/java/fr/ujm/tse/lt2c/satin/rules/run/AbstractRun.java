@@ -57,6 +57,8 @@ public abstract class AbstractRun implements RuleRun {
 
         if ((this.tripleBuffer.getOccupation()) == 0) {
             this.phaser.decrementAndGet();
+            this.phaser.notifyAll();
+
             return;
         }
 
@@ -69,6 +71,8 @@ public abstract class AbstractRun implements RuleRun {
 
             if (usableTriples == null) {
                 this.phaser.decrementAndGet();
+                this.phaser.notifyAll();
+
                 return;
             }
 
@@ -100,6 +104,7 @@ public abstract class AbstractRun implements RuleRun {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
             }
+
         }
     }
 

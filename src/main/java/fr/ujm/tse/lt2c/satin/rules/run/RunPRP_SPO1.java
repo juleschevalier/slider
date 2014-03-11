@@ -26,7 +26,8 @@ public class RunPRP_SPO1 extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = {};
     public static final String ruleName = "PRP_SPO1";
 
-    public RunPRP_SPO1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunPRP_SPO1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -58,10 +59,11 @@ public class RunPRP_SPO1 extends AbstractRun {
                     for (final Long p2 : subPropertyOfMultiMap.get(p1)) {
 
                         final Triple result = new ImmutableTriple(triple.getSubject(), p2, triple.getObject());
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
-                        }
                         outputTriples.add(result);
+                        // if (logger.isTraceEnabled()) {
+                        // logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new
+                        // ImmutableTriple(p1, subPropertyOf, p2)) + " -> " + dictionary.printTriple(result));
+                        // }
                     }
 
                 }

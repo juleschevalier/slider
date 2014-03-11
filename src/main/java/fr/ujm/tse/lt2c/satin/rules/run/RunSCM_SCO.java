@@ -30,7 +30,8 @@ public class RunSCM_SCO extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subClassOf };
     public static final String ruleName = "SCM_SCO";
 
-    public RunSCM_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunSCM_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -70,10 +71,14 @@ public class RunSCM_SCO extends AbstractRun {
                         if (!ts1.contains(triple.getSubject(), subClassOf, c1a) && !ts2.contains(triple.getSubject(), subClassOf, c1a)) {
                             final Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
                             outputTriples.add(result);
-
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(this.dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + this.dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c1a)) + " -> " + this.dictionary.printTriple(result));
-                            }
+                            // if (logger.isTraceEnabled()) {
+                            // logger.trace(ruleName + ": "
+                            // + this.dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf,
+                            // triple.getObject())) + " & "
+                            // + this.dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c1a)) +
+                            // " -> "
+                            // + this.dictionary.printTriple(result));
+                            // }
                         }
                     }
 

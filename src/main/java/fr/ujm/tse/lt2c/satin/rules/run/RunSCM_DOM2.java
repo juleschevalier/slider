@@ -30,7 +30,8 @@ public class RunSCM_DOM2 extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.domain };
     public static final String ruleName = "SCM_DOM2";
 
-    public RunSCM_DOM2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunSCM_DOM2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -70,10 +71,11 @@ public class RunSCM_DOM2 extends AbstractRun {
 
                     final Triple result = new ImmutableTriple(triple.getSubject(), domain, c);
                     outputTriples.add(result);
-
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), domain, c)) + " -> " + dictionary.printTriple(result));
-                    }
+                    // if (logger.isTraceEnabled()) {
+                    // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf,
+                    // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
+                    // domain, c)) + " -> " + dictionary.printTriple(result));
+                    // }
                 }
             }
         }

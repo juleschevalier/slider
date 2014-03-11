@@ -29,7 +29,8 @@ public class RunSCM_EQC2 extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.equivalentClass };
     public static final String ruleName = "SCM_EQC2";
 
-    public RunSCM_EQC2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunSCM_EQC2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
 
     }
@@ -70,10 +71,11 @@ public class RunSCM_EQC2 extends AbstractRun {
 
                         final Triple result = new ImmutableTriple(triple.getSubject(), equivalentClass, triple.getObject());
                         outputTriples.add(result);
-
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
-                        }
+                        // if (logger.isTraceEnabled()) {
+                        // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf,
+                        // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
+                        // subClassOf, triple.getSubject())) + " -> " + dictionary.printTriple(result));
+                        // }
                     }
                 }
             }

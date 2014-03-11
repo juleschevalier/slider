@@ -3,7 +3,7 @@ package fr.ujm.tse.lt2c.satin.utils;
 import java.io.File;
 import java.util.List;
 
-import fr.ujm.tse.lt2c.satin.rules.run.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
 
 public class ReasoningArguments {
 

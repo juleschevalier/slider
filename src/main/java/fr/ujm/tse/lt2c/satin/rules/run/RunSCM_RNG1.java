@@ -30,7 +30,8 @@ public class RunSCM_RNG1 extends AbstractRun {
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.range };
     public static final String ruleName = "SCM_RNG1";
 
-    public RunSCM_RNG1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+    public RunSCM_RNG1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
+            final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
     }
 
@@ -69,10 +70,11 @@ public class RunSCM_RNG1 extends AbstractRun {
 
                     final Triple result = new ImmutableTriple(triple.getSubject(), range, c2);
                     outputTriples.add(result);
-
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), range, triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c2)) + " -> " + dictionary.printTriple(result));
-                    }
+                    // if (logger.isTraceEnabled()) {
+                    // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), range,
+                    // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
+                    // subClassOf, c2)) + " -> " + dictionary.printTriple(result));
+                    // }
                 }
             }
         }
