@@ -25,10 +25,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  */
 public class RunCAX_SCO extends AbstractRun {
 
-    private static final Logger logger = Logger.getLogger(RunCAX_SCO.class);
+    private static final Logger LOGGER = Logger.getLogger(RunCAX_SCO.class);
+    private static final String ruleName = "CAX_SCO";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf, AbstractDictionary.type };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
-    public static final String ruleName = "CAX_SCO";
 
     public RunCAX_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
@@ -82,7 +82,7 @@ public class RunCAX_SCO extends AbstractRun {
 
     @Override
     public Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     @Override

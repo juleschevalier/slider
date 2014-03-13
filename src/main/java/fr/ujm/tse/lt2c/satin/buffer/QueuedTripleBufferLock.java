@@ -34,15 +34,12 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     String debugName;
 
-    long lastFlush;
-
     /**
      * Constructor
      */
     public QueuedTripleBufferLock(final long bufferSize) {
         this.triples = new ConcurrentLinkedQueue<>();
         this.bufferListeners = new HashSet<>();
-        this.lastFlush = System.nanoTime();
         this.currentBuffer = new AtomicInteger();
         this.bufferSize = bufferSize;
     }
@@ -109,7 +106,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            this.lastFlush = System.nanoTime();
             this.rwlock.writeLock().unlock();
             synchronized (this) {
                 this.notifyAll();
@@ -142,11 +138,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public Collection<BufferListener> getBufferListeners() {
         return this.bufferListeners;
-    }
-
-    @Override
-    public long getLastFlush() {
-        return this.lastFlush;
     }
 
     @Override

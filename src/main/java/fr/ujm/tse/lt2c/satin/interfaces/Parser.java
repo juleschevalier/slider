@@ -10,18 +10,24 @@ import com.hp.hpl.jena.rdf.model.Model;
 public interface Parser {
 
     /**
-     * Parse and "save" the ontology's triples in the TripleStore
+     * Parse and "save" the ontology's triples from a file in the TripleStore
      * 
      * @param fileInput
      */
     void parse(String fileInput);
+
+    /**
+     * Parse and "save" the ontology's triples from a model in the TripleStore
+     * 
+     * @param model
+     * @see Model
+     */
+    void parse(Model model);
 
     @Override
     int hashCode();
 
     @Override
     boolean equals(Object obj);
-
-    void parse(Model model);
 
 }

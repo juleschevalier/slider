@@ -14,7 +14,7 @@ import com.google.common.collect.Multimap;
 public interface TripleStore {
 
     /**
-     * Add the triple to the TripleStore
+     * Add the triple t to the TripleStore
      * 
      * @param t
      * @see Triple
@@ -27,7 +27,6 @@ public interface TripleStore {
      * @param s
      * @param p
      * @param o
-     * @see Triple
      */
     void add(long s, long p, long o);
 
@@ -73,7 +72,7 @@ public interface TripleStore {
     long size();
 
     /**
-     * Writes the TripleStore in a file in a RAW format
+     * Writes the TripleStore in a file in a defined format
      * 
      * @param file
      * @param dictionary
@@ -98,7 +97,6 @@ public interface TripleStore {
      * @param p
      * @param o
      * @return true if the TripleStore contains triple <s,p,o>, false else
-     * @see Triple
      */
     boolean contains(long s, long p, long o);
 
@@ -108,10 +106,9 @@ public interface TripleStore {
     void clear();
 
     /**
-     * Optional operation
-     * 
      * @param p
-     * @return the triples with p as predicate, as a multimap
+     * @return the triples with p as predicate, as a Multimap
+     * @see Multimap
      */
     Multimap<Long, Long> getMultiMapForPredicate(long p);
 
@@ -125,13 +122,5 @@ public interface TripleStore {
      * @return all the predicates in a Collection
      */
     Collection<Long> getPredicates();
-
-    /**
-     * TODO Comment
-     * 
-     * @param newTriples
-     * @param inferred
-     */
-    void merge(Collection<Triple> newTriples, Collection<Triple> inferred);
 
 }

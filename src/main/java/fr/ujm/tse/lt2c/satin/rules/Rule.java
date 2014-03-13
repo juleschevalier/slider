@@ -3,8 +3,6 @@ package fr.ujm.tse.lt2c.satin.rules;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
-
 import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
@@ -15,8 +13,6 @@ import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.rules.run.RunFactory;
 
 public class Rule implements BufferListener {
-
-    private static Logger logger = Logger.getLogger(Rule.class);
 
     /**
      * The Buffer receives the triples, notify the object when it's full

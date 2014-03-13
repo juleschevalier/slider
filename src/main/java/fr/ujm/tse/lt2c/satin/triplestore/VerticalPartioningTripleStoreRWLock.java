@@ -49,13 +49,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         this.triples = 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#add(fr.ujm.tse.lt2c.satin
-     * .interfaces.Triple)
-     */
     @Override
     public boolean add(final Triple t) {
         this.rwlock.writeLock().lock();
@@ -90,12 +83,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return exists;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#addAll(java.util.Collection)
-     */
     @Override
     public Collection<Triple> addAll(final Collection<Triple> triples) {
         this.rwlock.writeLock().lock();
@@ -116,29 +103,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
     }
 
     @Override
-    public void merge(final Collection<Triple> newTriples, final Collection<Triple> inferred) {
-        this.rwlock.writeLock().lock();
-        try {
-            for (final Triple triple : inferred) {
-                if (!this.containsNoLock(triple.getSubject(), triple.getPredicate(), triple.getObject())) {
-                    newTriples.add(triple);
-                    this.addNoLock(triple);
-                }
-
-            }
-        } catch (final Exception e) {
-            logger.error("", e);
-        } finally {
-            this.rwlock.writeLock().unlock();
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#getAll()
-     */
-    @Override
     public Collection<Triple> getAll() {
         this.rwlock.readLock().lock();
         final Collection<Triple> result = new ArrayList<>(this.triples);
@@ -157,11 +121,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#getbySubject(long)
-     */
     @Override
     public Collection<Triple> getbySubject(final long s) {
         this.rwlock.readLock().lock();
@@ -186,11 +145,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#getbyPredicate(long)
-     */
     @Override
     public Collection<Triple> getbyPredicate(final long p) {
         this.rwlock.readLock().lock();
@@ -210,11 +164,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#getbyObject(long)
-     */
     @Override
     public Collection<Triple> getbyObject(final long o) {
         this.rwlock.readLock().lock();
@@ -239,11 +188,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#size()
-     */
     @Override
     public long size() {
         this.rwlock.readLock().lock();
@@ -259,11 +203,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#isEmpty()
-     */
     @Override
     public boolean isEmpty() {
         this.rwlock.readLock().lock();
@@ -279,13 +218,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#writeToFile(java.lang.String
-     * , fr.ujm.tse.lt2c.satin.interfaces.Dictionary)
-     */
     @Override
     public void writeToFile(final String file, final Dictionary dictionary) {
         // Create an empty model.
@@ -302,20 +234,13 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("", e);
         } catch (final IOException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#contains(fr.ujm.tse.lt2c
-     * .satin.interfaces.Triple)
-     */
     @Override
     public boolean contains(final Triple triple) {
         this.rwlock.readLock().lock();
@@ -331,13 +256,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#contains(fr.ujm.tse.lt2c
-     * .satin.interfaces.Triple)
-     */
     @Override
     public boolean contains(final long s, final long p, final long o) {
         this.rwlock.readLock().lock();
@@ -361,13 +279,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.ujm.tse.lt2c.satin.interfaces.TripleStore#getMultiMapForPredicate(
-     * long)
-     */
     @Override
     public Multimap<Long, Long> getMultiMapForPredicate(final long p) {
         this.rwlock.readLock().lock();
@@ -390,11 +301,6 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         return this.internalstore.keySet();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.interfaces.TripleStore#clear()
-     */
     @Override
     public void clear() {
         this.rwlock.readLock().lock();

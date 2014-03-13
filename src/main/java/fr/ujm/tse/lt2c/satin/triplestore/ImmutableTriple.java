@@ -21,95 +21,65 @@ public final class ImmutableTriple implements Triple {
      * @param predicate
      * @param object
      */
-    public ImmutableTriple(long subject, long predicate, long object) {
+    public ImmutableTriple(final long subject, final long predicate, final long object) {
         super();
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Triple#getSubject()
-     */
     @Override
     public long getSubject() {
-        return subject;
+        return this.subject;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Triple#getPredicate()
-     */
     @Override
     public long getPredicate() {
-        return predicate;
+        return this.predicate;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Triple#getObject()
-     */
     @Override
     public long getObject() {
-        return object;
+        return this.object;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Triple#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (object ^ (object >>> 32));
-        result = prime * result + (int) (predicate ^ (predicate >>> 32));
-        result = prime * result + (int) (subject ^ (subject >>> 32));
+        result = (prime * result) + (int) (this.object ^ (this.object >>> 32));
+        result = (prime * result) + (int) (this.predicate ^ (this.predicate >>> 32));
+        result = (prime * result) + (int) (this.subject ^ (this.subject >>> 32));
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Triple#equals(Object obj)
-     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
-        ImmutableTriple other = (ImmutableTriple) obj;
-        if (object != other.object) {
+        final ImmutableTriple other = (ImmutableTriple) obj;
+        if (this.object != other.object) {
             return false;
         }
-        if (predicate != other.predicate) {
+        if (this.predicate != other.predicate) {
             return false;
         }
-        if (subject != other.subject) {
+        if (this.subject != other.subject) {
             return false;
         }
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "[" + subject + ", " + predicate + ", " + object + "]";
+        return "[" + this.subject + ", " + this.predicate + ", " + this.object + "]";
     }
 
 }

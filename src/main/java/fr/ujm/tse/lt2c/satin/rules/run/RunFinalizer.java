@@ -33,6 +33,7 @@ public class RunFinalizer implements BufferListener {
     private final ExecutorService executor;
     private final AtomicInteger phaser;
     private final ReasonerProfile profile;
+    private final boolean useful;
 
     public RunFinalizer(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final ExecutorService executor,
             final AtomicInteger phaser, final int bufferSize) {
@@ -43,6 +44,14 @@ public class RunFinalizer implements BufferListener {
         this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
         this.tripleBuffer.addBufferListener(this);
         this.profile = profile;
+        switch (profile) {
+        case RhoDFPP:
+            this.useful = true;
+            break;
+        default:
+            this.useful = false;
+            break;
+        }
     }
 
     public void addTriples(final Collection<Triple> triples) {
@@ -53,13 +62,13 @@ public class RunFinalizer implements BufferListener {
     public boolean bufferFull() {
         switch (this.profile) {
         case RhoDFPP:
-            return this.bufferFullGRhoDF();
+            return this.bufferFullRhoDFPP();
         default:
             return true;
         }
     }
 
-    public boolean bufferFullGRhoDF() {
+    public boolean bufferFullRhoDFPP() {
         final Runnable run = new Runnable() {
             @Override
             public void run() {
@@ -144,6 +153,10 @@ public class RunFinalizer implements BufferListener {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public boolean isUseful() {
+        return this.useful;
     }
 
     @Override

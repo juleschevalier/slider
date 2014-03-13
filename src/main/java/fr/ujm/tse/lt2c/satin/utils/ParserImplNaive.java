@@ -31,11 +31,6 @@ public class ParserImplNaive implements Parser {
         this.tripleStore = tripleStore;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.ujm.tse.lt2c.satin.Parser#parse()
-     */
     @Override
     public void parse(final String fileInput) {
 

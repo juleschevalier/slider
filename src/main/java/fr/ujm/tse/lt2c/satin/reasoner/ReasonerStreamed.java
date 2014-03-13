@@ -43,18 +43,33 @@ import fr.ujm.tse.lt2c.satin.utils.RunEntity;
  */
 public class ReasonerStreamed {
 
-    private static final Logger logger = Logger.getLogger(ReasonerStreamed.class);
+    private static final Logger LOGGER = Logger.getLogger(ReasonerStreamed.class);
 
     private static final int SESSION_ID = UUID.randomUUID().hashCode();
     private static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
 
-    private final int threadsPerCore;
     private int maxThreads = AVAILABLE_CORES;
     private final int bufferSize;
     private final ReasonerProfile profile;
     private static ExecutorService executor;
     private final TripleStore tripleStore;
     private final Dictionary dictionary;
+
+    /*
+     * Static fields for logging
+     */
+    private static String machine;
+    private static long ram;
+    static {
+        machine = "";
+        try {
+            machine = InetAddress.getLocalHost().getHostName();
+        } catch (final UnknownHostException e) {
+            LOGGER.error("", e);
+        }
+        machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
+        ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
+    }
 
     /*
      * Constructors
@@ -65,8 +80,7 @@ public class ReasonerStreamed {
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
         this.profile = profile;
-        this.threadsPerCore = threadsPerCore;
-        this.maxThreads = AVAILABLE_CORES * this.threadsPerCore;
+        this.maxThreads = AVAILABLE_CORES * threadsPerCore;
         this.bufferSize = bufferSize;
     }
 
@@ -76,26 +90,46 @@ public class ReasonerStreamed {
 
     public RunEntity infereFromFile(final String input) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inference from file " + input);
+        }
+
         /* File parsing */
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Parsing");
+        }
         long debugParsingTime = System.nanoTime();
         final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
         parser.parse(input);
         debugParsingTime = System.nanoTime() - debugParsingTime;
 
         /* Inference */
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inference");
+        }
         return this.infere(input, debugParsingTime);
 
     }
 
     public RunEntity infereFromModel(final Model model) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inference from file " + model.toString());
+        }
+
         /* Model parsing */
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Parsing");
+        }
         long debugParsingTime = System.nanoTime();
         final Parser parser = new ParserImplNaive(this.dictionary, this.tripleStore);
         parser.parse(model);
         debugParsingTime = System.nanoTime() - debugParsingTime;
 
         /* Inference */
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inference");
+        }
         return this.infere("Model", debugParsingTime);
 
     }
@@ -103,7 +137,6 @@ public class ReasonerStreamed {
     private RunEntity infere(final String input, final long debugParsingTime) {
 
         /* Initialize structures */
-
         final TripleManager tripleManager = new TripleManager();
         final AtomicInteger phaser = new AtomicInteger();
         executor = Executors.newFixedThreadPool(this.maxThreads);
@@ -120,6 +153,9 @@ public class ReasonerStreamed {
 
         final long debugStartTime = System.nanoTime();
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Send all triples for inference");
+        }
         tripleManager.addTriples(this.tripleStore.getAll());
 
         /*
@@ -127,6 +163,10 @@ public class ReasonerStreamed {
          * the end
          */
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Done.");
+            LOGGER.debug("Notify the buffers to flush last triples");
+        }
         long nonEmptyBuffers = tripleManager.flushBuffers();
         while (nonEmptyBuffers > 0) {
 
@@ -136,12 +176,15 @@ public class ReasonerStreamed {
                     try {
                         phaser.wait();
                     } catch (final InterruptedException e) {
-                        logger.error("", e);
+                        LOGGER.error("", e);
                     }
                     stillRunnning = phaser.get();
                 }
             }
 
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Notify the buffers to flush last triples");
+            }
             nonEmptyBuffers = tripleManager.flushBuffers();
 
         }
@@ -149,7 +192,10 @@ public class ReasonerStreamed {
         /* Reasoning must be ended */
 
         /* Infer last triples */
-        this.finalyze(this.profile, this.tripleStore, this.dictionary, phaser);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Infere last triples (finalization)");
+        }
+        this.finalize(this.profile, this.tripleStore, this.dictionary, phaser);
 
         shutdownAndAwaitTermination(executor);
 
@@ -159,26 +205,22 @@ public class ReasonerStreamed {
 
         final long debugEndTime = System.nanoTime();
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Infere over");
+        }
+
         /*
          * Some information display
          */
 
         /* Make runEntity */
-        String machine = "";
-        try {
-            machine = InetAddress.getLocalHost().getHostName();
-        } catch (final UnknownHostException e) {
-            logger.error("", e);
-        }
-        machine += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
-        final long ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
         final RunEntity runEntity = new RunEntity(machine, AVAILABLE_CORES, ram, this.maxThreads, this.bufferSize, "Stream", this.profile.name(), SESSION_ID,
                 input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "",
                 GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule());
 
-        if (logger.isInfoEnabled()) {
+        if (LOGGER.isInfoEnabled()) {
 
-            logger.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
+            LOGGER.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
                     + ") in " + Main.nsToTime(debugEndTime - debugStartTime));
 
         }
@@ -225,27 +267,28 @@ public class ReasonerStreamed {
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             break;
         default:
-            logger.error("Reasoner profile unknown: " + profile);
+            LOGGER.error("Reasoner profile unknown: " + profile);
             break;
         }
 
     }
 
-    private void finalyze(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
-        // TODO Watch for useless finalizations
+    private void finalize(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
         final RunFinalizer finalizer = new RunFinalizer(tripleStore, dictionary, profile, executor, phaser, this.bufferSize);
-        finalizer.addTriples(tripleStore.getAll());
-        finalizer.clearBuffer();
+        if (finalizer.isUseful()) {
+            finalizer.addTriples(tripleStore.getAll());
+            finalizer.clearBuffer();
 
-        synchronized (phaser) {
-            long running = phaser.get();
-            while (running > 0) {
-                try {
-                    phaser.wait();
-                } catch (final InterruptedException e1) {
-                    logger.error("", e1);
+            synchronized (phaser) {
+                long running = phaser.get();
+                while (running > 0) {
+                    try {
+                        phaser.wait();
+                    } catch (final InterruptedException e1) {
+                        LOGGER.error("", e1);
+                    }
+                    running = phaser.get();
                 }
-                running = phaser.get();
             }
         }
 
@@ -269,14 +312,13 @@ public class ReasonerStreamed {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } catch (final IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
     static void shutdownAndAwaitTermination(final ExecutorService pool) {
-        // System.exit(-1);
         // Disable new tasks from being submitted
         pool.shutdown();
         try {
@@ -286,12 +328,12 @@ public class ReasonerStreamed {
                 pool.shutdownNow();
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(50, TimeUnit.MILLISECONDS)) {
-                    logger.error("Pool did not terminate");
+                    LOGGER.error("Pool did not terminate");
                 }
             }
         } catch (final InterruptedException ie) {
             // (Re-)Cancel if current thread also interrupted
-            logger.error("", ie);
+            LOGGER.error("", ie);
             pool.shutdownNow();
 
             // Preserve interrupt status

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
 
@@ -15,8 +13,6 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  * @author Jules Chevalier
  */
 public class TripleManager {
-
-    private static final Logger logger = Logger.getLogger(TripleManager.class);
 
     List<Rule> rules;
     TripleDistributor generalDistributor;
@@ -28,7 +24,6 @@ public class TripleManager {
         super();
         this.rules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
-        this.generalDistributor.setName("T_MANAGER");
     }
 
     /**
@@ -65,7 +60,7 @@ public class TripleManager {
     /**
      * Used once all triples are sent.
      * Notify any rules with non-empty buffer to stop waiting for new ones and
-     * infere on them
+     * infers on them
      * 
      * @return the number of rules with non-empty buffers
      */

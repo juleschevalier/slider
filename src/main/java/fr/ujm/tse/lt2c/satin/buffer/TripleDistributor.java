@@ -13,7 +13,6 @@ public class TripleDistributor {
 
     private final Multimap<Long, TripleBuffer> subscribers;
     private final Collection<TripleBuffer> universalSubscribers;
-    private String debugName;
 
     /**
      * Constructor
@@ -22,7 +21,6 @@ public class TripleDistributor {
         super();
         this.subscribers = HashMultimap.create();
         this.universalSubscribers = new HashSet<>();
-        this.debugName = "";
     }
 
     /**
@@ -69,13 +67,6 @@ public class TripleDistributor {
             debugDistributed++;
         }
         return debugDistributed;
-    }
-
-    /**
-     * @param name
-     */
-    public void setName(final String name) {
-        this.debugName = name;
     }
 
     /**

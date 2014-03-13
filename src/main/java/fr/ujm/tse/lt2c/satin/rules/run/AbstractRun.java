@@ -43,9 +43,6 @@ public abstract class AbstractRun implements RuleRun {
         this.distributor = tripleDistributor;
         this.tripleBuffer = tripleBuffer;
         this.phaser = phaser;
-
-        this.ruleName = this.toString();
-        this.distributor.setName(this.ruleName + " Distributor");
     }
 
     @Override

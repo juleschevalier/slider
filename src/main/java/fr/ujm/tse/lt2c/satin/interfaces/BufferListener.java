@@ -10,7 +10,7 @@ import java.util.EventListener;
 public interface BufferListener extends EventListener {
 
     /**
-     * Invocated when the buffer is full
+     * Method invocated when the buffer is full
      */
     boolean bufferFull();
 

@@ -3,7 +3,7 @@ package fr.ujm.tse.lt2c.satin.interfaces;
 import java.util.Collection;
 
 /**
- * Interface for triple buffer
+ * Interface for FIFO triple buffer
  * 
  * @author jules
  * 
@@ -21,14 +21,8 @@ public interface TripleBuffer {
     boolean add(Triple triple);
 
     /**
-     * Following operations are performed :
-     * <ol>
-     * <li>Returns the second full buffer</li>
-     * <li>Empty the second buffer</li>
-     * 
-     * </ol>
-     * 
-     * @return
+     * @return the bufferSize first triples inserted in a TripleStore
+     * @See TripleStore
      */
     TripleStore clear();
 
@@ -40,16 +34,18 @@ public interface TripleBuffer {
      */
     void addBufferListener(BufferListener bufferListener);
 
+    /**
+     * @return the buffer listeners in a collection
+     * @see BufferListener
+     */
     Collection<BufferListener> getBufferListeners();
 
     /**
-     * 
-     * @return the size limit of the main buffer
+     * @return the limit size when bufferFull() is sent
      */
     long getBufferLimit();
 
     /**
-     * 
      * @return all triples in the main buffer
      * @see Triple
      */
@@ -61,22 +57,30 @@ public interface TripleBuffer {
     void sendFullBuffer();
 
     /**
-     * @return the timestamp since the last time the buffer were flushed
-     */
-    long getLastFlush();
-
-    /**
+     * For debugging, set the name used by logger
+     * 
      * @param name
      */
     void setDebugName(String name);
 
     /**
-     * @return the name for debugging
+     * @return the name used by logger for debugging
      */
     String getDebugName();
 
+    /**
+     * @return the number of triples stored
+     */
     long getOccupation();
 
+    /**
+     * Add all the triples to the buffer.
+     * Notifies subcsribers of "bufferfull" if needed
+     * 
+     * @param triples
+     * @return true if the insertion succeed
+     * @see Triple
+     */
     boolean addAll(Collection<Triple> triples);
 
 }

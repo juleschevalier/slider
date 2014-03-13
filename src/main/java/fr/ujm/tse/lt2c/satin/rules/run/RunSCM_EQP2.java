@@ -17,15 +17,18 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
- * INPUT c1 rdfs:subPropertyOf c2 c2 rdfs:subPropertyOf c1 OUPUT c1
- * owl:equivalentProperty c2
+ * INPUT
+ * c1 rdfs:subPropertyOf c2
+ * c2 rdfs:subPropertyOf c1
+ * OUPUT
+ * c1 owl:equivalentProperty c2
  */
 public class RunSCM_EQP2 extends AbstractRun {
 
-    private static final Logger logger = Logger.getLogger(RunSCM_EQP2.class);
+    private static final Logger LOGGER = Logger.getLogger(RunSCM_EQP2.class);
+    private static final String ruleName = "SCM_EQP2";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.equivalentProperty };
-    public static final String ruleName = "SCM_EQP2";
 
     public RunSCM_EQP2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
@@ -84,7 +87,7 @@ public class RunSCM_EQP2 extends AbstractRun {
 
     @Override
     public Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     @Override

@@ -17,14 +17,18 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 /**
- * INPUT p1 rdfs:subPropertyOf p2 x p1 y OUPUT x p2 y
+ * INPUT
+ * p1 rdfs:subPropertyOf p2
+ * x p1 y
+ * OUPUT
+ * x p2 y
  */
 public class RunPRP_SPO1 extends AbstractRun {
 
-    private static final Logger logger = Logger.getLogger(RunPRP_SPO1.class);
+    private static final Logger LOGGER = Logger.getLogger(RunPRP_SPO1.class);
+    private static final String ruleName = "PRP_SPO1";
     public static final long[] INPUT_MATCHERS = {};
     public static final long[] OUTPUT_MATCHERS = {};
-    public static final String ruleName = "PRP_SPO1";
 
     public RunPRP_SPO1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
@@ -76,7 +80,7 @@ public class RunPRP_SPO1 extends AbstractRun {
 
     @Override
     public Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     @Override

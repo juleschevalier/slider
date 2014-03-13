@@ -25,10 +25,10 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  */
 public class RunSCM_SCO extends AbstractRun {
 
-    private static final Logger logger = Logger.getLogger(RunSCM_SCO.class);
+    private static final Logger LOGGER = Logger.getLogger(RunSCM_SCO.class);
+    private static final String ruleName = "SCM_SCO";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subClassOf };
-    public static final String ruleName = "SCM_SCO";
 
     public RunSCM_SCO(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
@@ -92,7 +92,7 @@ public class RunSCM_SCO extends AbstractRun {
 
     @Override
     public Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     @Override

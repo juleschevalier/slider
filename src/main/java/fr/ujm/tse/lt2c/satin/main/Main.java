@@ -29,17 +29,33 @@ import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
+/**
+ * usage: main
+ * -b,--buffer-size <size>......set the buffer size
+ * -c,--cumulative..............does not reinit data for each file
+ * -d,--directory <directory>...infere on all ontologies in the directory
+ * -h,--help....................print this message
+ * -i,--iteration <number>......how many times each file
+ * -m,--mongo-save..............persists the results in MongoDB
+ * -o,--output..................save output into file
+ * -p,--profile <profile>.......set the fragment [GRhoDF, RhoDF, RhoDFPP]
+ * -t,--threads <number>........set the number of threads by avaible core
+ * 
+ * @author Jules Chevalier
+ */
 public class Main {
 
-    private static final Logger logger = Logger.getLogger(Main.class);
+    private Main() {
+    }
 
-    private final static int DEFAULT_THREADS_PER_CORE = 10;
-    private final static int DEFAULT_BUFFER_SIZE = 100;
-    private final static long DEFAULT_TIMEOUT = 100;
-    private final static boolean DEFAULT_CUMULATIVE_MODE = false;
-    private final static boolean DEFAULT_DUMP_MODE = false;
-    private final static boolean DEFAULT_PERSIST_MODE = false;
-    private final static ReasonerProfile DEFAULT_PROFILE = ReasonerProfile.RhoDF;
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
+
+    private static final int DEFAULT_THREADS_PER_CORE = 10;
+    private static final int DEFAULT_BUFFER_SIZE = 100;
+    private static final boolean DEFAULT_CUMULATIVE_MODE = false;
+    private static final boolean DEFAULT_DUMP_MODE = false;
+    private static final boolean DEFAULT_PERSIST_MODE = false;
+    private static final ReasonerProfile DEFAULT_PROFILE = ReasonerProfile.RhoDF;
 
     public static void main(final String[] args) {
 
@@ -54,7 +70,7 @@ public class Main {
         ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
 
         if (arguments.getFiles().isEmpty()) {
-            logger.warn("Well, without files I can't do anything, you know ?");
+            LOGGER.warn("Well, without files I can't do anything, you know ?");
             return;
         }
 
@@ -74,15 +90,14 @@ public class Main {
                 GlobalValues.reset();
 
                 if (arguments.isPersistMode()) {
-                    final MongoClient client;
                     try {
-                        client = new MongoClient("10.20.0.57");
+                        final MongoClient client = new MongoClient("10.20.0.57");
                         final Morphia morphia = new Morphia();
                         morphia.map(RunEntity.class);
                         final Datastore ds = morphia.createDatastore(client, "RunResults");
                         ds.save(runEntity);
                     } catch (final Exception e) {
-                        logger.error("", e);
+                        LOGGER.error("", e);
                     }
                 }
 
@@ -94,10 +109,10 @@ public class Main {
             }
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("--------AVERAGE TIMES--------");
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("--------AVERAGE TIMES--------");
             for (final String file : GlobalValues.getTimeByFile().keySet()) {
-                logger.info((new File(file).getName()) + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
+                LOGGER.info((new File(file).getName()) + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
             }
         }
         System.exit(-1);
@@ -109,7 +124,6 @@ public class Main {
         /* Reasoner fields */
         int threadsPerCore = DEFAULT_THREADS_PER_CORE;
         int bufferSize = DEFAULT_BUFFER_SIZE;
-        long timeout = DEFAULT_TIMEOUT;
         int iteration = 1;
         boolean cumulativeMode = DEFAULT_CUMULATIVE_MODE;
         ReasonerProfile profile = DEFAULT_PROFILE;
@@ -124,57 +138,42 @@ public class Main {
 
         final Options options = new Options();
 
-        // options.addOption("buffer", true, "set the buffer size");
-        final Option bufferSizeO = new Option("buffer", "set the buffer size");
+        final Option bufferSizeO = new Option("b", "buffer-size", true, "set the buffer size");
         bufferSizeO.setArgName("size");
         bufferSizeO.setArgs(1);
         bufferSizeO.setType(Number.class);
         options.addOption(bufferSizeO);
 
-        final Option iterationO = new Option("iteration", "how many times each file ");
+        final Option iterationO = new Option("i", "iteration", true, "how many times each file ");
         iterationO.setArgName("number");
         iterationO.setArgs(1);
         iterationO.setType(Number.class);
         options.addOption(iterationO);
 
-        options.addOption("cumulative", false, "does not reinit data for each file");
+        options.addOption("c", "cumulative", false, "does not reinit data for each file");
 
-        // options.addOption("directory", false,
-        // "parameters are directories instead of files. Inferes on all files in it");
-        final Option directoryO = new Option("d", "infere on all ontologies in the indicated directory");
+        final Option directoryO = new Option("d", "directory", true, "infere on all ontologies in the directory");
         directoryO.setArgName("directory");
         directoryO.setArgs(1);
         directoryO.setType(File.class);
         options.addOption(directoryO);
 
-        options.addOption("dump", false, "enable dump of inferred triples");
+        options.addOption("o", "output", false, "save output into file");
 
-        options.addOption("help", false, "print this message");
+        options.addOption("h", "help", false, "print this message");
 
-        options.addOption("persist", false, "persists the results in MongoDB");
+        options.addOption("m", "mongo-save", false, "persists the results in MongoDB");
 
-        // options.addOption("profile", true,
-        // "set the fragment (RDFS, RhoDF, ...)");
-        final Option profileO = new Option("profile", "set the fragment " + ReasonerProfile.values());
+        final Option profileO = new Option("p", "profile", true, "set the fragment " + java.util.Arrays.asList(ReasonerProfile.values()));
         profileO.setArgName("profile");
         profileO.setArgs(1);
         options.addOption(profileO);
 
-        // options.addOption("threads", true,
-        // "set the number of threads by avaible cores");
-        final Option threadsO = new Option("threads", "set the number of threads by avaible cores");
+        final Option threadsO = new Option("t", "threads", true, "set the number of threads by avaible core");
         threadsO.setArgName("number");
         threadsO.setArgs(1);
         threadsO.setType(Number.class);
         options.addOption(threadsO);
-
-        // options.addOption("timeout", true,
-        // "enable and set timeout before a non-full buffer is flushed, in ms");
-        final Option timeoutO = new Option("timeout", "enable and set timeout before a non-full buffer is flushed, in ms");
-        timeoutO.setArgName("time");
-        timeoutO.setArgs(1);
-        timeoutO.setType(Number.class);
-        options.addOption(timeoutO);
 
         /*
          * Arguments parsing
@@ -190,59 +189,52 @@ public class Main {
                 return null;
             }
 
-            if (logger.isInfoEnabled()) {
-                logger.info("******** OPTIONS ********");
-            }
-
             /* buffer */
-            if (cmd.hasOption("buffer")) {
-                final String arg = cmd.getOptionValue("buffer");
+            if (cmd.hasOption("buffer-size")) {
+                final String arg = cmd.getOptionValue("buffer-size");
                 try {
                     bufferSize = Integer.parseInt(arg);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("buffer: " + bufferSize);
-                    }
                 } catch (final NumberFormatException e) {
-                    logger.error("Buffer size must be a number. Option ignored");
+                    LOGGER.error("Buffer size must be a number. Default value used");
                 }
             }
             /* cumulative */
             if (cmd.hasOption("cumulative")) {
                 cumulativeMode = true;
-                if (logger.isInfoEnabled()) {
-                    logger.info("Cumulative mode enabled");
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Cumulative mode enabled");
                 }
             }
             /* dump */
-            if (cmd.hasOption("dump")) {
+            if (cmd.hasOption("output")) {
                 dumpMode = true;
-                if (logger.isInfoEnabled()) {
-                    logger.info("Dump mode enabled");
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Dump mode enabled");
                 }
             }
             /* directory */
             String dir = null;
-            if (cmd.hasOption("d")) {
-                for (final Object o : cmd.getOptionValues("d")) {
+            if (cmd.hasOption("directory")) {
+                for (final Object o : cmd.getOptionValues("directory")) {
                     String arg = o.toString();
                     if (arg.startsWith("~" + File.separator)) {
                         arg = System.getProperty("user.home") + arg.substring(1);
                     }
                     final File directory = new File(arg);
                     if (!directory.exists()) {
-                        logger.warn("**Cant not find " + directory);
+                        LOGGER.warn("**Cant not find " + directory);
                     } else if (!directory.isDirectory()) {
-                        logger.warn("**" + directory + " is not a directory");
+                        LOGGER.warn("**" + directory + " is not a directory");
                     } else {
                         dir = directory.getAbsolutePath();
                     }
                 }
             }
             /* persist */
-            if (cmd.hasOption("persist")) {
+            if (cmd.hasOption("mongo-save")) {
                 persistMode = true;
-                if (logger.isInfoEnabled()) {
-                    logger.info("Persist mode enabled");
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Persist mode enabled");
                 }
             }
             /* profile */
@@ -260,12 +252,9 @@ public class Main {
                     break;
 
                 default:
-                    logger.warn("Profile unknown, default profile used: " + DEFAULT_PROFILE);
+                    LOGGER.warn("Profile unknown, default profile used: " + DEFAULT_PROFILE);
                     profile = DEFAULT_PROFILE;
                     break;
-                }
-                if (logger.isInfoEnabled()) {
-                    logger.info("Profile: " + profile);
                 }
             }
             /* threads */
@@ -273,20 +262,8 @@ public class Main {
                 final String arg = cmd.getOptionValue("threads");
                 try {
                     threadsPerCore = Integer.parseInt(arg);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Threads: " + iteration);
-                    }
                 } catch (final NumberFormatException e) {
-                    logger.error("Threads must be a number. Option ignored");
-                }
-            }
-            /* timeout */
-            if (cmd.hasOption("timeout")) {
-                final String arg = cmd.getOptionValue("timeout");
-                try {
-                    timeout = Integer.parseInt(arg);
-                } catch (final NumberFormatException e) {
-                    logger.error("Timeout must be a number. Option ignored");
+                    LOGGER.error("Threads number must be a number. Default value used");
                 }
             }
             /* iteration */
@@ -294,11 +271,8 @@ public class Main {
                 final String arg = cmd.getOptionValue("iteration");
                 try {
                     iteration = Integer.parseInt(arg);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Iterations: " + iteration);
-                    }
                 } catch (final NumberFormatException e) {
-                    logger.error("Iteration must be a number. Option ignored");
+                    LOGGER.error("Iteration must be a number. Default value used");
                 }
             }
 
@@ -321,9 +295,9 @@ public class Main {
                 }
                 final File file = new File(arg);
                 if (!file.exists()) {
-                    logger.warn("**Cant not find " + file);
+                    LOGGER.warn("**Cant not find " + file);
                 } else if (file.isDirectory()) {
-                    logger.warn("**" + file + " is a directory");
+                    LOGGER.warn("**" + file + " is a directory");
                 } else {
                     files.add(file);
                 }
@@ -342,10 +316,19 @@ public class Main {
                 }
             });
 
-            return new ReasoningArguments(threadsPerCore, bufferSize, timeout, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("********* OPTIONS *********");
+                LOGGER.info("Buffer size:      " + bufferSize);
+                LOGGER.info("Profile:          " + profile);
+                LOGGER.info("Threads per core: " + threadsPerCore);
+                LOGGER.info("Iterations:       " + iteration);
+                LOGGER.info("***************************");
+            }
+
+            return new ReasoningArguments(threadsPerCore, bufferSize, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
 
         } catch (final ParseException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return null;
     }
