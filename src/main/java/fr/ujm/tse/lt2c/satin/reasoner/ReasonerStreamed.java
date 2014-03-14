@@ -91,6 +91,7 @@ public class ReasonerStreamed {
     public RunEntity infereFromFile(final String input) {
 
         if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("*****************************");
             LOGGER.debug("Inference from file " + input);
         }
 
@@ -114,7 +115,8 @@ public class ReasonerStreamed {
     public RunEntity infereFromModel(final Model model) {
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Inference from file " + model.toString());
+            LOGGER.debug("*****************************");
+            LOGGER.debug("Inference from Model " + model.toString());
         }
 
         /* Model parsing */
@@ -206,7 +208,7 @@ public class ReasonerStreamed {
         final long debugEndTime = System.nanoTime();
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Infere over");
+            LOGGER.debug("Infere over *****************");
         }
 
         /*
@@ -218,10 +220,21 @@ public class ReasonerStreamed {
                 input, new Date(), debugParsingTime, (debugEndTime - debugStartTime), debugBeginNbTriples, (this.tripleStore.size() - debugBeginNbTriples), "",
                 GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule());
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Input: " + input);
+            LOGGER.debug("Parsing: " + debugBeginNbTriples + " in " + Main.nsToTime(debugParsingTime));
+        }
         if (LOGGER.isInfoEnabled()) {
 
             LOGGER.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
                     + ") in " + Main.nsToTime(debugEndTime - debugStartTime));
+
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Options: profile " + this.profile + ", Threads " + this.maxThreads + ", Buffer " + this.bufferSize);
+            LOGGER.debug("Runs by Rule: " + GlobalValues.getRunsByRule());
+            LOGGER.debug("Duplicates by Rule: " + GlobalValues.getDuplicatesByRule());
+            LOGGER.debug("Infered by Rule: " + GlobalValues.getInferedByRule());
 
         }
         GlobalValues.addTimeForFile(input, (debugEndTime - debugStartTime));

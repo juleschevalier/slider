@@ -89,7 +89,7 @@ public class Main {
                 /* Reset log tracers */
                 GlobalValues.reset();
 
-                if (arguments.isPersistMode()) {
+                if (arguments.isPersistMode() && (loop > 0)) {
                     try {
                         final MongoClient client = new MongoClient("10.20.0.57");
                         final Morphia morphia = new Morphia();
