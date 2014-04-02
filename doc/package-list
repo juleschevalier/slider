@@ -1,14 +1,1 @@
 fr.ujm.tse.lt2c.satin.buffer
-fr.ujm.tse.lt2c.satin.dictionary
-fr.ujm.tse.lt2c.satin.dictionary.test
-fr.ujm.tse.lt2c.satin.interfaces
-fr.ujm.tse.lt2c.satin.main
-fr.ujm.tse.lt2c.satin.reasoner
-fr.ujm.tse.lt2c.satin.rules
-fr.ujm.tse.lt2c.satin.rules.run
-fr.ujm.tse.lt2c.satin.runs.test
-fr.ujm.tse.lt2c.satin.triplebuffer.test
-fr.ujm.tse.lt2c.satin.tripledistributor.test
-fr.ujm.tse.lt2c.satin.triplestore
-fr.ujm.tse.lt2c.satin.triplestore.test
-fr.ujm.tse.lt2c.satin.utils

@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.reasoner;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +59,7 @@ import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
 /**
  * 
+ * 
  * @author Jules Chevalier
  */
 public class ReasonerStreamed {
@@ -71,7 +92,7 @@ public class ReasonerStreamed {
         ram = (((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
     }
 
-    /*
+    /**
      * Constructors
      */
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int threadsPerCore,
@@ -146,7 +167,6 @@ public class ReasonerStreamed {
         final long debugBeginNbTriples = this.tripleStore.size();
 
         /* Initialize rules used for inference on RhoDF */
-
         this.initialiseReasoner(this.profile, this.tripleStore, this.dictionary, tripleManager, phaser, executor);
 
         /********************
@@ -158,6 +178,7 @@ public class ReasonerStreamed {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Send all triples for inference");
         }
+        // TODO And what if there already had some triples before ?
         tripleManager.addTriples(this.tripleStore.getAll());
 
         /*
@@ -226,8 +247,8 @@ public class ReasonerStreamed {
         }
         if (LOGGER.isInfoEnabled()) {
 
-            LOGGER.info("Inference: " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+" + (this.tripleStore.size() - debugBeginNbTriples)
-                    + ") in " + Main.nsToTime(debugEndTime - debugStartTime));
+            LOGGER.info(input.split("/")[input.split("/").length - 1] + ": " + debugBeginNbTriples + " -> " + this.tripleStore.size() + "(+"
+                    + (this.tripleStore.size() - debugBeginNbTriples) + ") in " + Main.nsToTime(debugEndTime - debugStartTime));
 
         }
         if (LOGGER.isDebugEnabled()) {
@@ -242,6 +263,16 @@ public class ReasonerStreamed {
         return runEntity;
     }
 
+    /**
+     * Creates and add rules to the reasoner according to the fragment
+     * 
+     * @param profile
+     * @param tripleStore
+     * @param dictionary
+     * @param tripleManager
+     * @param phaser
+     * @param executor
+     */
     private void initialiseReasoner(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary,
             final TripleManager tripleManager, final AtomicInteger phaser, final ExecutorService executor) {
         switch (profile) {
@@ -286,6 +317,14 @@ public class ReasonerStreamed {
 
     }
 
+    /**
+     * Infers the last triples which won't throw new rules
+     * 
+     * @param profile
+     * @param tripleStore
+     * @param dictionary
+     * @param phaser
+     */
     private void finalize(final ReasonerProfile profile, final TripleStore tripleStore, final Dictionary dictionary, final AtomicInteger phaser) {
         final RunFinalizer finalizer = new RunFinalizer(tripleStore, dictionary, profile, executor, phaser, this.bufferSize);
         if (finalizer.isUseful()) {
@@ -308,7 +347,7 @@ public class ReasonerStreamed {
     }
 
     /**
-     * Add into Jena Model and use Jena Dumper
+     * Add the tripleStore into Jena Model and use Jena Dumper to write it in a file
      */
     protected static void outputToFile(final TripleStore tripleStore, final Dictionary dictionary, final String ouputFile) {
         // Create an empty model.
@@ -331,6 +370,11 @@ public class ReasonerStreamed {
         }
     }
 
+    /**
+     * Properly terminates an executor service
+     * 
+     * @param pool
+     */
     static void shutdownAndAwaitTermination(final ExecutorService pool) {
         // Disable new tasks from being submitted
         pool.shutdown();
@@ -352,9 +396,5 @@ public class ReasonerStreamed {
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         }
-    }
-
-    public static int getMaxThreads() {
-        return 0;
     }
 }

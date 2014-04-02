@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.main;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +70,7 @@ public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class);
 
+    /* Initialization if default options */
     private static final int DEFAULT_THREADS_PER_CORE = 10;
     private static final int DEFAULT_BUFFER_SIZE = 100;
     private static final boolean DEFAULT_CUMULATIVE_MODE = false;
@@ -77,8 +98,12 @@ public class Main {
         for (int loop = 0; loop < arguments.getIteration(); loop++) {
             for (final File file : arguments.getFiles()) {
 
+                /*
+                 * INFERENCE
+                 */
                 final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
 
+                /* Dumping */
                 if (arguments.isDumpMode()) {
                     final File newFile = new File("infered_" + arguments.getProfile() + "_" + file.getName());
                     if (!newFile.exists()) {
@@ -119,6 +144,10 @@ public class Main {
 
     }
 
+    /**
+     * @param args
+     * @return a ReasoningArguements object containing all the parsed arguments
+     */
     private static ReasoningArguments getArguments(final String[] args) {
 
         /* Reasoner fields */
@@ -333,6 +362,10 @@ public class Main {
         return null;
     }
 
+    /**
+     * @param bytes
+     * @return the size in human readable format
+     */
     public static String humanReadableSize(final long bytes) {
         final int unit = 1024;
         if (bytes < unit) {
@@ -343,6 +376,10 @@ public class Main {
         return String.format("%6.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
+    /**
+     * @param timeInNs
+     * @return the time in format HH:MM:SS.ms
+     */
     public static String nsToTime(final long timeInNs) {
 
         long left = timeInNs;

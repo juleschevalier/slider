@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.buffer;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Queue;
@@ -16,16 +36,16 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 /**
+ * Concurrent implementation of {@link interfaces.TripleBuffer} using a ConcurrentLinkedQueue as buffer
  * 
  * @author Jules Chevalier
  * @see TripleBuffer
  */
 public class QueuedTripleBufferLock implements TripleBuffer {
+    private static Logger logger = Logger.getLogger(QueuedTripleBufferLock.class);
 
     /* Limit of the buffer (adding the last triple calls bufferfull) */
     private final long bufferSize;
-
-    private static Logger logger = Logger.getLogger(QueuedTripleBufferLock.class);
 
     Queue<Triple> triples;
     ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
@@ -45,12 +65,11 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     }
 
     @Override
-    public boolean add(final Triple triple) {
-        boolean success = false;
+    public void add(final Triple triple) {
         try {
             this.rwlock.writeLock().lock();
 
-            success = this.triples.add(triple);
+            this.triples.add(triple);
             if (this.currentBuffer.incrementAndGet() >= this.bufferSize) {
                 this.currentBuffer.set(0);
                 for (final BufferListener bufferListener : this.bufferListeners) {
@@ -63,12 +82,10 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         } finally {
             this.rwlock.writeLock().unlock();
         }
-        return success;
     }
 
     @Override
-    public boolean addAll(final Collection<Triple> triples) {
-        final boolean success = true;
+    public void addAll(final Collection<Triple> triples) {
         try {
             this.rwlock.writeLock().lock();
             triples.addAll(triples);
@@ -83,7 +100,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         } finally {
             this.rwlock.writeLock().unlock();
         }
-        return success;
     }
 
     @Override
