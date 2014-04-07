@@ -101,17 +101,17 @@ public class RunFinalizer implements BufferListener {
 
                 final Collection<Triple> outputTriples = new HashSet<>();
 
+                /* x sp x (x in RhoDF) */
+                outputTriples.add(new ImmutableTriple(subPropertyOf, subPropertyOf, subPropertyOf));
+                outputTriples.add(new ImmutableTriple(subClassOf, subPropertyOf, subClassOf));
+                outputTriples.add(new ImmutableTriple(domain, subPropertyOf, domain));
+                outputTriples.add(new ImmutableTriple(range, subPropertyOf, range));
+                outputTriples.add(new ImmutableTriple(type, subPropertyOf, type));
+
                 for (final Triple triple : RunFinalizer.this.tripleBuffer.clear().getAll()) {
                     final long s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
 
                     /* subproperty reflexivity */
-
-                    /* x sp x (x in RhoDF) */
-                    outputTriples.add(new ImmutableTriple(subPropertyOf, subPropertyOf, subPropertyOf));
-                    outputTriples.add(new ImmutableTriple(subClassOf, subPropertyOf, subClassOf));
-                    outputTriples.add(new ImmutableTriple(domain, subPropertyOf, domain));
-                    outputTriples.add(new ImmutableTriple(range, subPropertyOf, range));
-                    outputTriples.add(new ImmutableTriple(type, subPropertyOf, type));
 
                     /* s p o -> p sp p */
                     outputTriples.add(new ImmutableTriple(p, subPropertyOf, p));
@@ -181,7 +181,7 @@ public class RunFinalizer implements BufferListener {
 
     @Override
     public String toString() {
-        return "RunFinalzer";
+        return "RunFinalizer";
     }
 
 }

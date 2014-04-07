@@ -88,7 +88,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public void addAll(final Collection<Triple> triples) {
         try {
             this.rwlock.writeLock().lock();
-            triples.addAll(triples);
+            this.triples.addAll(triples);
             for (final BufferListener bufferListener : this.bufferListeners) {
                 for (int i = 0; i < (triples.size() / this.bufferSize); i++) {
                     bufferListener.bufferFull();

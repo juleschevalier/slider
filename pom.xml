@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.ujm.tse.lt2c.satin</groupId>
-	<artifactId>DistributedReasoner</artifactId>
+	<artifactId>slider</artifactId>
 	<version>0.9</version>
-	<name>SLIDeR</name>
+	<name>slider</name>
 	<url>https://github.com/telecom-se/distributed-reasoner</url>
 	<distributionManagement>
 		<repository>
@@ -21,7 +21,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+
 		<license.licenseName>apache_v2</license.licenseName>
 		<license.organizationName>Université Jean Monnet, Saint Etienne</license.organizationName>
 		<license.inceptionYear>2014</license.inceptionYear>

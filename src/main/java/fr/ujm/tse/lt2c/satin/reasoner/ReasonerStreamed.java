@@ -162,7 +162,11 @@ public class ReasonerStreamed {
         /* Initialize structures */
         final TripleManager tripleManager = new TripleManager();
         final AtomicInteger phaser = new AtomicInteger();
-        executor = Executors.newFixedThreadPool(this.maxThreads);
+        if (this.maxThreads > 0) {
+            executor = Executors.newFixedThreadPool(this.maxThreads);
+        } else {
+            executor = Executors.newCachedThreadPool();
+        }
 
         final long debugBeginNbTriples = this.tripleStore.size();
 

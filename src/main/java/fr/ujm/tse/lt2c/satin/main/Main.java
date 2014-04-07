@@ -198,7 +198,7 @@ public class Main {
         profileO.setArgs(1);
         options.addOption(profileO);
 
-        final Option threadsO = new Option("t", "threads", true, "set the number of threads by avaible core");
+        final Option threadsO = new Option("t", "threads", true, "set the number of threads by avaible core (0 means the jvm manage)");
         threadsO.setArgName("number");
         threadsO.setArgs(1);
         threadsO.setType(Number.class);
@@ -276,7 +276,7 @@ public class Main {
                 case "GRhoDF":
                     profile = ReasonerProfile.GRhoDF;
                     break;
-                case "RhoDF++":
+                case "RhoDFPP":
                     profile = ReasonerProfile.RhoDFPP;
                     break;
 
@@ -349,7 +349,11 @@ public class Main {
                 LOGGER.info("********* OPTIONS *********");
                 LOGGER.info("Buffer size:      " + bufferSize);
                 LOGGER.info("Profile:          " + profile);
-                LOGGER.info("Threads per core: " + threadsPerCore);
+                if (threadsPerCore > 0) {
+                    LOGGER.info("Threads per core: " + threadsPerCore);
+                } else {
+                    LOGGER.info("Threads per core: Automatic");
+                }
                 LOGGER.info("Iterations:       " + iteration);
                 LOGGER.info("***************************");
             }
