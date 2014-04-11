@@ -189,10 +189,14 @@ public class ReasonerStreamed {
                 }
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Notify the buffers to flush last triples");
-            }
+            // if (LOGGER.isDebugEnabled()) {
+            // LOGGER.debug("Notify the buffers to flush last triples");
+            // }
             nonEmptyBuffers = tripleManager.flushBuffers();
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Notify the buffers to flush last triples " + nonEmptyBuffers);
+            }
 
         }
 
