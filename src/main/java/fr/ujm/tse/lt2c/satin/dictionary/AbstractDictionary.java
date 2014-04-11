@@ -1,25 +1,5 @@
 package fr.ujm.tse.lt2c.satin.dictionary;
 
-/*
- * #%L
- * SLIDeR
- * %%
- * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 
 /**
@@ -92,48 +72,48 @@ public abstract class AbstractDictionary implements Dictionary {
         /*
          * All the prefixes come from prefix.cc
          */
-        domain = add("http://www.w3.org/2000/01/rdf-schema#domain");
-        range = add("http://www.w3.org/2000/01/rdf-schema#range");
-        type = add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        subClassOf = add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
-        subPropertyOf = add("http://www.w3.org/2000/01/rdf-schema#subPropertyOf");
-        equivalentClass = add("http://www.w3.org/2002/07/owl#equivalentClass");
-        equivalentProperty = add("http://www.w3.org/2002/07/owl#equivalentProperty");
-        sameAs = add("http://www.w3.org/2002/07/owl#sameAs");
-        inverseOf = add("http://www.w3.org/2002/07/owl#inverseOf");
-        propertyDisjointWith = add("http://www.w3.org/2002/07/owl#propertyDisjointWith");
-        differentFrom = add("http://www.w3.org/2002/07/owl#differentFrom");
-        allDifferent = add("http://www.w3.org/2002/07/owl#AllDifferent");
-        allDisjointClasses = add("http://www.w3.org/2002/07/owl#allDisjointClasses");
-        allValuesFrom = add("http://www.w3.org/2002/07/owl#allValuesFrom");
-        annotationProperty = add("http://www.w3.org/2002/07/owl#AnnotationProperty");
-        assertionProperty = add("http://www.w3.org/2002/07/owl#assertionProperty");
-        asymetricProperty = add("http://www.w3.org/2002/07/owl#asymetricProperty");
-        clazz = add("http://www.w3.org/2002/07/owl#Class");
-        complementOf = add("http://www.w3.org/2002/07/owl#complementOf");
-        disjoinWith = add("http://www.w3.org/2002/07/owl#disjointWith");
-        distinctmembers = add("http://www.w3.org/2002/07/owl#distinctMembers");
-        functionalProperty = add("http://www.w3.org/2002/07/owl#functionalProperty");
-        hasKey = add("http://www.w3.org/2002/07/owl#hasKey");
-        hasValue = add("http://www.w3.org/2002/07/owl#hasValue");
-        intersectionOf = add("http://www.w3.org/2002/07/owl#intersectionOf");
-        inverseFunctionalProperty = add("http://www.w3.org/2002/07/owl#inverseFunctionalProperty");
-        irreflexiveProperty = add("http://www.w3.org/2002/07/owl#irreflexiveProperty");
-        maxCardinality = add("http://www.w3.org/2002/07/owl#maxCardinality");
-        maxQualifiedCardinality = add("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
-        members = add("http://www.w3.org/2002/07/owl#members");
-        nothing = add("http://www.w3.org/2002/07/owl#nothing");
-        onClass = add("http://www.w3.org/2002/07/owl#onClass");
-        onProperty = add("http://www.w3.org/2002/07/owl#onProperty");
-        oneOf = add("http://www.w3.org/2002/07/owl#oneOf");
-        propertyChainAxiom = add("http://www.w3.org/2002/07/owl#propertyChainAxiom");
-        someValuesFrom = add("http://www.w3.org/2002/07/owl#someValuesFrom");
-        sourceIndividual = add("http://www.w3.org/2002/07/owl#sourceIndividual");
-        symetricProperty = add("http://www.w3.org/2002/07/owl#symetricProperty");
-        targetIndividual = add("http://www.w3.org/2002/07/owl#targetIndividual");
-        targetValue = add("http://www.w3.org/2002/07/owl#targetValue");
-        thing = add("http://www.w3.org/2002/07/owl#Thing");
-        transitiveProperty = add("http://www.w3.org/2002/07/owl#TransitiveProperty");
-        unionOf = add("http://www.w3.org/2002/07/owl#unionOf");
+        domain = this.add("http://www.w3.org/2000/01/rdf-schema#domain");
+        range = this.add("http://www.w3.org/2000/01/rdf-schema#range");
+        type = this.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        subClassOf = this.add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
+        subPropertyOf = this.add("http://www.w3.org/2000/01/rdf-schema#subPropertyOf");
+        equivalentClass = this.add("http://www.w3.org/2002/07/owl#equivalentClass");
+        equivalentProperty = this.add("http://www.w3.org/2002/07/owl#equivalentProperty");
+        sameAs = this.add("http://www.w3.org/2002/07/owl#sameAs");
+        inverseOf = this.add("http://www.w3.org/2002/07/owl#inverseOf");
+        propertyDisjointWith = this.add("http://www.w3.org/2002/07/owl#propertyDisjointWith");
+        differentFrom = this.add("http://www.w3.org/2002/07/owl#differentFrom");
+        allDifferent = this.add("http://www.w3.org/2002/07/owl#AllDifferent");
+        allDisjointClasses = this.add("http://www.w3.org/2002/07/owl#allDisjointClasses");
+        allValuesFrom = this.add("http://www.w3.org/2002/07/owl#allValuesFrom");
+        annotationProperty = this.add("http://www.w3.org/2002/07/owl#AnnotationProperty");
+        assertionProperty = this.add("http://www.w3.org/2002/07/owl#assertionProperty");
+        asymetricProperty = this.add("http://www.w3.org/2002/07/owl#asymetricProperty");
+        clazz = this.add("http://www.w3.org/2002/07/owl#Class");
+        complementOf = this.add("http://www.w3.org/2002/07/owl#complementOf");
+        disjoinWith = this.add("http://www.w3.org/2002/07/owl#disjointWith");
+        distinctmembers = this.add("http://www.w3.org/2002/07/owl#distinctMembers");
+        functionalProperty = this.add("http://www.w3.org/2002/07/owl#functionalProperty");
+        hasKey = this.add("http://www.w3.org/2002/07/owl#hasKey");
+        hasValue = this.add("http://www.w3.org/2002/07/owl#hasValue");
+        intersectionOf = this.add("http://www.w3.org/2002/07/owl#intersectionOf");
+        inverseFunctionalProperty = this.add("http://www.w3.org/2002/07/owl#inverseFunctionalProperty");
+        irreflexiveProperty = this.add("http://www.w3.org/2002/07/owl#irreflexiveProperty");
+        maxCardinality = this.add("http://www.w3.org/2002/07/owl#maxCardinality");
+        maxQualifiedCardinality = this.add("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
+        members = this.add("http://www.w3.org/2002/07/owl#members");
+        nothing = this.add("http://www.w3.org/2002/07/owl#nothing");
+        onClass = this.add("http://www.w3.org/2002/07/owl#onClass");
+        onProperty = this.add("http://www.w3.org/2002/07/owl#onProperty");
+        oneOf = this.add("http://www.w3.org/2002/07/owl#oneOf");
+        propertyChainAxiom = this.add("http://www.w3.org/2002/07/owl#propertyChainAxiom");
+        someValuesFrom = this.add("http://www.w3.org/2002/07/owl#someValuesFrom");
+        sourceIndividual = this.add("http://www.w3.org/2002/07/owl#sourceIndividual");
+        symetricProperty = this.add("http://www.w3.org/2002/07/owl#symetricProperty");
+        targetIndividual = this.add("http://www.w3.org/2002/07/owl#targetIndividual");
+        targetValue = this.add("http://www.w3.org/2002/07/owl#targetValue");
+        thing = this.add("http://www.w3.org/2002/07/owl#Thing");
+        transitiveProperty = this.add("http://www.w3.org/2002/07/owl#TransitiveProperty");
+        unionOf = this.add("http://www.w3.org/2002/07/owl#unionOf");
     }
 }
