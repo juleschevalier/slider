@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunSCM_DOM1 extends AbstractRun {
 
     private static final Logger LOGGER = Logger.getLogger(RunSCM_DOM1.class);
-    private static final String ruleName = "SCM_DOM1";
+    private static final String RULENAME = "SCM_DOM1";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.domain, AbstractDictionary.subClassOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.domain };
 
@@ -71,11 +71,6 @@ public class RunSCM_DOM1 extends AbstractRun {
 
                     final Triple result = new ImmutableTriple(triple.getSubject(), domain, c2);
                     outputTriples.add(result);
-                    // if (logger.isTraceEnabled()) {
-                    // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), domain,
-                    // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
-                    // subClassOf, c2)) + " -> " + dictionary.printTriple(result));
-                    // }
                 }
             }
         }
@@ -91,7 +86,7 @@ public class RunSCM_DOM1 extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.ruleName;
+        return RULENAME;
     }
 
 }

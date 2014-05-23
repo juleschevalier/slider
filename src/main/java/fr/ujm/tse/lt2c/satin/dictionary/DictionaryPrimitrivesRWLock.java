@@ -146,7 +146,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
             for (final String s : this.triples.keySet()) {
                 sb.append(this.triples.get(s));
                 sb.append("=");
-                sb.append(this.printConcept(s));
+                sb.append(this.printAxiom(s));
                 sb.append("\n");
             }
         } catch (final Exception e) {
@@ -163,9 +163,9 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         String s = null, p = null, o = null;
         try {
             this.rwlock.readLock().lock();
-            s = this.printConcept(this.get(t.getSubject()));
-            p = this.printConcept(this.get(t.getPredicate()));
-            o = this.printConcept(this.get(t.getObject()));
+            s = this.printAxiom(this.get(t.getSubject()));
+            p = this.printAxiom(this.get(t.getPredicate()));
+            o = this.printAxiom(this.get(t.getObject()));
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -181,7 +181,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         try {
             this.rwlock.readLock().lock();
             for (final String s : this.triples.keySet()) {
-                sb.append(s + " ==> " + this.printConcept(s) + "\n");
+                sb.append(s + " ==> " + this.printAxiom(s) + "\n");
             }
         } catch (final Exception e) {
             logger.error("", e);

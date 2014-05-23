@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunCAX_SCO extends AbstractRun {
 
     private static final Logger LOGGER = Logger.getLogger(RunCAX_SCO.class);
-    private static final String ruleName = "CAX_SCO";
+    private static final String RULENAME = "CAX_SCO";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf, AbstractDictionary.type };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
 
@@ -65,12 +65,6 @@ public class RunCAX_SCO extends AbstractRun {
                     if (typeTriple.getSubject() >= 0) {
                         final Triple result = new ImmutableTriple(typeTriple.getSubject(), type, c2);
                         outputTriples.add(result);
-                        // if (logger.isTraceEnabled()) {
-                        // logger.trace(dictionary.printTriple(new ImmutableTriple(typeTriple.getSubject(), type,
-                        // typeTriple.getObject())) + " & " + dictionary.printTriple(new
-                        // ImmutableTriple(typeTriple.getObject(), subClassOf, c2)) + " -> " +
-                        // dictionary.printTriple(result));
-                        // }
                     }
                 }
             }
@@ -87,7 +81,7 @@ public class RunCAX_SCO extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.ruleName;
+        return RULENAME;
     }
 
 }

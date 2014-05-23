@@ -2,6 +2,7 @@ package fr.ujm.tse.lt2c.satin.utils;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bson.types.ObjectId;
@@ -227,25 +228,25 @@ public class RunEntity {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (this.bufferSize ^ (this.bufferSize >>> 32));
-        result = (prime * result) + this.coresNb;
-        result = (prime * result) + ((this.date == null) ? 0 : this.date.hashCode());
-        result = (prime * result) + ((this.duplicatesByRule == null) ? 0 : this.duplicatesByRule.hashCode());
-        result = (prime * result) + ((this.fileInput == null) ? 0 : this.fileInput.hashCode());
-        result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
-        result = (prime * result) + ((this.inferedByRule == null) ? 0 : this.inferedByRule.hashCode());
-        result = (prime * result) + (int) (this.inferenceTime ^ (this.inferenceTime >>> 32));
-        result = (prime * result) + ((this.machineName == null) ? 0 : this.machineName.hashCode());
-        result = (prime * result) + (int) (this.nbInferedTriples ^ (this.nbInferedTriples >>> 32));
-        result = (prime * result) + (int) (this.nbInitialTriples ^ (this.nbInitialTriples >>> 32));
-        result = (prime * result) + (int) (this.parsingTime ^ (this.parsingTime >>> 32));
-        result = (prime * result) + ((this.perfStat == null) ? 0 : this.perfStat.hashCode());
-        result = (prime * result) + ((this.profile == null) ? 0 : this.profile.hashCode());
-        result = (prime * result) + (int) (this.ram ^ (this.ram >>> 32));
-        result = (prime * result) + ((this.runsByRule == null) ? 0 : this.runsByRule.hashCode());
-        result = (prime * result) + this.sessionId;
-        result = (prime * result) + this.threadsNb;
-        result = (prime * result) + ((this.version == null) ? 0 : this.version.hashCode());
+        result = prime * result + (int) (this.bufferSize ^ this.bufferSize >>> 32);
+        result = prime * result + this.coresNb;
+        result = prime * result + (this.date == null ? 0 : this.date.hashCode());
+        result = prime * result + (this.duplicatesByRule == null ? 0 : this.duplicatesByRule.hashCode());
+        result = prime * result + (this.fileInput == null ? 0 : this.fileInput.hashCode());
+        result = prime * result + (this.id == null ? 0 : this.id.hashCode());
+        result = prime * result + (this.inferedByRule == null ? 0 : this.inferedByRule.hashCode());
+        result = prime * result + (int) (this.inferenceTime ^ this.inferenceTime >>> 32);
+        result = prime * result + (this.machineName == null ? 0 : this.machineName.hashCode());
+        result = prime * result + (int) (this.nbInferedTriples ^ this.nbInferedTriples >>> 32);
+        result = prime * result + (int) (this.nbInitialTriples ^ this.nbInitialTriples >>> 32);
+        result = prime * result + (int) (this.parsingTime ^ this.parsingTime >>> 32);
+        result = prime * result + (this.perfStat == null ? 0 : this.perfStat.hashCode());
+        result = prime * result + (this.profile == null ? 0 : this.profile.hashCode());
+        result = prime * result + (int) (this.ram ^ this.ram >>> 32);
+        result = prime * result + (this.runsByRule == null ? 0 : this.runsByRule.hashCode());
+        result = prime * result + this.sessionId;
+        result = prime * result + this.threadsNb;
+        result = prime * result + (this.version == null ? 0 : this.version.hashCode());
         return result;
     }
 
@@ -396,13 +397,19 @@ public class RunEntity {
         builder.append(this.nbInferedTriples);
         builder.append(", perfStat=");
         builder.append(this.perfStat);
-        builder.append(", runsByRule=");
-        builder.append(this.runsByRule);
-        builder.append(", duplicatesByRule=");
-        builder.append(this.duplicatesByRule);
-        builder.append(", inferedByRule=");
-        builder.append(this.inferedByRule);
-        builder.append("]");
+        builder.append(", runsByRule{");
+        for (final Entry<String, AtomicLong> entry : this.runsByRule.entrySet()) {
+            builder.append(entry.getKey() + "=" + entry.getValue());
+        }
+        builder.append("}, duplicatesByRule{");
+        for (final Entry<String, AtomicLong> entry : this.duplicatesByRule.entrySet()) {
+            builder.append(entry.getKey() + "=" + entry.getValue());
+        }
+        builder.append("}, inferedByRule{");
+        for (final Entry<String, AtomicLong> entry : this.inferedByRule.entrySet()) {
+            builder.append(entry.getKey() + "=" + entry.getValue());
+        }
+        builder.append("}");
         return builder.toString();
     }
 

@@ -6,6 +6,7 @@ import java.util.EventListener;
  * @author Jules Chevalier
  * 
  *         Interface for classes which want to be notified of buffer events
+ * @see TripleBuffer
  */
 public interface BufferListener extends EventListener {
 

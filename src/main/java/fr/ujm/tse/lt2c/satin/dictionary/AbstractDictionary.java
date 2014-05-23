@@ -14,7 +14,8 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long annotationProperty = 0;
     public static long assertionProperty = 0;
     public static long asymetricProperty = 0;
-    public static long clazz = 0;
+    public static long classOwl = 0;
+    public static long classRdfs = 0;
     public static long complementOf = 0;
     public static long differentFrom = 0;
     public static long disjoinWith = 0;
@@ -30,7 +31,7 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long irreflexiveProperty = 0;
     public static long maxCardinality = 0;
     public static long maxQualifiedCardinality = 0;
-    public static long members = 0;
+    public static long member = 0;
     public static long nothing = 0;
     public static long onClass = 0;
     public static long oneOf = 0;
@@ -51,9 +52,14 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long subClassOf = 0;
     public static long subPropertyOf = 0;
     public static long type = 0;
+    public static long ressource = 0;
+    public static long property = 0;
+    public static long containerMembershipProperty = 0;
+    public static long literal = 0;
+    public static long datatype = 0;
 
     @Override
-    public String printConcept(String c) {
+    public String printAxiom(String c) {
         /* Replace integers, strings... by their value */
         c = c.replaceAll("(\".*\")\\^\\^.*", "$1");
 
@@ -89,7 +95,8 @@ public abstract class AbstractDictionary implements Dictionary {
         annotationProperty = this.add("http://www.w3.org/2002/07/owl#AnnotationProperty");
         assertionProperty = this.add("http://www.w3.org/2002/07/owl#assertionProperty");
         asymetricProperty = this.add("http://www.w3.org/2002/07/owl#asymetricProperty");
-        clazz = this.add("http://www.w3.org/2002/07/owl#Class");
+        classOwl = this.add("http://www.w3.org/2002/07/owl#Class");
+        classRdfs = this.add("http://www.w3.org/2000/01/rdf-schema#");
         complementOf = this.add("http://www.w3.org/2002/07/owl#complementOf");
         disjoinWith = this.add("http://www.w3.org/2002/07/owl#disjointWith");
         distinctmembers = this.add("http://www.w3.org/2002/07/owl#distinctMembers");
@@ -101,7 +108,7 @@ public abstract class AbstractDictionary implements Dictionary {
         irreflexiveProperty = this.add("http://www.w3.org/2002/07/owl#irreflexiveProperty");
         maxCardinality = this.add("http://www.w3.org/2002/07/owl#maxCardinality");
         maxQualifiedCardinality = this.add("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
-        members = this.add("http://www.w3.org/2002/07/owl#members");
+        member = this.add("http://www.w3.org/2002/07/owl#member");
         nothing = this.add("http://www.w3.org/2002/07/owl#nothing");
         onClass = this.add("http://www.w3.org/2002/07/owl#onClass");
         onProperty = this.add("http://www.w3.org/2002/07/owl#onProperty");
@@ -115,5 +122,10 @@ public abstract class AbstractDictionary implements Dictionary {
         thing = this.add("http://www.w3.org/2002/07/owl#Thing");
         transitiveProperty = this.add("http://www.w3.org/2002/07/owl#TransitiveProperty");
         unionOf = this.add("http://www.w3.org/2002/07/owl#unionOf");
+        ressource = this.add("http://www.w3.org/2000/01/rdf-schema#ressource");
+        property = this.add("http://www.w3.org/2000/01/rdf-schema#property");
+        containerMembershipProperty = this.add("http://www.w3.org/2000/01/rdf-schema#containerMembershipProperty");
+        literal = this.add("http://www.w3.org/2000/01/rdf-schema#Literal");
+        datatype = this.add("http://www.w3.org/2000/01/rdf-schema#Datatype");
     }
 }

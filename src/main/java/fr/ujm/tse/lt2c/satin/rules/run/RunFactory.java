@@ -11,14 +11,14 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 
 public class RunFactory {
 
-    private static final Logger logger = Logger.getLogger(RunFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(RunFactory.class);
 
     private RunFactory() {
 
     }
 
-    public static AbstractRun getRunInstance(AvaibleRuns run, Dictionary dictionary, TripleStore tripleStore, TripleBuffer tripleBuffer,
-            TripleDistributor tripleDistributor, AtomicInteger phaser) {
+    public static AbstractRun getRunInstance(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore,
+            final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
 
         switch (run) {
         case CAX_SCO:
@@ -45,14 +45,24 @@ public class RunFactory {
             return new RunSCM_SCO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         case SCM_SPO:
             return new RunSCM_SPO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS4:
+            return new RunRDFS4(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS6:
+            return new RunRDFS6(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS8:
+            return new RunRDFS8(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS12:
+            return new RunRDFS12(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS13:
+            return new RunRDFS13(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         default:
-            logger.error("RUN FACTORY Unknown run type: " + run);
+            LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
         }
         return null;
     }
 
-    public static long[] getInputMatchers(AvaibleRuns run) {
+    public static long[] getInputMatchers(final AvaibleRuns run) {
         switch (run) {
         case CAX_SCO:
             return RunCAX_SCO.INPUT_MATCHERS;
@@ -78,14 +88,24 @@ public class RunFactory {
             return RunSCM_SCO.INPUT_MATCHERS;
         case SCM_SPO:
             return RunSCM_SPO.INPUT_MATCHERS;
+        case RDFS4:
+            return RunRDFS4.INPUT_MATCHERS;
+        case RDFS6:
+            return RunRDFS6.INPUT_MATCHERS;
+        case RDFS8:
+            return RunRDFS8.INPUT_MATCHERS;
+        case RDFS12:
+            return RunRDFS12.INPUT_MATCHERS;
+        case RDFS13:
+            return RunRDFS13.INPUT_MATCHERS;
         default:
-            logger.error("RUN FACTORY Unknown run type: " + run);
+            LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
         }
-        return null;
+        return new long[0];
     }
 
-    public static long[] getOutputMatchers(AvaibleRuns run) {
+    public static long[] getOutputMatchers(final AvaibleRuns run) {
         switch (run) {
         case CAX_SCO:
             return RunCAX_SCO.OUTPUT_MATCHERS;
@@ -111,16 +131,25 @@ public class RunFactory {
             return RunSCM_SCO.OUTPUT_MATCHERS;
         case SCM_SPO:
             return RunSCM_SPO.OUTPUT_MATCHERS;
-
+        case RDFS4:
+            return RunRDFS4.OUTPUT_MATCHERS;
+        case RDFS6:
+            return RunRDFS6.OUTPUT_MATCHERS;
+        case RDFS8:
+            return RunRDFS8.OUTPUT_MATCHERS;
+        case RDFS12:
+            return RunRDFS12.OUTPUT_MATCHERS;
+        case RDFS13:
+            return RunRDFS13.OUTPUT_MATCHERS;
         default:
-            logger.error("RUN FACTORY Unknown run type: " + run);
+            LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
         }
-        return null;
+        return new long[0];
 
     }
 
-    public static String getRuleName(AvaibleRuns run) {
+    public static String getRuleName(final AvaibleRuns run) {
         switch (run) {
         case CAX_SCO:
             return "CAX_SCO";
@@ -146,9 +175,19 @@ public class RunFactory {
             return "SCM_SCO";
         case SCM_SPO:
             return "SCM_SPO";
+        case RDFS4:
+            return "RDFS4";
+        case RDFS6:
+            return "RDFS6";
+        case RDFS8:
+            return "RDFS8";
+        case RDFS12:
+            return "RDFS12";
+        case RDFS13:
+            return "RDFS13";
 
         default:
-            logger.error("RUN FACTORY Unknown run type: " + run);
+            LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
         }
         return null;

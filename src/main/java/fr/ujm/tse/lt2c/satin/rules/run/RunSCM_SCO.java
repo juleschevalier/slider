@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunSCM_SCO extends AbstractRun {
 
     private static final Logger LOGGER = Logger.getLogger(RunSCM_SCO.class);
-    private static final String ruleName = "SCM_SCO";
+    private static final String RULE_NAME = "SCM_SCO";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.subClassOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subClassOf };
 
@@ -67,19 +67,10 @@ public class RunSCM_SCO extends AbstractRun {
                 loops++;
                 for (final Long c1a : c3s) {
 
-                    if (c1a != triple.getSubject()) {
-                        if (!ts1.contains(triple.getSubject(), subClassOf, c1a) && !ts2.contains(triple.getSubject(), subClassOf, c1a)) {
-                            final Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
-                            outputTriples.add(result);
-                            // if (logger.isTraceEnabled()) {
-                            // logger.trace(ruleName + ": "
-                            // + this.dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subClassOf,
-                            // triple.getObject())) + " & "
-                            // + this.dictionary.printTriple(new ImmutableTriple(triple.getObject(), subClassOf, c1a)) +
-                            // " -> "
-                            // + this.dictionary.printTriple(result));
-                            // }
-                        }
+                    if ((c1a != triple.getSubject()) && !ts1.contains(triple.getSubject(), subClassOf, c1a)
+                            && !ts2.contains(triple.getSubject(), subClassOf, c1a)) {
+                        final Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
+                        outputTriples.add(result);
                     }
 
                 }
@@ -97,7 +88,7 @@ public class RunSCM_SCO extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.ruleName;
+        return RULE_NAME;
     }
 
 }

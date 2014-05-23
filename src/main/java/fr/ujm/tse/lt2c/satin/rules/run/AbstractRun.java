@@ -24,6 +24,7 @@ public abstract class AbstractRun implements RuleRun {
     protected TripleBuffer tripleBuffer;
     protected String ruleName = "";
     protected AtomicInteger phaser;
+    protected byte complexity = 2;
 
     /**
      * Constructor
@@ -52,7 +53,7 @@ public abstract class AbstractRun implements RuleRun {
          * Buffer verification
          */
 
-        if ((this.tripleBuffer.getOccupation()) == 0) {
+        if (this.tripleBuffer.getOccupation() == 0) {
             this.phaser.decrementAndGet();
             this.phaser.notifyAll();
 
@@ -80,10 +81,14 @@ public abstract class AbstractRun implements RuleRun {
              */
             final Collection<Triple> outputTriples = new HashSet<>();
 
-            /* For rules with 2 components */
             if (!usableTriples.isEmpty()) {
-                this.process(usableTriples, this.tripleStore, outputTriples);
-                this.process(this.tripleStore, usableTriples, outputTriples);
+                /* For rules with 2 components */
+                if (this.complexity == 2) {
+                    this.process(usableTriples, this.tripleStore, outputTriples);
+                    this.process(this.tripleStore, usableTriples, outputTriples);
+                } else if (this.complexity == 1) {
+                    this.process(this.tripleStore, usableTriples, outputTriples);
+                }
             }
 
             /*

@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunPRP_RNG extends AbstractRun {
 
     private static final Logger LOGGER = Logger.getLogger(RunPRP_RNG.class);
-    private static final String ruleName = "PRP_RNG";
+    private static final String RULENAME = "PRP_RNG";
     public static final long[] INPUT_MATCHERS = {};
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
 
@@ -66,10 +66,6 @@ public class RunPRP_RNG extends AbstractRun {
                         if (triple.getObject() >= 0) {
                             final Triple result = new ImmutableTriple(triple.getObject(), type, c);
                             outputTriples.add(result);
-                            // if (logger.isTraceEnabled()) {
-                            // logger.trace(dictionary.printTriple(triple) + " & " + dictionary.printTriple(new
-                            // ImmutableTriple(p, range, c)) + " -> " + dictionary.printTriple(result));
-                            // }
                         }
                     }
                 }
@@ -87,7 +83,7 @@ public class RunPRP_RNG extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.ruleName;
+        return RULENAME;
     }
 
 }

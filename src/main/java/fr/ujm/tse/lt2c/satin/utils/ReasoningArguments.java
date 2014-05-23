@@ -7,10 +7,10 @@ import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
 
 public class ReasoningArguments {
 
-    public ReasoningArguments(final int threadsPerCore, final int bufferSize, final int iteration, final boolean cumulativeMode, final ReasonerProfile profile,
+    public ReasoningArguments(final int threads, final int bufferSize, final int iteration, final boolean cumulativeMode, final ReasonerProfile profile,
             final boolean persistMode, final boolean dumpMode, final List<File> files) {
         super();
-        this.threadsPerCore = threadsPerCore;
+        this.threads = threads;
         this.bufferSize = bufferSize;
         this.iteration = iteration;
         this.cumulativeMode = cumulativeMode;
@@ -21,7 +21,7 @@ public class ReasoningArguments {
     }
 
     /* Reasoner fields */
-    private final int threadsPerCore;
+    private final int threads;
     private final int bufferSize;
     private final int iteration;
     private final boolean cumulativeMode;
@@ -33,7 +33,7 @@ public class ReasoningArguments {
     private final List<File> files;
 
     public int getThreadsPerCore() {
-        return this.threadsPerCore;
+        return this.threads;
     }
 
     public int getBufferSize() {
@@ -75,7 +75,7 @@ public class ReasoningArguments {
         result = (prime * result) + this.iteration;
         result = (prime * result) + (this.persistMode ? 1231 : 1237);
         result = (prime * result) + ((this.profile == null) ? 0 : this.profile.hashCode());
-        result = (prime * result) + this.threadsPerCore;
+        result = (prime * result) + this.threads;
         return result;
     }
 
@@ -116,7 +116,7 @@ public class ReasoningArguments {
         if (this.profile != other.profile) {
             return false;
         }
-        if (this.threadsPerCore != other.threadsPerCore) {
+        if (this.threads != other.threads) {
             return false;
         }
         return true;

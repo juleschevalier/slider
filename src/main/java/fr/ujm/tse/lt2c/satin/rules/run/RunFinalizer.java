@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
  */
 public class RunFinalizer implements BufferListener {
 
-    private static final Logger logger = Logger.getLogger(RunFinalizer.class);
+    private static final Logger LOGGER = Logger.getLogger(RunFinalizer.class);
     private final TripleStore tripleStore;
     private final Dictionary dictionary;
     private final TripleBuffer tripleBuffer;
@@ -45,7 +45,7 @@ public class RunFinalizer implements BufferListener {
         this.tripleBuffer.addBufferListener(this);
         this.profile = profile;
         switch (profile) {
-        case RhoDFPP:
+        case RHODFPP:
             this.useful = true;
             break;
         default:
@@ -61,7 +61,7 @@ public class RunFinalizer implements BufferListener {
     @Override
     public boolean bufferFull() {
         switch (this.profile) {
-        case RhoDFPP:
+        case RHODFPP:
             return this.bufferFullRhoDFPP();
         default:
             return true;
@@ -104,7 +104,7 @@ public class RunFinalizer implements BufferListener {
                         }
                     }
 
-                    /* s p o -> s sp s (p in {domain, range} */
+                    /* s p o -> s sp s (p in {domain, range}) */
                     if ((p == domain) || (p == range)) {
                         outputTriples.add(new ImmutableTriple(s, subPropertyOf, s));
                     }
@@ -117,7 +117,7 @@ public class RunFinalizer implements BufferListener {
                         outputTriples.add(new ImmutableTriple(o, subClassOf, o));
                     }
 
-                    /* s p o -> o sc o (p in {domain, range, type} */
+                    /* s p o -> o sc o (p in {domain, range, type}) */
                     if ((p == domain) || (p == range) || (p == type)) {
                         outputTriples.add(new ImmutableTriple(o, subClassOf, o));
                     }
@@ -126,8 +126,8 @@ public class RunFinalizer implements BufferListener {
                     if (!RunFinalizer.this.tripleStore.contains(triple)) {
                         RunFinalizer.this.tripleStore.add(triple);
                     } else {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(RunFinalizer.this.dictionary.printTriple(triple) + " already present");
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(RunFinalizer.this.dictionary.printTriple(triple) + " already present");
                         }
                     }
                 }
@@ -152,7 +152,7 @@ public class RunFinalizer implements BufferListener {
     }
 
     public Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     public boolean isUseful() {

@@ -26,7 +26,7 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 public class RunSCM_RNG2 extends AbstractRun {
 
     private static final Logger LOGGER = Logger.getLogger(RunSCM_RNG2.class);
-    private static final String ruleName = "SCM_RNG2";
+    private static final String RULENAME = "SCM_RNG2";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.range, AbstractDictionary.subPropertyOf };
     public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.range };
 
@@ -71,11 +71,6 @@ public class RunSCM_RNG2 extends AbstractRun {
 
                     final Triple result = new ImmutableTriple(triple.getSubject(), range, c);
                     outputTriples.add(result);
-                    // if (logger.isTraceEnabled()) {
-                    // logger.trace(dictionary.printTriple(new ImmutableTriple(triple.getSubject(), subPropertyOf,
-                    // triple.getObject())) + " & " + dictionary.printTriple(new ImmutableTriple(triple.getObject(),
-                    // range, c)) + " -> " + dictionary.printTriple(result));
-                    // }
                 }
             }
         }
@@ -91,7 +86,7 @@ public class RunSCM_RNG2 extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.ruleName;
+        return RULENAME;
     }
 
 }

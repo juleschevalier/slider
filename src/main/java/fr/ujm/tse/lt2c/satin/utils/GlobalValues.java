@@ -6,6 +6,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class GlobalValues {
 
+    private GlobalValues() {
+
+    }
+
     private static Map<String, AtomicLong> runsByRule;
     private static Map<String, AtomicLong> duplicatesByRule;
     private static Map<String, AtomicLong> inferedByRule;
@@ -68,8 +72,8 @@ public class GlobalValues {
         if (!timeByFile.containsKey(file)) {
             timeByFile.put(file, time);
         } else {
-            final long new_time = (timeByFile.get(file) + time) / 2;
-            timeByFile.put(file, new_time);
+            final long newTime = (timeByFile.get(file) + time) / 2;
+            timeByFile.put(file, newTime);
         }
 
     }
