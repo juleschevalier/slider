@@ -38,7 +38,7 @@ import fr.ujm.tse.lt2c.satin.utils.RunEntity;
  * -i,--iteration <number>......how many times each file
  * -m,--mongo-save..............persists the results in MongoDB
  * -o,--output..................save output into file
- * -p,--profile <profile>.......set the fragment [GRhoDF, RhoDF, RhoDFPP]
+ * -p,--profile <profile>.......set the fragment [RhoDF, BRhoDF, RDFS, BRDFS]
  * -t,--threads <number>........set the number of threads by avaible core
  * 
  * @author Jules Chevalier
@@ -259,14 +259,14 @@ public class Main {
             case "RhoDF":
                 profile = ReasonerProfile.RHODF;
                 break;
-            case "GRhoDF":
-                profile = ReasonerProfile.GRHODF;
-                break;
-            case "RhoDFPP":
-                profile = ReasonerProfile.RHODFPP;
+            case "BRhoDF":
+                profile = ReasonerProfile.BRHODF;
                 break;
             case "RDFS":
                 profile = ReasonerProfile.RDFS;
+                break;
+            case "BRDFS":
+                profile = ReasonerProfile.BRDFS;
                 break;
 
             default:

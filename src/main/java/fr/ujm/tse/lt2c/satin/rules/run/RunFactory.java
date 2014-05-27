@@ -51,10 +51,22 @@ public class RunFactory {
             return new RunRDFS6(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         case RDFS8:
             return new RunRDFS8(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RDFS10:
+            return new RunRDFS10(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         case RDFS12:
             return new RunRDFS12(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         case RDFS13:
             return new RunRDFS13(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RHODF6a:
+            return new RunRHODF6a(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RHODF6b:
+            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RHODF6d:
+            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RHODF7a:
+            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        case RHODF7b:
+            return new RunRHODF7b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
         default:
             LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
@@ -94,10 +106,22 @@ public class RunFactory {
             return RunRDFS6.INPUT_MATCHERS;
         case RDFS8:
             return RunRDFS8.INPUT_MATCHERS;
+        case RDFS10:
+            return RunRDFS10.INPUT_MATCHERS;
         case RDFS12:
             return RunRDFS12.INPUT_MATCHERS;
         case RDFS13:
             return RunRDFS13.INPUT_MATCHERS;
+        case RHODF6a:
+            return RunRHODF6a.INPUT_MATCHERS;
+        case RHODF6b:
+            return RunRHODF6b.INPUT_MATCHERS;
+        case RHODF6d:
+            return RunRHODF6d.INPUT_MATCHERS;
+        case RHODF7a:
+            return RunRHODF7a.INPUT_MATCHERS;
+        case RHODF7b:
+            return RunRHODF7b.INPUT_MATCHERS;
         default:
             LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
@@ -137,10 +161,22 @@ public class RunFactory {
             return RunRDFS6.OUTPUT_MATCHERS;
         case RDFS8:
             return RunRDFS8.OUTPUT_MATCHERS;
+        case RDFS10:
+            return RunRDFS10.OUTPUT_MATCHERS;
         case RDFS12:
             return RunRDFS12.OUTPUT_MATCHERS;
         case RDFS13:
             return RunRDFS13.OUTPUT_MATCHERS;
+        case RHODF6a:
+            return RunRHODF6a.OUTPUT_MATCHERS;
+        case RHODF6b:
+            return RunRHODF6b.OUTPUT_MATCHERS;
+        case RHODF6d:
+            return RunRHODF6d.OUTPUT_MATCHERS;
+        case RHODF7a:
+            return RunRHODF7a.OUTPUT_MATCHERS;
+        case RHODF7b:
+            return RunRHODF7b.OUTPUT_MATCHERS;
         default:
             LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
@@ -181,10 +217,22 @@ public class RunFactory {
             return "RDFS6";
         case RDFS8:
             return "RDFS8";
+        case RDFS10:
+            return "RDFS10";
         case RDFS12:
             return "RDFS12";
         case RDFS13:
             return "RDFS13";
+        case RHODF6a:
+            return "RHODF6a";
+        case RHODF6b:
+            return "RHODF6b";
+        case RHODF6d:
+            return "RHODF6d";
+        case RHODF7a:
+            return "RHODF7a";
+        case RHODF7b:
+            return "RHODF7b";
 
         default:
             LOGGER.error("RUN FACTORY Unknown run type: " + run);
