@@ -58,7 +58,7 @@ public class TripleDistributor {
      */
     public void distributeAll(final Collection<Triple> triples) {
         for (final Triple triple : triples) {
-            this.ditribute(triple);
+            this.distribute(triple);
         }
     }
 
@@ -68,7 +68,7 @@ public class TripleDistributor {
      * @param triple
      * @return the number of times a triple has been sent
      */
-    public long ditribute(final Triple triple) {
+    public long distribute(final Triple triple) {
         long debugDistributed = 0;
         for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
             tripleBuffer.add(triple);

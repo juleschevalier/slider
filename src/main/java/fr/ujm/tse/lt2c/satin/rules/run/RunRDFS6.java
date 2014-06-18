@@ -26,7 +26,7 @@ public class RunRDFS6 extends AbstractRun {
     private static final Logger LOGGER = Logger.getLogger(RunRDFS6.class);
     private static final String RULENAME = "RDFS6";
     public static final long[] INPUT_MATCHERS = { AbstractDictionary.type };
-    public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.type };
+    public static final long[] OUTPUT_MATCHERS = { AbstractDictionary.subPropertyOf };
 
     public RunRDFS6(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
@@ -36,6 +36,7 @@ public class RunRDFS6 extends AbstractRun {
 
     @Override
     protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
+        System.out.println("mslkddjff");
 
         final long subPropertyOf = AbstractDictionary.subPropertyOf;
         final long type = AbstractDictionary.type;

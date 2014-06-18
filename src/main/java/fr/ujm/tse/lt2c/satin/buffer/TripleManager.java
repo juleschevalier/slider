@@ -43,7 +43,7 @@ public class TripleManager {
                 final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
                 newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
             }
-            if ((rule != newRule) && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
+            if (rule != newRule && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
                 rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
             }
         }
@@ -55,7 +55,18 @@ public class TripleManager {
      * @param triples
      */
     public void addTriples(final Collection<Triple> triples) {
+        // this.notify();
         this.generalDistributor.distributeAll(triples);
+    }
+
+    /**
+     * Send new triple to matching rules for inference
+     * 
+     * @param triples
+     */
+    public void addTriple(final Triple triple) {
+        // this.notify();
+        this.generalDistributor.distribute(triple);
     }
 
     /**
@@ -68,7 +79,7 @@ public class TripleManager {
     public long flushBuffers() {
         long total = 0;
         for (final Rule rule : this.rules) {
-            if ((rule.getTripleBuffer().getOccupation()) > 0) {
+            if (rule.getTripleBuffer().getOccupation() > 0) {
                 total++;
                 rule.bufferFull();
             }
@@ -94,7 +105,7 @@ public class TripleManager {
      *         else
      */
     private boolean match(final long[] in, final long[] out) {
-        if ((in.length == 0) || (out.length == 0)) {
+        if (in.length == 0 || out.length == 0) {
             return true;
         }
         // Broken loops
@@ -118,7 +129,7 @@ public class TripleManager {
      * @see #match(long[], long[])
      */
     private long[] extractMatchers(final long[] out, final long[] in) {
-        if ((in.length == 0) || (out.length == 0)) {
+        if (in.length == 0 || out.length == 0) {
             return new long[] {};
         }
 

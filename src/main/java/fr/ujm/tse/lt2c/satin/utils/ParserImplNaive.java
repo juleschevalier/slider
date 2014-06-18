@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.utils;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class ParserImplNaive implements Parser {
@@ -32,10 +35,11 @@ public class ParserImplNaive implements Parser {
     }
 
     @Override
-    public void parse(final String fileInput) {
+    public Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> parse(final String fileInput) {
 
         final PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         final PipedRDFStream<Triple> inputStream = new PipedTriplesStream(iter);
+        final Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> triples = new HashSet<>();
 
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Runnable parser = new Runnable() {
@@ -51,29 +55,95 @@ public class ParserImplNaive implements Parser {
         executor.shutdown();
         while (iter.hasNext()) {
             final Triple next = iter.next();
-            this.addTriple(next);
+            final String s = next.getSubject().toString();
+            final String p = next.getPredicate().toString();
+            final String o = next.getObject().toString();
+
+            final long si = this.dictionary.add(s);
+            final long pi = this.dictionary.add(p);
+            final long oi = this.dictionary.add(o);
+
+            final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
+            this.tripleStore.add(triple);
+            triples.add(triple);
         }
+
+        return triples;
 
     }
 
-    private void addTriple(final Triple next) {
-        final String s = next.getSubject().toString();
-        final String p = next.getPredicate().toString();
-        final String o = next.getObject().toString();
+    @Override
+    public void parseStream(final String fileInput, final ReasonerStreamed reasoner) {
 
-        final long si = this.dictionary.add(s);
-        final long pi = this.dictionary.add(p);
-        final long oi = this.dictionary.add(o);
+        final PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
+        final PipedRDFStream<Triple> inputStream = new PipedTriplesStream(iter);
 
-        this.tripleStore.add(new ImmutableTriple(si, pi, oi));
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
+        final Runnable parser = new Runnable() {
+
+            @Override
+            public void run() {
+                // Call the parsing process.
+                RDFDataMgr.parse(inputStream, fileInput);
+            }
+        };
+
+        final int max = 10;
+        final Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> triples = new HashSet<>();
+
+        executor.submit(parser);
+        executor.shutdown();
+        while (iter.hasNext()) {
+            final Triple next = iter.next();
+            final String s = next.getSubject().toString();
+            final String p = next.getPredicate().toString();
+            final String o = next.getObject().toString();
+
+            final long si = this.dictionary.add(s);
+            final long pi = this.dictionary.add(p);
+            final long oi = this.dictionary.add(o);
+
+            final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
+            this.tripleStore.add(triple);
+            triples.add(triple);
+            if (triples.size() > max) {
+                reasoner.addTriples(triples);
+                triples.clear();
+            }
+        }
+        reasoner.addTriples(triples);
+
+    }
+
+    @Override
+    public Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> parse(final Model model) {
+        final StmtIterator smtIterator = model.listStatements();
+        final Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> triples = new HashSet<>();
+
+        while (smtIterator.hasNext()) {
+            final Triple next = smtIterator.next().asTriple();
+            final String s = next.getSubject().toString();
+            final String p = next.getPredicate().toString();
+            final String o = next.getObject().toString();
+
+            final long si = this.dictionary.add(s);
+            final long pi = this.dictionary.add(p);
+            final long oi = this.dictionary.add(o);
+
+            final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
+            this.tripleStore.add(triple);
+            triples.add(triple);
+        }
+
+        return triples;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((this.dictionary == null) ? 0 : this.dictionary.hashCode());
-        result = (prime * result) + ((this.tripleStore == null) ? 0 : this.tripleStore.hashCode());
+        result = prime * result + (this.dictionary == null ? 0 : this.dictionary.hashCode());
+        result = prime * result + (this.tripleStore == null ? 0 : this.tripleStore.hashCode());
         return result;
     }
 
@@ -104,14 +174,5 @@ public class ParserImplNaive implements Parser {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void parse(final Model model) {
-        final StmtIterator smtIterator = model.listStatements();
-        while (smtIterator.hasNext()) {
-            final Triple next = smtIterator.next().asTriple();
-            this.addTriple(next);
-        }
     }
 }

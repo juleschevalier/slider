@@ -2,6 +2,7 @@ package fr.ujm.tse.lt2c.satin.main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -14,20 +15,17 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-
-import com.mongodb.MongoClient;
 
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
+import fr.ujm.tse.lt2c.satin.interfaces.Parser;
+import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
-import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
-import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
 /**
  * usage: main
@@ -66,62 +64,71 @@ public class Main {
             return;
         }
 
-        TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-        Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
-
         if (arguments.getFiles().isEmpty()) {
             LOGGER.warn("No available file.");
             return;
         }
 
-        for (int loop = 0; loop < arguments.getIteration(); loop++) {
-            for (final File file : arguments.getFiles()) {
+        for (final File file : arguments.getFiles()) {
 
-                /*
-                 * INFERENCE
-                 */
-                final RunEntity runEntity = reasoner.infereFromFile(file.getAbsolutePath());
+            System.out.println(file.getName());
 
-                /* Dumping */
-                if (arguments.isDumpMode()) {
-                    final File newFile = new File("infered_" + arguments.getProfile() + "_" + file.getName());
-                    if (!newFile.exists()) {
-                        tripleStore.writeToFile(newFile.getName(), dictionary);
-                    }
-                }
-
-                /* Reset log tracers */
-                GlobalValues.reset();
-
-                if (arguments.isPersistMode() && loop > 0) {
-                    try {
-                        // TODO Customizable IP
-                        final MongoClient client = new MongoClient("10.20.0.57");
-                        final Morphia morphia = new Morphia();
-                        morphia.map(RunEntity.class);
-                        final Datastore ds = morphia.createDatastore(client, "RunResults");
-                        ds.save(runEntity);
-                    } catch (final Exception e) {
-                        LOGGER.error("", e);
-                    }
-                }
-
-                if (!arguments.isCumulativeMode()) {
-                    tripleStore = new VerticalPartioningTripleStoreRWLock();
-                    dictionary = new DictionaryPrimitrivesRWLock();
-                    reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments);
-                }
+            Long start = System.nanoTime();
+            TripleStore tripleStore = null;
+            for (int i = 0; i < 5; i++) {
+                tripleStore = reason2(arguments, file);
             }
-        }
+            Long stop = System.nanoTime();
+            System.out.println(tripleStore.size() + " triples in " + (stop - start) / 1000000 / 5 + "ms (stream)");
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("--------AVERAGE TIMES--------");
-            for (final String file : GlobalValues.getTimeByFile().keySet()) {
-                LOGGER.info(new File(file).getName() + " " + nsToTime(GlobalValues.getTimeByFile().get(file)));
+            start = System.nanoTime();
+            for (int i = 0; i < 5; i++) {
+                tripleStore = reason1(arguments, file);
             }
-        }
+            stop = System.nanoTime();
+            System.out.println(tripleStore.size() + " triples in " + (stop - start) / 1000000 / 5 + "ms (normal)");
 
+        }
+    }
+
+    private static TripleStore reason1(final ReasoningArguments arguments, final File file) {
+        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
+
+        reasoner.start();
+
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        parser.parseStream(file.getAbsolutePath(), reasoner);
+
+        reasoner.close();
+        try {
+            reasoner.join();
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        return tripleStore;
+    }
+
+    private static TripleStore reason2(final ReasoningArguments arguments, final File file) {
+        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
+
+        reasoner.start();
+
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
+
+        reasoner.addTriples(triples);
+
+        reasoner.close();
+        try {
+            reasoner.join();
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        return tripleStore;
     }
 
     /**
