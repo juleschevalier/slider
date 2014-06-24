@@ -50,13 +50,15 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        if (((this.phaser.get() < this.maxThreads) || (this.maxThreads == 0)) && ((this.tripleBuffer.getOccupation()) > 0)) {
-            this.phaser.incrementAndGet();
-            this.executor
-                    .submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
-            return true;
+        synchronized (this.phaser) {
+            if ((this.phaser.get() < this.maxThreads || this.maxThreads == 0) && this.tripleBuffer.getOccupation() > 0) {
+                this.phaser.incrementAndGet();
+                this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
+                        this.phaser));
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     public long[] getInputMatchers() {

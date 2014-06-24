@@ -69,29 +69,25 @@ public class Main {
             return;
         }
 
-        for (final File file : arguments.getFiles()) {
+        LOGGER.info("file output batch stream");
 
-            System.out.println(file.getName());
+        for (int i = 0; i < arguments.getIteration(); i++) {
+            for (final File file : arguments.getFiles()) {
 
-            Long start = System.nanoTime();
-            TripleStore tripleStore = null;
-            for (int i = 0; i < 5; i++) {
-                tripleStore = reason2(arguments, file);
+                final Long start = System.nanoTime();
+                TripleStore tripleStore = null;
+                tripleStore = reasonBatch(arguments, file);
+                final Long batch = System.nanoTime();
+
+                tripleStore = reasonStream(arguments, file);
+                final Long stream = System.nanoTime();
+                LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (batch - start) / 1000000 + " " + (stream - batch) / 1000000);
+
             }
-            Long stop = System.nanoTime();
-            System.out.println(tripleStore.size() + " triples in " + (stop - start) / 1000000 / 5 + "ms (stream)");
-
-            start = System.nanoTime();
-            for (int i = 0; i < 5; i++) {
-                tripleStore = reason1(arguments, file);
-            }
-            stop = System.nanoTime();
-            System.out.println(tripleStore.size() + " triples in " + (stop - start) / 1000000 / 5 + "ms (normal)");
-
         }
     }
 
-    private static TripleStore reason1(final ReasoningArguments arguments, final File file) {
+    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
@@ -110,15 +106,15 @@ public class Main {
         return tripleStore;
     }
 
-    private static TripleStore reason2(final ReasoningArguments arguments, final File file) {
+    private static TripleStore reasonBatch(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
 
-        reasoner.start();
-
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
         final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
+
+        reasoner.start();
 
         reasoner.addTriples(triples);
 
@@ -128,6 +124,7 @@ public class Main {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
+
         return tripleStore;
     }
 

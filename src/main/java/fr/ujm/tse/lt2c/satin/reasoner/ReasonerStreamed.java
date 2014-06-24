@@ -45,7 +45,7 @@ public class ReasonerStreamed extends Thread {
     private final Dictionary dictionary;
     private final TripleManager tripleManager;
     private final AtomicInteger phaser;
-    private boolean running = false;
+    private boolean running = true;
 
     /**
      * Constructors
@@ -93,7 +93,7 @@ public class ReasonerStreamed extends Thread {
     @Override
     public void run() {
 
-        this.running = true;
+        // this.running = true;
 
         long nonEmptyBuffers = this.tripleManager.flushBuffers();
 
@@ -158,7 +158,6 @@ public class ReasonerStreamed extends Thread {
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
             tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            // break;
             break;
         case BRDFS:
             tripleManager.addRule(new Rule(AvaibleRuns.RDFS6, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
@@ -240,6 +239,5 @@ public class ReasonerStreamed extends Thread {
 
     public void close() {
         this.running = false;
-
     }
 }
