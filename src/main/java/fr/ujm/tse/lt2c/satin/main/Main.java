@@ -69,7 +69,7 @@ public class Main {
             return;
         }
 
-        LOGGER.info("file output batch stream");
+        LOGGER.info("file profile batchInfered batchTime streamInfered streamTime");
 
         for (int i = 0; i < arguments.getIteration(); i++) {
             for (final File file : arguments.getFiles()) {
@@ -77,11 +77,15 @@ public class Main {
                 final Long start = System.nanoTime();
                 TripleStore tripleStore = null;
                 tripleStore = reasonBatch(arguments, file);
-                final Long batch = System.nanoTime();
+                final Long batchTime = System.nanoTime();
+                final long batchInfered = tripleStore.size();
 
                 tripleStore = reasonStream(arguments, file);
-                final Long stream = System.nanoTime();
-                LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (batch - start) / 1000000 + " " + (stream - batch) / 1000000);
+                final Long streamTime = System.nanoTime();
+                final long streamInfered = tripleStore.size();
+
+                LOGGER.info(file.getName() + " " + arguments.getProfile() + " " + batchInfered + " " + (batchTime - start) / 1000000 + " " + streamInfered
+                        + " " + (streamTime - batchTime) / 1000000);
 
             }
         }
