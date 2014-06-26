@@ -22,8 +22,9 @@ import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
 public class ParserImplNaive implements Parser {
 
-    Dictionary dictionary;
-    TripleStore tripleStore;
+    private final Dictionary dictionary;
+    private final TripleStore tripleStore;
+    private int streamBlockSize;
 
     /**
      * @param f
@@ -32,6 +33,7 @@ public class ParserImplNaive implements Parser {
     public ParserImplNaive(final Dictionary dictionary, final TripleStore tripleStore) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
+        this.streamBlockSize = 100;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class ParserImplNaive implements Parser {
             }
         };
 
-        final int max = 10;
+        // final int max = 1000;
         final Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> triples = new HashSet<>();
 
         executor.submit(parser);
@@ -106,7 +108,7 @@ public class ParserImplNaive implements Parser {
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
             this.tripleStore.add(triple);
             triples.add(triple);
-            if (triples.size() > max) {
+            if (triples.size() > this.getStreamBlockSize()) {
                 reasoner.addTriples(triples);
                 triples.clear();
             }
@@ -174,5 +176,13 @@ public class ParserImplNaive implements Parser {
             return false;
         }
         return true;
+    }
+
+    public int getStreamBlockSize() {
+        return this.streamBlockSize;
+    }
+
+    public void setStreamBlockSize(final int streamBlockSize) {
+        this.streamBlockSize = streamBlockSize;
     }
 }

@@ -69,29 +69,52 @@ public class Main {
             return;
         }
 
-        LOGGER.info("file profile batchInfered batchTime streamInfered streamTime");
+        LOGGER.info("Tour pour rien...");
+        for (final File file : arguments.getFiles()) {
+            long start = System.nanoTime();
+            start = System.nanoTime();
+            reasonStream(arguments, file, 10);
+            final long streamTime = System.nanoTime();
 
-        for (int i = 0; i < arguments.getIteration(); i++) {
+        }
+
+        LOGGER.info("Soyons sérieux");
+        final int[] sizes = { 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000 };
+        for (final int blockSize : sizes) {
             for (final File file : arguments.getFiles()) {
 
-                final Long start = System.nanoTime();
-                TripleStore tripleStore = null;
-                tripleStore = reasonBatch(arguments, file);
-                final Long batchTime = System.nanoTime();
-                final long batchInfered = tripleStore.size();
+                final long start = System.nanoTime();
+                for (int i = 0; i < arguments.getIteration(); i++) {
+                    reasonStream(arguments, file, blockSize);
 
-                tripleStore = reasonStream(arguments, file);
-                final Long streamTime = System.nanoTime();
-                final long streamInfered = tripleStore.size();
+                }
+                final long streamTime = System.nanoTime();
 
-                LOGGER.info(file.getName() + " " + arguments.getProfile() + " " + batchInfered + " " + (batchTime - start) / 1000000 + " " + streamInfered
-                        + " " + (streamTime - batchTime) / 1000000);
+                LOGGER.info(file.getName() + " " + (streamTime - start) / 1000000 / arguments.getIteration() + " " + blockSize);
 
             }
         }
     }
 
-    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file) {
+    // LOGGER.info("file profile batchInfered batchTime streamInfered streamTime");
+
+    // long start = System.nanoTime();
+    // TripleStore tripleStore = null;
+    // tripleStore = reasonBatch(arguments, file);
+    // final Long batchTime = System.nanoTime();
+    // final long batchInfered = tripleStore.size();
+    //
+    // start = System.nanoTime();
+    // tripleStore = reasonStream(arguments, file);
+    // final long streamTime = System.nanoTime();
+    // final long streamInfered = tripleStore.size();
+    //
+    // LOGGER.info(file.getName() + " " + arguments.getProfile() + " " + batchInfered + " " + (batchTime
+    // -
+    // start) / 1000000 + " " + streamInfered
+    // + " " + (streamTime - batchTime) / 1000000);
+
+    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file, final int blockSize) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
@@ -99,6 +122,7 @@ public class Main {
         reasoner.start();
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        parser.setStreamBlockSize(blockSize);
         parser.parseStream(file.getAbsolutePath(), reasoner);
 
         reasoner.close();
