@@ -37,7 +37,7 @@ import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
  * -m,--mongo-save..............persists the results in MongoDB
  * -o,--output..................save output into file
  * -p,--profile <profile>.......set the fragment [RhoDF, BRhoDF, RDFS, BRDFS]
- * -t,--threads <number>........set the number of threads by avaible core
+ * -t,--threads <number>........set the number of threads by available core
  * 
  * @author Jules Chevalier
  */
@@ -69,52 +69,18 @@ public class Main {
             return;
         }
 
-        LOGGER.info("Tour pour rien...");
         for (final File file : arguments.getFiles()) {
-            long start = System.nanoTime();
-            start = System.nanoTime();
-            reasonStream(arguments, file, 10);
+            final long start = System.nanoTime();
+            for (int i = 0; i < arguments.getIteration(); i++) {
+                reasonStream(arguments, file);
+            }
             final long streamTime = System.nanoTime();
 
-        }
-
-        LOGGER.info("Soyons sérieux");
-        final int[] sizes = { 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000 };
-        for (final int blockSize : sizes) {
-            for (final File file : arguments.getFiles()) {
-
-                final long start = System.nanoTime();
-                for (int i = 0; i < arguments.getIteration(); i++) {
-                    reasonStream(arguments, file, blockSize);
-
-                }
-                final long streamTime = System.nanoTime();
-
-                LOGGER.info(file.getName() + " " + (streamTime - start) / 1000000 / arguments.getIteration() + " " + blockSize);
-
-            }
+            LOGGER.info(file.getName() + " " + (streamTime - start) / 1000000 / arguments.getIteration());
         }
     }
 
-    // LOGGER.info("file profile batchInfered batchTime streamInfered streamTime");
-
-    // long start = System.nanoTime();
-    // TripleStore tripleStore = null;
-    // tripleStore = reasonBatch(arguments, file);
-    // final Long batchTime = System.nanoTime();
-    // final long batchInfered = tripleStore.size();
-    //
-    // start = System.nanoTime();
-    // tripleStore = reasonStream(arguments, file);
-    // final long streamTime = System.nanoTime();
-    // final long streamInfered = tripleStore.size();
-    //
-    // LOGGER.info(file.getName() + " " + arguments.getProfile() + " " + batchInfered + " " + (batchTime
-    // -
-    // start) / 1000000 + " " + streamInfered
-    // + " " + (streamTime - batchTime) / 1000000);
-
-    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file, final int blockSize) {
+    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
@@ -122,7 +88,6 @@ public class Main {
         reasoner.start();
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-        parser.setStreamBlockSize(blockSize);
         parser.parseStream(file.getAbsolutePath(), reasoner);
 
         reasoner.close();
@@ -210,7 +175,7 @@ public class Main {
         profileO.setArgs(1);
         options.addOption(profileO);
 
-        final Option threadsO = new Option("t", "threads", true, "set the number of threads by avaible core (0 means the jvm manage)");
+        final Option threadsO = new Option("t", "threads", true, "set the number of threads by available core (0 means the jvm manage)");
         threadsO.setArgName("number");
         threadsO.setArgs(1);
         threadsO.setType(Number.class);

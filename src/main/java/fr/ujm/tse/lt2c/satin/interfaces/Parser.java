@@ -38,6 +38,4 @@ public interface Parser {
      */
     Collection<Triple> parse(Model model);
 
-    public void setStreamBlockSize(final int streamBlockSize);
-
 }

@@ -24,7 +24,7 @@ public class ParserImplNaive implements Parser {
 
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
-    private int streamBlockSize;
+    private final static int STREAM_BLOCK_SIZE = 200;
 
     /**
      * @param f
@@ -33,7 +33,6 @@ public class ParserImplNaive implements Parser {
     public ParserImplNaive(final Dictionary dictionary, final TripleStore tripleStore) {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
-        this.streamBlockSize = 100;
     }
 
     @Override
@@ -66,8 +65,9 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
 
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
-            this.tripleStore.add(triple);
-            triples.add(triple);
+            if (this.tripleStore.add(triple)) {
+                triples.add(triple);
+            }
         }
 
         return triples;
@@ -108,7 +108,7 @@ public class ParserImplNaive implements Parser {
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
             this.tripleStore.add(triple);
             triples.add(triple);
-            if (triples.size() > this.getStreamBlockSize()) {
+            if (triples.size() > STREAM_BLOCK_SIZE) {
                 reasoner.addTriples(triples);
                 triples.clear();
             }
@@ -133,8 +133,9 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
 
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
-            this.tripleStore.add(triple);
-            triples.add(triple);
+            if (this.tripleStore.add(triple)) {
+                triples.add(triple);
+            }
         }
 
         return triples;
@@ -176,13 +177,5 @@ public class ParserImplNaive implements Parser {
             return false;
         }
         return true;
-    }
-
-    public int getStreamBlockSize() {
-        return this.streamBlockSize;
-    }
-
-    public void setStreamBlockSize(final int streamBlockSize) {
-        this.streamBlockSize = streamBlockSize;
     }
 }
