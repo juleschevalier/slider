@@ -70,6 +70,10 @@ public class Main {
         }
 
         for (final File file : arguments.getFiles()) {
+            reasonStream(arguments, file);
+        }
+
+        for (final File file : arguments.getFiles()) {
             final long start = System.nanoTime();
             for (int i = 0; i < arguments.getIteration(); i++) {
                 reasonStream(arguments, file);

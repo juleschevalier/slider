@@ -3,6 +3,7 @@ package fr.ujm.tse.lt2c.satin.rules;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
@@ -27,11 +28,12 @@ public class Rule implements BufferListener {
     private final TripleStore tripleStore;
     private final AvaibleRuns run;
     private final int maxThreads;
+    private final BufferTimer timer;
 
     ExecutorService executor;
 
     public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
-            final int bufferSize, final int maxThreads) {
+            final int bufferSize, final int maxThreads, final BufferTimer timer) {
         super();
         this.run = run;
         this.executor = executor;
@@ -39,8 +41,9 @@ public class Rule implements BufferListener {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
         this.maxThreads = maxThreads;
+        this.timer = timer;
 
-        this.tripleBuffer = new QueuedTripleBufferLock(bufferSize);
+        this.tripleBuffer = new QueuedTripleBufferLock(bufferSize, this.timer, this);
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
         this.tripleBuffer.addBufferListener(this);
 
@@ -54,7 +57,7 @@ public class Rule implements BufferListener {
             if ((this.phaser.get() < this.maxThreads || this.maxThreads == 0) && this.tripleBuffer.getOccupation() > 0) {
                 this.phaser.incrementAndGet();
                 this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
-                        this.phaser));
+                        this.phaser, this.timer));
                 return true;
             }
             return false;

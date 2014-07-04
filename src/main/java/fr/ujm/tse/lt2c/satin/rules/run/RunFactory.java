@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
@@ -18,7 +19,7 @@ public class RunFactory {
     }
 
     public static AbstractRun getRunInstance(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore,
-            final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+            final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser, final BufferTimer timer) {
 
         switch (run) {
         case CAX_SCO:

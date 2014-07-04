@@ -24,7 +24,6 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
-import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -94,7 +93,7 @@ public class ReasonerStreamed extends Thread {
     public void run() {
 
         // this.running = true;
-
+        this.tripleManager.start();
         long nonEmptyBuffers = this.tripleManager.flushBuffers();
 
         while (this.running || nonEmptyBuffers > 0) {
@@ -115,6 +114,7 @@ public class ReasonerStreamed extends Thread {
 
         }
 
+        this.tripleManager.stop();
         shutdownAndAwaitTermination(this.executor);
 
     }
@@ -133,11 +133,11 @@ public class ReasonerStreamed extends Thread {
             final TripleManager tripleManager, final AtomicInteger phaser, final ExecutorService executor) {
         switch (profile) {
         case BRHODF:
-            tripleManager.addRule(new Rule(AvaibleRuns.RHODF6a, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RHODF6b, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RHODF6d, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RHODF7a, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RHODF7b, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(AvaibleRuns.RHODF6a, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RHODF6b, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RHODF6d, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RHODF7a, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RHODF7b, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
 
             final long subPropertyOf = AbstractDictionary.subPropertyOf;
             final long subClassOf = AbstractDictionary.subClassOf;
@@ -150,33 +150,33 @@ public class ReasonerStreamed extends Thread {
             tripleStore.add(new ImmutableTriple(range, subPropertyOf, range));
             tripleStore.add(new ImmutableTriple(type, subPropertyOf, type));
         case RHODF:
-            tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
             break;
         case BRDFS:
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS6, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS10, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(AvaibleRuns.RDFS6, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RDFS10, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
         case RDFS:
-            tripleManager.addRule(new Rule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS4, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS8, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS12, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
-            tripleManager.addRule(new Rule(AvaibleRuns.RDFS13, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads));
+            tripleManager.addRule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_DOM1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_RNG1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RDFS4, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RDFS8, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RDFS12, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            tripleManager.addRule(AvaibleRuns.RDFS13, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
             break;
         default:
             LOGGER.error("Reasoner profile unknown: " + profile);

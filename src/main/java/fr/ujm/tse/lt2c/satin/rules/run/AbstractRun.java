@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.RuleRun;
@@ -18,13 +19,14 @@ public abstract class AbstractRun implements RuleRun {
 
     private static Logger logger = Logger.getLogger(AbstractRun.class);
 
-    protected Dictionary dictionary;
-    protected TripleStore tripleStore;
-    protected TripleDistributor distributor;
-    protected TripleBuffer tripleBuffer;
+    protected final Dictionary dictionary;
+    protected final TripleStore tripleStore;
+    protected final TripleDistributor distributor;
+    protected final TripleBuffer tripleBuffer;
     protected String ruleName = "";
-    protected AtomicInteger phaser;
+    protected final AtomicInteger phaser;
     protected byte complexity = 2;
+    protected final BufferTimer timer;
 
     /**
      * Constructor
@@ -44,6 +46,7 @@ public abstract class AbstractRun implements RuleRun {
         this.distributor = tripleDistributor;
         this.tripleBuffer = tripleBuffer;
         this.phaser = phaser;
+        this.timer = this.timer;
     }
 
     @Override

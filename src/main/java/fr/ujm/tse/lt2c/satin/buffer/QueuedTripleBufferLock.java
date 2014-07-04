@@ -13,6 +13,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 
 /**
@@ -27,21 +28,25 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     /* Limit of the buffer (adding the last triple calls bufferfull) */
     private final long bufferSize;
 
-    Queue<Triple> triples;
-    ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
-    Collection<BufferListener> bufferListeners;
-    AtomicInteger currentBuffer;
+    private final Queue<Triple> triples;
+    private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
+    private final Collection<BufferListener> bufferListeners;
+    private final AtomicInteger currentBuffer;
+    private final BufferTimer timer;
+    private final Rule rule;
 
     String debugName;
 
     /**
      * Constructor
      */
-    public QueuedTripleBufferLock(final long bufferSize) {
+    public QueuedTripleBufferLock(final long bufferSize, final BufferTimer timer, final Rule rule) {
         this.triples = new ConcurrentLinkedQueue<>();
         this.bufferListeners = new HashSet<>();
         this.currentBuffer = new AtomicInteger();
         this.bufferSize = bufferSize;
+        this.timer = timer;
+        this.rule = rule;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             this.rwlock.writeLock().lock();
 
             this.triples.add(triple);
+            this.timer.notifyAdd(this.rule);
             if (this.currentBuffer.incrementAndGet() >= this.bufferSize) {
                 this.currentBuffer.set(0);
                 for (final BufferListener bufferListener : this.bufferListeners) {
@@ -70,7 +76,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             this.rwlock.writeLock().lock();
             this.triples.addAll(triples);
             for (final BufferListener bufferListener : this.bufferListeners) {
-                for (int i = 0; i < (triples.size() / this.bufferSize); i++) {
+                for (int i = 0; i < triples.size() / this.bufferSize; i++) {
                     bufferListener.bufferFull();
                 }
             }
@@ -91,7 +97,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
             int i = 0;
             Triple triple = this.triples.poll();
-            while ((triple != null) && (i++ < this.bufferSize)) {
+            while (triple != null && i++ < this.bufferSize) {
                 ts.add(triple);
                 if (i < this.bufferSize) {
                     triple = this.triples.poll();
@@ -118,7 +124,16 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     @Override
     public Collection<Triple> getCollection() {
-        return this.triples;
+        Collection<Triple> triplesList = null;
+        try {
+            this.rwlock.readLock().lock();
+            triplesList = this.triples;
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.readLock().unlock();
+        }
+        return triplesList;
     }
 
     @Override
@@ -128,7 +143,16 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     @Override
     public long getOccupation() {
-        return this.triples.size();
+        long size = -1;
+        try {
+            this.rwlock.readLock().lock();
+            size = this.triples.size();
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.readLock().unlock();
+        }
+        return size;
     }
 
     @Override

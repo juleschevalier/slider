@@ -3,9 +3,15 @@ package fr.ujm.tse.lt2c.satin.buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.Rule;
+import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 
 /**
  * Links all the buffers together
@@ -17,6 +23,9 @@ public class TripleManager {
 
     List<Rule> rules;
     TripleDistributor generalDistributor;
+    Timer timer;
+    BufferTimer bufferTimer;
+    private final static long TIMEOUT = 500;
 
     /**
      * Constructor
@@ -25,6 +34,19 @@ public class TripleManager {
         super();
         this.rules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
+        this.timer = new Timer();
+        this.bufferTimer = new BufferTimer(TIMEOUT);
+    }
+
+    public void start() {
+        for (final Rule rule : this.rules) {
+            this.bufferTimer.addRule(rule);
+        }
+        this.timer.scheduleAtFixedRate(this.bufferTimer, TIMEOUT, TIMEOUT);
+    }
+
+    public void stop() {
+        this.timer.cancel();
     }
 
     /**
@@ -34,7 +56,10 @@ public class TripleManager {
      * @param newRule
      * @see Rule
      */
-    public void addRule(final Rule newRule) {
+    public void addRule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary,
+            final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
+
+        final Rule newRule = new Rule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.bufferTimer);
         this.rules.add(newRule);
         this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
 
@@ -55,7 +80,6 @@ public class TripleManager {
      * @param triples
      */
     public void addTriples(final Collection<Triple> triples) {
-        // this.notify();
         this.generalDistributor.distributeAll(triples);
     }
 
@@ -65,7 +89,6 @@ public class TripleManager {
      * @param triples
      */
     public void addTriple(final Triple triple) {
-        // this.notify();
         this.generalDistributor.distribute(triple);
     }
 
