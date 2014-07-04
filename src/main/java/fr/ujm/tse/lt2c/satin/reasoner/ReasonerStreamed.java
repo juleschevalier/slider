@@ -24,6 +24,7 @@ import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
@@ -60,6 +61,7 @@ public class ReasonerStreamed extends Thread {
 
         /* Initialize rules used for inference on RhoDF */
         this.initialiseReasoner(this.profile, this.tripleStore, this.dictionary, this.tripleManager, this.phaser, this.executor);
+
     }
 
     /*
@@ -239,5 +241,9 @@ public class ReasonerStreamed extends Thread {
 
     public void close() {
         this.running = false;
+    }
+
+    public Collection<Rule> getRules() {
+        return this.tripleManager.getRules();
     }
 }

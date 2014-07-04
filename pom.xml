@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.ujm.tse.lt2c.satin</groupId>
 	<artifactId>DistributedReasoner</artifactId>
-	<version>0.9.4</version>
+	<version>0.9.5</version>
 	<name>slider</name>
 	<url>https://github.com/telecom-se/distributed-reasoner</url>
 	<distributionManagement>

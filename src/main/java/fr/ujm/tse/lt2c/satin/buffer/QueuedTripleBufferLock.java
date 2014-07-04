@@ -145,12 +145,12 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public long getOccupation() {
         long size = -1;
         try {
-            this.rwlock.readLock().lock();
+            // this.rwlock.readLock().lock();
             size = this.triples.size();
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            this.rwlock.readLock().unlock();
+            // this.rwlock.readLock().unlock();
         }
         return size;
     }

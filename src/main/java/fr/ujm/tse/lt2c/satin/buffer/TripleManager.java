@@ -25,7 +25,7 @@ public class TripleManager {
     TripleDistributor generalDistributor;
     Timer timer;
     BufferTimer bufferTimer;
-    private final static long TIMEOUT = 500;
+    public final static long TIMEOUT = 500;
 
     /**
      * Constructor

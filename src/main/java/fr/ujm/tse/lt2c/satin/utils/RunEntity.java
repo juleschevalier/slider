@@ -1,8 +1,10 @@
 package fr.ujm.tse.lt2c.satin.utils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bson.types.ObjectId;
@@ -13,18 +15,23 @@ import org.mongodb.morphia.annotations.Id;
 @Entity(noClassnameStored = true)
 public class RunEntity {
 
-    /* Mongo stuff */
+    /* Mongo */
     @Id
     private ObjectId id;
 
-    /* Config stuff */
+    /* Environment */
     private String machineName;
     private int coresNb;
     private long ram;
+
+    /* Configuration */
     private int threadsNb;
     private long bufferSize;
+    private long timeout;
     private String version;
     private String profile;
+    @Embedded
+    private Collection<String> rules;
 
     /* Results */
     private int sessionId;
@@ -34,7 +41,6 @@ public class RunEntity {
     private long inferenceTime;
     private long nbInitialTriples;
     private long nbInferedTriples;
-    private String perfStat;
 
     @Embedded
     private Map<String, AtomicLong> runsByRule;
@@ -42,34 +48,44 @@ public class RunEntity {
     private Map<String, AtomicLong> duplicatesByRule;
     @Embedded
     private Map<String, AtomicLong> inferedByRule;
+    @Embedded
+    private Map<String, AtomicLong> timeoutByRule;
 
     public RunEntity() {
         super();
     }
 
-    public RunEntity(final String machineName, final int coresNb, final long ram, final int threadsNb, final long bufferSize, final String version,
-            final String profile, final int sessionId, final String fileInput, final Date date, final long parsingTime, final long inferenceTime,
-            final long nbInitialTriples, final long nbInferedTriples, final String perfStat, final Map<String, AtomicLong> runsByRule,
-            final Map<String, AtomicLong> duplicatesByRule, final Map<String, AtomicLong> inferedByRule) {
+    public RunEntity(final int threadsNb, final long bufferSize, final long timeout, final String version, final String profile,
+            final Collection<String> rules, final int sessionId, final String fileInput, final long parsingTime, final long inferenceTime,
+            final long nbInitialTriples, final long nbInferedTriples, final Map<String, AtomicLong> runsByRule, final Map<String, AtomicLong> duplicatesByRule,
+            final Map<String, AtomicLong> inferedByRule, final Map<String, AtomicLong> timeoutByRule) {
         super();
-        this.machineName = machineName;
-        this.coresNb = coresNb;
-        this.ram = ram;
+
+        this.machineName = "";
+        try {
+            this.machineName = InetAddress.getLocalHost().getHostName();
+        } catch (final UnknownHostException e) {}
+        this.machineName += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
+        this.coresNb = Runtime.getRuntime().availableProcessors();
+        this.ram = Runtime.getRuntime().totalMemory();
+        this.date = new Date();
+
         this.threadsNb = threadsNb;
         this.bufferSize = bufferSize;
+        this.timeout = timeout;
         this.version = version;
         this.profile = profile;
+        this.rules = rules;
         this.sessionId = sessionId;
         this.fileInput = fileInput;
-        this.date = date;
         this.parsingTime = parsingTime;
         this.inferenceTime = inferenceTime;
         this.nbInitialTriples = nbInitialTriples;
         this.nbInferedTriples = nbInferedTriples;
-        this.perfStat = perfStat;
         this.runsByRule = runsByRule;
         this.duplicatesByRule = duplicatesByRule;
         this.inferedByRule = inferedByRule;
+        this.timeoutByRule = timeoutByRule;
     }
 
     public ObjectId getId() {
@@ -120,6 +136,14 @@ public class RunEntity {
         this.bufferSize = bufferSize;
     }
 
+    public long getTimeout() {
+        return this.timeout;
+    }
+
+    public void setTimeout(final long timeout) {
+        this.timeout = timeout;
+    }
+
     public String getVersion() {
         return this.version;
     }
@@ -134,6 +158,14 @@ public class RunEntity {
 
     public void setProfile(final String profile) {
         this.profile = profile;
+    }
+
+    public Collection<String> getRules() {
+        return this.rules;
+    }
+
+    public void setRules(final Collection<String> rules) {
+        this.rules = rules;
     }
 
     public int getSessionId() {
@@ -192,14 +224,6 @@ public class RunEntity {
         this.nbInferedTriples = nbInferedTriples;
     }
 
-    public String getPerfStat() {
-        return this.perfStat;
-    }
-
-    public void setPerfStat(final String perfStat) {
-        this.perfStat = perfStat;
-    }
-
     public Map<String, AtomicLong> getRunsByRule() {
         return this.runsByRule;
     }
@@ -224,6 +248,14 @@ public class RunEntity {
         this.inferedByRule = inferedByRule;
     }
 
+    public Map<String, AtomicLong> getTimeoutByRule() {
+        return this.timeoutByRule;
+    }
+
+    public void setTimeoutByRule(final Map<String, AtomicLong> timeoutByRule) {
+        this.timeoutByRule = timeoutByRule;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -240,12 +272,14 @@ public class RunEntity {
         result = prime * result + (int) (this.nbInferedTriples ^ this.nbInferedTriples >>> 32);
         result = prime * result + (int) (this.nbInitialTriples ^ this.nbInitialTriples >>> 32);
         result = prime * result + (int) (this.parsingTime ^ this.parsingTime >>> 32);
-        result = prime * result + (this.perfStat == null ? 0 : this.perfStat.hashCode());
         result = prime * result + (this.profile == null ? 0 : this.profile.hashCode());
         result = prime * result + (int) (this.ram ^ this.ram >>> 32);
+        result = prime * result + (this.rules == null ? 0 : this.rules.hashCode());
         result = prime * result + (this.runsByRule == null ? 0 : this.runsByRule.hashCode());
         result = prime * result + this.sessionId;
         result = prime * result + this.threadsNb;
+        result = prime * result + (int) (this.timeout ^ this.timeout >>> 32);
+        result = prime * result + (this.timeoutByRule == null ? 0 : this.timeoutByRule.hashCode());
         result = prime * result + (this.version == null ? 0 : this.version.hashCode());
         return result;
     }
@@ -322,13 +356,6 @@ public class RunEntity {
         if (this.parsingTime != other.parsingTime) {
             return false;
         }
-        if (this.perfStat == null) {
-            if (other.perfStat != null) {
-                return false;
-            }
-        } else if (!this.perfStat.equals(other.perfStat)) {
-            return false;
-        }
         if (this.profile == null) {
             if (other.profile != null) {
                 return false;
@@ -337,6 +364,13 @@ public class RunEntity {
             return false;
         }
         if (this.ram != other.ram) {
+            return false;
+        }
+        if (this.rules == null) {
+            if (other.rules != null) {
+                return false;
+            }
+        } else if (!this.rules.equals(other.rules)) {
             return false;
         }
         if (this.runsByRule == null) {
@@ -350,6 +384,16 @@ public class RunEntity {
             return false;
         }
         if (this.threadsNb != other.threadsNb) {
+            return false;
+        }
+        if (this.timeout != other.timeout) {
+            return false;
+        }
+        if (this.timeoutByRule == null) {
+            if (other.timeoutByRule != null) {
+                return false;
+            }
+        } else if (!this.timeoutByRule.equals(other.timeoutByRule)) {
             return false;
         }
         if (this.version == null) {
@@ -377,11 +421,17 @@ public class RunEntity {
         builder.append(this.threadsNb);
         builder.append(", bufferSize=");
         builder.append(this.bufferSize);
+        builder.append(", timeout=");
+        builder.append(this.timeout);
         builder.append(", version=");
         builder.append(this.version);
         builder.append(", profile=");
         builder.append(this.profile);
-        builder.append(", sessionId=");
+        builder.append(", rules={");
+        for (final String rule : this.rules) {
+            builder.append(rule + " ");
+        }
+        builder.append("}, sessionId=");
         builder.append(this.sessionId);
         builder.append(", fileInput=");
         builder.append(this.fileInput);
@@ -395,21 +445,15 @@ public class RunEntity {
         builder.append(this.nbInitialTriples);
         builder.append(", nbInferedTriples=");
         builder.append(this.nbInferedTriples);
-        builder.append(", perfStat=");
-        builder.append(this.perfStat);
-        builder.append(", runsByRule{");
-        for (final Entry<String, AtomicLong> entry : this.runsByRule.entrySet()) {
-            builder.append(entry.getKey() + "=" + entry.getValue());
-        }
-        builder.append("}, duplicatesByRule{");
-        for (final Entry<String, AtomicLong> entry : this.duplicatesByRule.entrySet()) {
-            builder.append(entry.getKey() + "=" + entry.getValue());
-        }
-        builder.append("}, inferedByRule{");
-        for (final Entry<String, AtomicLong> entry : this.inferedByRule.entrySet()) {
-            builder.append(entry.getKey() + "=" + entry.getValue());
-        }
-        builder.append("}");
+        builder.append(", runsByRule=");
+        builder.append(this.runsByRule);
+        builder.append(", duplicatesByRule=");
+        builder.append(this.duplicatesByRule);
+        builder.append(", inferedByRule=");
+        builder.append(this.inferedByRule);
+        builder.append(", timeoutByRule=");
+        builder.append(this.timeoutByRule);
+        builder.append("]");
         return builder.toString();
     }
 

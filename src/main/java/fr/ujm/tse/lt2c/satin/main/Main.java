@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -15,7 +17,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 
+import com.mongodb.MongoClient;
+
+import fr.ujm.tse.lt2c.satin.buffer.TripleManager;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -23,9 +30,12 @@ import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.rules.Rule;
 import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
+import fr.ujm.tse.lt2c.satin.utils.GlobalValues;
 import fr.ujm.tse.lt2c.satin.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
+import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
 /**
  * usage: main
@@ -69,26 +79,43 @@ public class Main {
             return;
         }
 
+        LOGGER.info("---Warm-up lap---");
         for (final File file : arguments.getFiles()) {
             reasonStream(arguments, file);
         }
 
-        for (final File file : arguments.getFiles()) {
-            final long start = System.nanoTime();
-            for (int i = 0; i < arguments.getIteration(); i++) {
-                reasonStream(arguments, file);
+        Datastore ds = null;
+        if (arguments.isPersistMode()) {
+            try {
+                // TODO Customizable IP
+                final MongoClient client = new MongoClient("10.20.0.57");
+                final Morphia morphia = new Morphia();
+                morphia.map(RunEntity.class);
+                ds = morphia.createDatastore(client, "TotalStream");
+            } catch (final Exception e) {
+                LOGGER.error("", e);
             }
-            final long streamTime = System.nanoTime();
+        }
 
-            LOGGER.info(file.getName() + " " + (streamTime - start) / 1000000 / arguments.getIteration());
+        LOGGER.info("---Real runs---");
+        for (final File file : arguments.getFiles()) {
+            for (int i = 0; i < arguments.getIteration(); i++) {
+                final RunEntity run = reasonStream(arguments, file);
+                if (run != null && arguments.isPersistMode()) {
+                    ds.save(run);
+                }
+            }
+
+            LOGGER.info(file.getName() + " ok(" + arguments.getIteration() + ")");
         }
     }
 
-    private static TripleStore reasonStream(final ReasoningArguments arguments, final File file) {
+    private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
 
+        final long start = System.nanoTime();
         reasoner.start();
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
@@ -100,17 +127,34 @@ public class Main {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        return tripleStore;
+        final long stop = System.nanoTime();
+        LOGGER.info(file.getName() + " " + (stop - start) / 1000000 + "ms");
+
+        if (arguments.isPersistMode()) {
+
+            final Collection<String> rules = new HashSet<>();
+            for (final Rule rule : reasoner.getRules()) {
+                rules.add(rule.name());
+            }
+            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), TripleManager.TIMEOUT, "total-stream", arguments
+                    .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, 0, tripleStore.size(),
+                    GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+            return run;
+        }
+        return null;
     }
 
-    private static TripleStore reasonBatch(final ReasoningArguments arguments, final File file) {
+    private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+
+        final long parse = System.nanoTime();
         final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
 
+        final long start = System.nanoTime();
         reasoner.start();
 
         reasoner.addTriples(triples);
@@ -121,8 +165,21 @@ public class Main {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
+        final long stop = System.nanoTime();
+        LOGGER.info(file.getName() + " " + (stop - start) / 1000000 + "ms");
 
-        return tripleStore;
+        if (arguments.isPersistMode()) {
+            final Collection<String> rules = new HashSet<>();
+            for (final Rule rule : reasoner.getRules()) {
+                rules.add(rule.name());
+            }
+            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), TripleManager.TIMEOUT, "total-stream", arguments
+                    .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, 0, tripleStore.size(),
+                    GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+            return run;
+        }
+        return null;
+
     }
 
     /**

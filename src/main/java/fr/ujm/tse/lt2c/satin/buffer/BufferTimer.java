@@ -24,7 +24,6 @@ public class BufferTimer extends TimerTask {
             lastAdd = (now - this.rulesLastFlushes.get(rule)) / 1000000;
             if (lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0) {
                 rule.bufferFull();
-                System.out.println(rule.name() + "!");
             }
         }
 

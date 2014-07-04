@@ -32,7 +32,7 @@ public class ReasoningArguments {
     private final boolean dumpMode;
     private final List<File> files;
 
-    public int getThreadsPerCore() {
+    public int getNbThreads() {
         return this.threads;
     }
 

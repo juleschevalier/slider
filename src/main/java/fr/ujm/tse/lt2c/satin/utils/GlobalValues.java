@@ -13,12 +13,14 @@ public class GlobalValues {
     private static Map<String, AtomicLong> runsByRule;
     private static Map<String, AtomicLong> duplicatesByRule;
     private static Map<String, AtomicLong> inferedByRule;
+    private static Map<String, AtomicLong> timeoutByRule;
     private static Map<String, Long> timeByFile;
 
     static {
         runsByRule = new HashMap<String, AtomicLong>();
         duplicatesByRule = new HashMap<String, AtomicLong>();
         inferedByRule = new HashMap<String, AtomicLong>();
+        timeoutByRule = new HashMap<String, AtomicLong>();
         timeByFile = new HashMap<String, Long>();
     }
 
@@ -26,6 +28,7 @@ public class GlobalValues {
         runsByRule = new HashMap<String, AtomicLong>();
         duplicatesByRule = new HashMap<String, AtomicLong>();
         inferedByRule = new HashMap<String, AtomicLong>();
+        timeoutByRule = new HashMap<String, AtomicLong>();
     }
 
     public static void incRunsByRule(final String rule) {
@@ -33,6 +36,14 @@ public class GlobalValues {
             runsByRule.put(rule, new AtomicLong(1));
         } else {
             runsByRule.get(rule).incrementAndGet();
+        }
+    }
+
+    public static void incTimeoutByRule(final String rule) {
+        if (!timeoutByRule.containsKey(rule)) {
+            timeoutByRule.put(rule, new AtomicLong(1));
+        } else {
+            timeoutByRule.get(rule).incrementAndGet();
         }
     }
 
@@ -66,6 +77,10 @@ public class GlobalValues {
 
     public static Map<String, Long> getTimeByFile() {
         return timeByFile;
+    }
+
+    public static Map<String, AtomicLong> getTimeoutByRule() {
+        return timeoutByRule;
     }
 
     public static void addTimeForFile(final String file, final long time) {
