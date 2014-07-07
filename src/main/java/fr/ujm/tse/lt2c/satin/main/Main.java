@@ -22,7 +22,6 @@ import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
 
-import fr.ujm.tse.lt2c.satin.buffer.TripleManager;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -39,15 +38,17 @@ import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
 /**
  * usage: main
- * -b,--buffer-size <size>......set the buffer size
+ * -b,--buffer-size <time>......set the buffer size
  * -c,--cumulative..............does not reinit data for each file
- * -d,--directory <directory>...infere on all ontologies in the directory
+ * -d,--directory <directory>.. infere on all ontologies in the directory
  * -h,--help....................print this message
  * -i,--iteration <number>......how many times each file
  * -m,--mongo-save..............persists the results in MongoDB
+ * -n,--threads <number>........set the number of threads by available core (0 means the jvm manage)
  * -o,--output..................save output into file
- * -p,--profile <profile>.......set the fragment [RhoDF, BRhoDF, RDFS, BRDFS]
- * -t,--threads <number>........set the number of threads by available core
+ * -p,--profile <profile>...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
+ * -t,--timeout <arg>.......... set the buffer timeout in ms (0 means no timeout)
+ * 
  * 
  * @author Jules Chevalier
  */
@@ -61,6 +62,7 @@ public class Main {
     /* Initialization if default options */
     private static final int DEFAULT_THREADS = 0;
     private static final int DEFAULT_BUFFER_SIZE = 100000;
+    private static final long DEFAULT_TIMEOUT = 500;
     private static final boolean DEFAULT_CUMULATIVE_MODE = false;
     private static final boolean DEFAULT_DUMP_MODE = false;
     private static final boolean DEFAULT_PERSIST_MODE = false;
@@ -113,7 +115,7 @@ public class Main {
     private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
 
         final long start = System.nanoTime();
         reasoner.start();
@@ -136,7 +138,7 @@ public class Main {
             for (final Rule rule : reasoner.getRules()) {
                 rules.add(rule.name());
             }
-            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), TripleManager.TIMEOUT, "total-stream", arguments
+            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments
                     .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, 0, tripleStore.size(),
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             return run;
@@ -147,7 +149,7 @@ public class Main {
     private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile());
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
@@ -173,7 +175,7 @@ public class Main {
             for (final Rule rule : reasoner.getRules()) {
                 rules.add(rule.name());
             }
-            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), TripleManager.TIMEOUT, "total-stream", arguments
+            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments
                     .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, 0, tripleStore.size(),
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             return run;
@@ -191,6 +193,7 @@ public class Main {
         /* Reasoner fields */
         int threads = DEFAULT_THREADS;
         int bufferSize = DEFAULT_BUFFER_SIZE;
+        long timeout = DEFAULT_TIMEOUT;
         int iteration = 1;
         boolean cumulativeMode = DEFAULT_CUMULATIVE_MODE;
         ReasonerProfile profile = DEFAULT_PROFILE;
@@ -210,6 +213,12 @@ public class Main {
         bufferSizeO.setArgs(1);
         bufferSizeO.setType(Number.class);
         options.addOption(bufferSizeO);
+
+        final Option timeoutO = new Option("t", "timeout", true, "set the buffer timeout in ms (0 means no timeout)");
+        bufferSizeO.setArgName("time");
+        bufferSizeO.setArgs(1);
+        bufferSizeO.setType(Number.class);
+        options.addOption(timeoutO);
 
         final Option iterationO = new Option("i", "iteration", true, "how many times each file ");
         iterationO.setArgName("number");
@@ -236,7 +245,7 @@ public class Main {
         profileO.setArgs(1);
         options.addOption(profileO);
 
-        final Option threadsO = new Option("t", "threads", true, "set the number of threads by available core (0 means the jvm manage)");
+        final Option threadsO = new Option("n", "threads", true, "set the number of threads by available core (0 means the jvm manage)");
         threadsO.setArgName("number");
         threadsO.setArgs(1);
         threadsO.setType(Number.class);
@@ -269,6 +278,15 @@ public class Main {
                 bufferSize = Integer.parseInt(arg);
             } catch (final NumberFormatException e) {
                 LOGGER.error("Buffer size must be a number. Default value used", e);
+            }
+        }
+        /* timeout */
+        if (cmd.hasOption("timeout")) {
+            final String arg = cmd.getOptionValue("timeout");
+            try {
+                timeout = Integer.parseInt(arg);
+            } catch (final NumberFormatException e) {
+                LOGGER.error("Timeout must be a number. Default value used", e);
             }
         }
         /* cumulative */
@@ -405,7 +423,7 @@ public class Main {
             LOGGER.info("***************************");
         }
 
-        return new ReasoningArguments(threads, bufferSize, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
+        return new ReasoningArguments(threads, bufferSize, timeout, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
 
     }
 

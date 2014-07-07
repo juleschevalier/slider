@@ -21,28 +21,31 @@ import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
  */
 public class TripleManager {
 
-    List<Rule> rules;
-    TripleDistributor generalDistributor;
-    Timer timer;
-    BufferTimer bufferTimer;
-    public final static long TIMEOUT = 500;
+    private final List<Rule> rules;
+    private final TripleDistributor generalDistributor;
+    private final Timer timer;
+    private final BufferTimer bufferTimer;
+    private final long timeout;
 
     /**
      * Constructor
      */
-    public TripleManager() {
+    public TripleManager(final long timeout) {
         super();
         this.rules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
         this.timer = new Timer();
-        this.bufferTimer = new BufferTimer(TIMEOUT);
+        this.bufferTimer = new BufferTimer(this.timeout);
+        this.timeout = timeout;
     }
 
     public void start() {
         for (final Rule rule : this.rules) {
             this.bufferTimer.addRule(rule);
         }
-        this.timer.scheduleAtFixedRate(this.bufferTimer, TIMEOUT, TIMEOUT);
+        if (this.timeout > 0) {
+            this.timer.scheduleAtFixedRate(this.bufferTimer, this.timeout, this.timeout);
+        }
     }
 
     public void stop() {

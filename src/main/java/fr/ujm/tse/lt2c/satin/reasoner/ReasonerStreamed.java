@@ -50,12 +50,12 @@ public class ReasonerStreamed extends Thread {
     /**
      * Constructors
      */
-    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile) {
+    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final long timeout) {
         super();
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
         this.profile = profile;
-        this.tripleManager = new TripleManager();
+        this.tripleManager = new TripleManager(timeout);
         this.phaser = new AtomicInteger();
         this.executor = Executors.newCachedThreadPool();
 
@@ -68,12 +68,12 @@ public class ReasonerStreamed extends Thread {
      * Constructor with configuration
      */
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int bufferSize,
-            final int maxThreads) {
+            final int maxThreads, final long timeout) {
         super();
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
         this.profile = profile;
-        this.tripleManager = new TripleManager();
+        this.tripleManager = new TripleManager(timeout);
         this.phaser = new AtomicInteger();
         this.bufferSize = bufferSize;
         this.maxThreads = maxThreads;

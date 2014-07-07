@@ -22,7 +22,7 @@ public class TestTimeout {
 
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RHODF);
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RHODF, 1000);
 
         reasoner.start();
         /****************/
