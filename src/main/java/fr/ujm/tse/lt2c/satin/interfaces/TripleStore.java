@@ -40,6 +40,15 @@ public interface TripleStore {
     Collection<Triple> addAll(Collection<Triple> t);
 
     /**
+     * Removes the triple t from the TripleStore
+     * Does nothing if it does not contains t
+     * 
+     * @param t
+     * @see Triple
+     */
+    void remove(Triple t);
+
+    /**
      * @return all the triples in the TripleStore in a Collection
      * @see Triple
      */

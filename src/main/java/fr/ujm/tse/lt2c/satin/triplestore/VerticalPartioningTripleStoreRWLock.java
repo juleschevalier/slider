@@ -73,8 +73,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             this.triples++;
 
         } else {
-            if (!(this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject()))
-                    && (this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject()))) {
+            if (!this.internalstore.get(t.getPredicate()).containsEntry(t.getSubject(), t.getObject())
+                    && this.internalstore.get(t.getPredicate()).put(t.getSubject(), t.getObject())) {
                 this.triples++;
             } else {
                 exists = true;
@@ -100,6 +100,25 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         }
         return newTriples;
 
+    }
+
+    @Override
+    public void remove(final Triple triple) {
+        this.rwlock.writeLock().lock();
+        try {
+            if (this.contains(triple)) {
+                final Multimap<Long, Long> multimap = this.internalstore.get(triple.getPredicate());
+                multimap.remove(triple.getSubject(), triple.getObject());
+                this.triples--;
+                if (multimap.isEmpty()) {
+                    this.internalstore.remove(triple.getPredicate());
+                }
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
+        }
     }
 
     @Override
@@ -274,7 +293,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
     private boolean containsNoLock(final long s, final long p, final long o) {
         boolean result = false;
         if (this.internalstore.containsKey(p)) {
-            result = (this.internalstore.get(p).containsEntry(s, o));
+            result = this.internalstore.get(p).containsEntry(s, o);
         }
         return result;
     }
@@ -327,7 +346,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 this.triples++;
 
             } else {
-                if (!(this.internalstore.get(p).containsEntry(s, o)) && (this.internalstore.get(p).put(s, o))) {
+                if (!this.internalstore.get(p).containsEntry(s, o) && this.internalstore.get(p).put(s, o)) {
                     this.triples++;
                 }
             }
@@ -343,8 +362,8 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((this.internalstore == null) ? 0 : this.internalstore.hashCode());
-        result = (prime * result) + this.triples;
+        result = prime * result + (this.internalstore == null ? 0 : this.internalstore.hashCode());
+        result = prime * result + this.triples;
         return result;
     }
 
