@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
@@ -20,6 +22,8 @@ import fr.ujm.tse.lt2c.satin.rules.run.AvaibleRuns;
  * @author Jules Chevalier
  */
 public class TripleManager {
+
+    private final Logger LOGGER = Logger.getLogger(TripleManager.class);
 
     private final List<Rule> rules;
     private final TripleDistributor generalDistributor;
@@ -40,10 +44,10 @@ public class TripleManager {
     }
 
     public void start() {
-        for (final Rule rule : this.rules) {
-            this.bufferTimer.addRule(rule);
-        }
         if (this.timeout > 0) {
+            for (final Rule rule : this.rules) {
+                this.bufferTimer.addRule(rule);
+            }
             this.timer.scheduleAtFixedRate(this.bufferTimer, this.timeout, this.timeout);
         }
     }
@@ -109,10 +113,8 @@ public class TripleManager {
                 total++;
                 rule.bufferFull();
             }
-
         }
         return total;
-
     }
 
     /**

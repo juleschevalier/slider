@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -34,6 +33,7 @@ public class RunSCM_RNG1 extends AbstractRun {
     public RunSCM_RNG1(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        super.ruleName = RULENAME;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RunSCM_RNG1 extends AbstractRun {
         int loops = 0;
 
         final Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
-        if ((subclassMultimap != null) && !subclassMultimap.isEmpty()) {
+        if (subclassMultimap != null && !subclassMultimap.isEmpty()) {
 
             final Collection<Triple> rangeTriples = ts2.getbyPredicate(range);
 

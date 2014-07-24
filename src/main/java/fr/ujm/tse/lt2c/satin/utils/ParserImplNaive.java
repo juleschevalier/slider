@@ -65,11 +65,10 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
 
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
-            if (this.tripleStore.add(triple)) {
+            if (!this.tripleStore.add(triple)) {
                 triples.add(triple);
             }
         }
-
         return triples;
 
     }
@@ -85,12 +84,11 @@ public class ParserImplNaive implements Parser {
 
             @Override
             public void run() {
-                // Call the parsing process.
+                // final Call the parsing process.
                 RDFDataMgr.parse(inputStream, fileInput);
             }
         };
 
-        // final int max = 1000;
         final Collection<fr.ujm.tse.lt2c.satin.interfaces.Triple> triples = new HashSet<>();
 
         executor.submit(parser);
@@ -106,11 +104,12 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
 
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
-            this.tripleStore.add(triple);
-            triples.add(triple);
-            if (triples.size() > STREAM_BLOCK_SIZE) {
-                reasoner.addTriples(triples);
-                triples.clear();
+            if (!this.tripleStore.add(triple)) {
+                triples.add(triple);
+                if (triples.size() > STREAM_BLOCK_SIZE) {
+                    reasoner.addTriples(triples);
+                    triples.clear();
+                }
             }
         }
         reasoner.addTriples(triples);
@@ -133,7 +132,7 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
 
             final fr.ujm.tse.lt2c.satin.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
-            if (this.tripleStore.add(triple)) {
+            if (!this.tripleStore.add(triple)) {
                 triples.add(triple);
             }
         }

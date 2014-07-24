@@ -3,6 +3,8 @@ package fr.ujm.tse.lt2c.satin.rules;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
 import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
@@ -20,6 +22,8 @@ public class Rule implements BufferListener {
      * This object launch a new Run with the received triples
      * The distributor sends the new triples to the subscribers
      */
+
+    private final Logger LOGGER = Logger.getLogger(BufferListener.class);
 
     private final QueuedTripleBufferLock tripleBuffer;
     private final TripleDistributor tripleDistributor;
@@ -54,7 +58,7 @@ public class Rule implements BufferListener {
     @Override
     public boolean bufferFull() {
         synchronized (this.phaser) {
-            if ((this.phaser.get() < this.maxThreads || this.maxThreads == 0) && this.tripleBuffer.getOccupation() > 0) {
+            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.getOccupation() > 0) {
                 this.phaser.incrementAndGet();
                 this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
                         this.phaser, this.timer));

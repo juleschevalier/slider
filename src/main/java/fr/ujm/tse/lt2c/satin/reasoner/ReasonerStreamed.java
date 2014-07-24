@@ -141,6 +141,7 @@ public class ReasonerStreamed extends Thread {
             tripleManager.addRule(AvaibleRuns.RHODF7a, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
             tripleManager.addRule(AvaibleRuns.RHODF7b, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
 
+            /* Axiomatic triples */
             final long subPropertyOf = AbstractDictionary.subPropertyOf;
             final long subClassOf = AbstractDictionary.subClassOf;
             final long domain = AbstractDictionary.domain;
@@ -152,14 +153,21 @@ public class ReasonerStreamed extends Thread {
             tripleStore.add(new ImmutableTriple(range, subPropertyOf, range));
             tripleStore.add(new ImmutableTriple(type, subPropertyOf, type));
         case RHODF:
-            tripleManager.addRule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.CAX_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.PRP_DOM, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.PRP_RNG, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.PRP_SPO1, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.SCM_DOM2, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.SCM_RNG2, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
             tripleManager.addRule(AvaibleRuns.SCM_SCO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
-            tripleManager.addRule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);
+            // tripleManager.addRule(AvaibleRuns.SCM_SPO, executor, phaser, dictionary, tripleStore, this.bufferSize,
+            // this.maxThreads);
             break;
         case BRDFS:
             tripleManager.addRule(AvaibleRuns.RDFS6, executor, phaser, dictionary, tripleStore, this.bufferSize, this.maxThreads);

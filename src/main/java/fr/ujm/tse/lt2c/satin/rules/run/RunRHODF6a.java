@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
-import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -30,6 +29,7 @@ public class RunRHODF6a extends AbstractRun {
     public RunRHODF6a(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        super.ruleName = RULENAME;
         super.complexity = 1;
     }
 

@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -34,6 +33,7 @@ public class RunPRP_RNG extends AbstractRun {
     public RunPRP_RNG(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        super.ruleName = RULENAME;
 
     }
 
@@ -46,7 +46,7 @@ public class RunPRP_RNG extends AbstractRun {
         final int loops = 0;
 
         final Multimap<Long, Long> rangeMultiMap = ts1.getMultiMapForPredicate(range);
-        if ((rangeMultiMap != null) && !rangeMultiMap.isEmpty()) {
+        if (rangeMultiMap != null && !rangeMultiMap.isEmpty()) {
 
             final HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 

@@ -83,7 +83,7 @@ public class Main {
 
         LOGGER.info("---Warm-up lap---");
         for (final File file : arguments.getFiles()) {
-            reasonStream(arguments, file);
+            // reasonStream(arguments, file);
         }
 
         Datastore ds = null;
@@ -102,10 +102,12 @@ public class Main {
         LOGGER.info("---Real runs---");
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
+                System.out.print("   " + i * 100 / arguments.getIteration() + "%\r");
                 final RunEntity run = reasonStream(arguments, file);
-                if (run != null && arguments.isPersistMode()) {
-                    ds.save(run);
-                }
+                // final RunEntity run2 = reasonBatch(arguments, file);
+                // if (run != null && arguments.isPersistMode()) {
+                // ds.save(run);
+                // }
             }
 
             LOGGER.info(file.getName() + " ok(" + arguments.getIteration() + ")");
@@ -130,7 +132,17 @@ public class Main {
             e.printStackTrace();
         }
         final long stop = System.nanoTime();
-        LOGGER.info(file.getName() + " " + (stop - start) / 1000000 + "ms");
+
+        // LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
+        // LOGGER.info(tripleStore.size() + " " + GlobalValues.getInferedByRule());
+        if (tripleStore.size() != 56) {
+            final Collection<String> rules = new HashSet<>();
+            for (final Rule rule : reasoner.getRules()) {
+                rules.add(rule.name());
+            }
+            LOGGER.error("Chier !");
+            System.exit(-1);
+        }
 
         if (arguments.isPersistMode()) {
 
@@ -143,6 +155,7 @@ public class Main {
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             return run;
         }
+        GlobalValues.reset();
         return null;
     }
 
@@ -168,7 +181,7 @@ public class Main {
             e.printStackTrace();
         }
         final long stop = System.nanoTime();
-        LOGGER.info(file.getName() + " " + (stop - start) / 1000000 + "ms");
+        LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
 
         if (arguments.isPersistMode()) {
             final Collection<String> rules = new HashSet<>();
@@ -180,6 +193,7 @@ public class Main {
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             return run;
         }
+        GlobalValues.reset();
         return null;
 
     }
@@ -417,9 +431,10 @@ public class Main {
             if (threads > 0) {
                 LOGGER.info("Threads:          " + threads);
             } else {
-                LOGGER.info("Threads:          Automatique");
+                LOGGER.info("Threads:          Auto");
             }
             LOGGER.info("Iterations:       " + iteration);
+            LOGGER.info("Timeout:          " + timeout);
             LOGGER.info("***************************");
         }
 

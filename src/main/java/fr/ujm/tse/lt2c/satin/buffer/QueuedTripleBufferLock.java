@@ -53,7 +53,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public void add(final Triple triple) {
         try {
             this.rwlock.writeLock().lock();
-
             this.triples.add(triple);
             this.timer.notifyAdd(this.rule);
             if (this.currentBuffer.incrementAndGet() >= this.bufferSize) {

@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -34,6 +33,7 @@ public class RunSCM_EQP2 extends AbstractRun {
     public RunSCM_EQP2(final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor,
             final AtomicInteger phaser) {
         super(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+        super.ruleName = RULENAME;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RunSCM_EQP2 extends AbstractRun {
         int loops = 0;
 
         final Multimap<Long, Long> subpropertyMultimap = ts1.getMultiMapForPredicate(subPropertyOf);
-        if ((subpropertyMultimap != null) && !subpropertyMultimap.isEmpty()) {
+        if (subpropertyMultimap != null && !subpropertyMultimap.isEmpty()) {
 
             final Collection<Triple> subpropertyTriples = ts2.getbyPredicate(subPropertyOf);
 
@@ -68,7 +68,7 @@ public class RunSCM_EQP2 extends AbstractRun {
                 loops++;
                 for (final Long c1a : c1as) {
 
-                    if ((c1a == triple.getSubject()) && (triple.getObject() != triple.getSubject())) {
+                    if (c1a == triple.getSubject() && triple.getObject() != triple.getSubject()) {
 
                         final Triple result = new ImmutableTriple(triple.getSubject(), equivalentProperty, triple.getObject());
                         outputTriples.add(result);

@@ -32,64 +32,84 @@ public class GlobalValues {
     }
 
     public static void incRunsByRule(final String rule) {
-        if (!runsByRule.containsKey(rule)) {
-            runsByRule.put(rule, new AtomicLong(1));
-        } else {
-            runsByRule.get(rule).incrementAndGet();
+        synchronized (runsByRule) {
+            if (!runsByRule.containsKey(rule)) {
+                runsByRule.put(rule, new AtomicLong(1));
+            } else {
+                runsByRule.get(rule).incrementAndGet();
+            }
         }
     }
 
     public static void incTimeoutByRule(final String rule) {
-        if (!timeoutByRule.containsKey(rule)) {
-            timeoutByRule.put(rule, new AtomicLong(1));
-        } else {
-            timeoutByRule.get(rule).incrementAndGet();
+        synchronized (timeoutByRule) {
+            if (!timeoutByRule.containsKey(rule)) {
+                timeoutByRule.put(rule, new AtomicLong(1));
+            } else {
+                timeoutByRule.get(rule).incrementAndGet();
+            }
         }
     }
 
     public static void incDuplicatesByRule(final String rule, final long number) {
-        if (!duplicatesByRule.containsKey(rule)) {
-            duplicatesByRule.put(rule, new AtomicLong(number));
-        } else {
-            duplicatesByRule.get(rule).addAndGet(number);
+        synchronized (duplicatesByRule) {
+            if (!duplicatesByRule.containsKey(rule)) {
+                duplicatesByRule.put(rule, new AtomicLong(number));
+            } else {
+                duplicatesByRule.get(rule).addAndGet(number);
+            }
         }
     }
 
     public static void incInferedByRule(final String rule, final long number) {
-        if (!inferedByRule.containsKey(rule)) {
-            inferedByRule.put(rule, new AtomicLong(number));
-        } else {
-            inferedByRule.get(rule).addAndGet(number);
+        synchronized (inferedByRule) {
+            if (!inferedByRule.containsKey(rule)) {
+                inferedByRule.put(rule, new AtomicLong(number));
+            } else {
+                inferedByRule.get(rule).addAndGet(number);
+            }
         }
-    }
-
-    public static Map<String, AtomicLong> getRunsByRule() {
-        return runsByRule;
-    }
-
-    public static Map<String, AtomicLong> getDuplicatesByRule() {
-        return duplicatesByRule;
-    }
-
-    public static Map<String, AtomicLong> getInferedByRule() {
-        return inferedByRule;
-    }
-
-    public static Map<String, Long> getTimeByFile() {
-        return timeByFile;
-    }
-
-    public static Map<String, AtomicLong> getTimeoutByRule() {
-        return timeoutByRule;
     }
 
     public static void addTimeForFile(final String file, final long time) {
-        if (!timeByFile.containsKey(file)) {
-            timeByFile.put(file, time);
-        } else {
-            final long newTime = (timeByFile.get(file) + time) / 2;
-            timeByFile.put(file, newTime);
+        synchronized (timeByFile) {
+            if (!timeByFile.containsKey(file)) {
+                timeByFile.put(file, time);
+            } else {
+                final long newTime = (timeByFile.get(file) + time) / 2;
+                timeByFile.put(file, newTime);
+            }
         }
 
+    }
+
+    public static Map<String, AtomicLong> getRunsByRule() {
+        synchronized (runsByRule) {
+            return runsByRule;
+        }
+    }
+
+    public static Map<String, AtomicLong> getDuplicatesByRule() {
+        synchronized (duplicatesByRule) {
+            return duplicatesByRule;
+        }
+    }
+
+    public static Map<String, AtomicLong> getInferedByRule() {
+        synchronized (inferedByRule) {
+            return inferedByRule;
+        }
+    }
+
+    public static Map<String, Long> getTimeByFile() {
+        synchronized (timeByFile) {
+            return timeByFile;
+        }
+    }
+
+    public static Map<String, AtomicLong> getTimeoutByRule() {
+        synchronized (timeoutByRule) {
+            return timeoutByRule;
+        }
     }
 }
