@@ -83,7 +83,7 @@ public class Main {
 
         LOGGER.info("---Warm-up lap---");
         for (final File file : arguments.getFiles()) {
-            // reasonStream(arguments, file);
+            reasonStream(arguments, file);
         }
 
         Datastore ds = null;
@@ -93,7 +93,7 @@ public class Main {
                 final MongoClient client = new MongoClient("10.20.0.57");
                 final Morphia morphia = new Morphia();
                 morphia.map(RunEntity.class);
-                ds = morphia.createDatastore(client, "TotalStream");
+                ds = morphia.createDatastore(client, "Incremental");
             } catch (final Exception e) {
                 LOGGER.error("", e);
             }
@@ -101,17 +101,25 @@ public class Main {
 
         LOGGER.info("---Real runs---");
         for (final File file : arguments.getFiles()) {
+            final long startTime = System.nanoTime();
             for (int i = 0; i < arguments.getIteration(); i++) {
-                System.out.print("   " + i * 100 / arguments.getIteration() + "%\r");
                 final RunEntity run = reasonStream(arguments, file);
-                // final RunEntity run2 = reasonBatch(arguments, file);
-                // if (run != null && arguments.isPersistMode()) {
-                // ds.save(run);
-                // }
+                if (arguments.isPersistMode()) {
+                    ds.save(run);
+                }
+                LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
+                        + run.getBufferSize());
+                // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " +
+                // run.getProfile() + " " + run.getTimeout());
+                // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " +
+                // run.getProfile() + " "
+                // + run.getRules().size());
             }
 
-            LOGGER.info(file.getName() + " ok(" + arguments.getIteration() + ")");
+            final long endTime = System.nanoTime();
         }
+
+        LOGGER.info("---Done---");
     }
 
     private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
@@ -133,30 +141,20 @@ public class Main {
         }
         final long stop = System.nanoTime();
 
-        // LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
-        // LOGGER.info(tripleStore.size() + " " + GlobalValues.getInferedByRule());
-        if (tripleStore.size() != 56) {
-            final Collection<String> rules = new HashSet<>();
-            for (final Rule rule : reasoner.getRules()) {
-                rules.add(rule.name());
-            }
-            LOGGER.error("Chier !");
-            System.exit(-1);
-        }
-
-        if (arguments.isPersistMode()) {
+//        if (arguments.isPersistMode()) {
 
             final Collection<String> rules = new HashSet<>();
             for (final Rule rule : reasoner.getRules()) {
                 rules.add(rule.name());
             }
-            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments
+            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "incremental", arguments
                     .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, 0, tripleStore.size(),
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+            GlobalValues.reset();
             return run;
-        }
-        GlobalValues.reset();
-        return null;
+//        }
+//        GlobalValues.reset();
+//        return null;
     }
 
     private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
@@ -191,6 +189,7 @@ public class Main {
             final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments
                     .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, 0, tripleStore.size(),
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+            GlobalValues.reset();
             return run;
         }
         GlobalValues.reset();

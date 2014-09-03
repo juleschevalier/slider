@@ -39,8 +39,8 @@ public class TripleManager {
         this.rules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
         this.timer = new Timer();
-        this.bufferTimer = new BufferTimer(this.timeout);
         this.timeout = timeout;
+        this.bufferTimer = new BufferTimer(this.timeout);
     }
 
     public void start() {
