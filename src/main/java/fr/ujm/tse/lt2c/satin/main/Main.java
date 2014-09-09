@@ -83,7 +83,7 @@ public class Main {
 
         LOGGER.info("---Warm-up lap---");
         for (final File file : arguments.getFiles()) {
-            reasonStream(arguments, file);
+            reasonStream(arguments, file, 8);
         }
 
         Datastore ds = null;
@@ -100,38 +100,38 @@ public class Main {
         }
 
         LOGGER.info("---Real runs---");
+        LOGGER.info("File Time Infered Profile Sizes");
         for (final File file : arguments.getFiles()) {
-            final long startTime = System.nanoTime();
-            for (int i = 0; i < arguments.getIteration(); i++) {
-                final RunEntity run = reasonStream(arguments, file);
-                if (arguments.isPersistMode()) {
-                    ds.save(run);
+            for (int nb_rules = 1; nb_rules < 9; nb_rules++) {
+                for (int i = 0; i < arguments.getIteration(); i++) {
+                    final RunEntity run = reasonStream(arguments, file, nb_rules);
+                    // final RunEntity run = reasonBatch(arguments, file);
+                    if (arguments.isPersistMode()) {
+                        ds.save(run);
+                    }
+                    // LOGGER.info(file.getName() + " " + run.getNbInitialTriples() + " " + run.getNbInferedTriples());
+                    // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " "
+                    // +
+                    // run.getProfile() + " " + run.getTimeout());
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
+                            + run.getRules().size());
                 }
-                LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
-                        + run.getBufferSize());
-                // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " +
-                // run.getProfile() + " " + run.getTimeout());
-                // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " " +
-                // run.getProfile() + " "
-                // + run.getRules().size());
             }
-
-            final long endTime = System.nanoTime();
         }
 
         LOGGER.info("---Done---");
     }
 
-    private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
+    private static RunEntity reasonStream(final ReasoningArguments arguments, final File file, final int nb_rules) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout(), nb_rules);
 
         final long start = System.nanoTime();
         reasoner.start();
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-        parser.parseStream(file.getAbsolutePath(), reasoner);
+        final int input_size = parser.parseStream(file.getAbsolutePath(), reasoner);
 
         reasoner.close();
         try {
@@ -141,20 +141,20 @@ public class Main {
         }
         final long stop = System.nanoTime();
 
-//        if (arguments.isPersistMode()) {
+        // if (arguments.isPersistMode()) {
 
-            final Collection<String> rules = new HashSet<>();
-            for (final Rule rule : reasoner.getRules()) {
-                rules.add(rule.name());
-            }
-            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "incremental", arguments
-                    .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, 0, tripleStore.size(),
-                    GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
-            GlobalValues.reset();
-            return run;
-//        }
-//        GlobalValues.reset();
-//        return null;
+        final Collection<String> rules = new HashSet<>();
+        for (final Rule rule : reasoner.getRules()) {
+            rules.add(rule.name());
+        }
+        final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "incremental", arguments.getProfile()
+                .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, input_size, tripleStore.size() - input_size,
+                GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+        GlobalValues.reset();
+        return run;
+        // }
+        // GlobalValues.reset();
+        // return null;
     }
 
     private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
@@ -179,21 +179,22 @@ public class Main {
             e.printStackTrace();
         }
         final long stop = System.nanoTime();
-        LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
+        // LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
 
-        if (arguments.isPersistMode()) {
-            final Collection<String> rules = new HashSet<>();
-            for (final Rule rule : reasoner.getRules()) {
-                rules.add(rule.name());
-            }
-            final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments
-                    .getProfile().toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, 0, tripleStore.size(),
-                    GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
-            GlobalValues.reset();
-            return run;
+        // if (arguments.isPersistMode()) {
+        final Collection<String> rules = new HashSet<>();
+        for (final Rule rule : reasoner.getRules()) {
+            rules.add(rule.name());
         }
+        final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments.getProfile()
+                .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, triples.size(), tripleStore.size()
+                - triples.size(), GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(),
+                GlobalValues.getTimeoutByRule());
         GlobalValues.reset();
-        return null;
+        return run;
+        // }
+        // GlobalValues.reset();
+        // return null;
 
     }
 

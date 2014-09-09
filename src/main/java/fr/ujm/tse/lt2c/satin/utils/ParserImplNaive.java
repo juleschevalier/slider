@@ -74,7 +74,7 @@ public class ParserImplNaive implements Parser {
     }
 
     @Override
-    public void parseStream(final String fileInput, final ReasonerStreamed reasoner) {
+    public int parseStream(final String fileInput, final ReasonerStreamed reasoner) {
 
         final PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         final PipedRDFStream<Triple> inputStream = new PipedTriplesStream(iter);
@@ -93,7 +93,9 @@ public class ParserImplNaive implements Parser {
 
         executor.submit(parser);
         executor.shutdown();
+        int total_input = 0;
         while (iter.hasNext()) {
+            total_input++;
             final Triple next = iter.next();
             final String s = next.getSubject().toString();
             final String p = next.getPredicate().toString();
@@ -114,6 +116,7 @@ public class ParserImplNaive implements Parser {
         }
         reasoner.addTriples(triples);
 
+        return total_input;
     }
 
     @Override

@@ -27,7 +27,7 @@ public interface Parser {
      * @param fileInput
      * @see Triple
      */
-    void parseStream(String fileInput, ReasonerStreamed reasoner);
+    int parseStream(String fileInput, ReasonerStreamed reasoner);
 
     /**
      * Parse and "save" the ontology's triples from a model in the TripleStore
