@@ -59,7 +59,7 @@ public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class);
 
-    /* Initialization if default options */
+    /* Initialization of default options */
     private static final int DEFAULT_THREADS = 0;
     private static final int DEFAULT_BUFFER_SIZE = 100000;
     private static final long DEFAULT_TIMEOUT = 500;
@@ -81,10 +81,10 @@ public class Main {
             return;
         }
 
-        LOGGER.info("---Warm-up lap---");
-        for (final File file : arguments.getFiles()) {
-            reasonStream(arguments, file, 8);
-        }
+        // LOGGER.info("---Warm-up lap---");
+        // for (final File file : arguments.getFiles()) {
+        // reasonStream(arguments, file, 8);
+        // }
 
         Datastore ds = null;
         if (arguments.isPersistMode()) {
@@ -102,30 +102,23 @@ public class Main {
         LOGGER.info("---Real runs---");
         LOGGER.info("File Time Infered Profile Sizes");
         for (final File file : arguments.getFiles()) {
-            for (int nb_rules = 1; nb_rules < 9; nb_rules++) {
-                for (int i = 0; i < arguments.getIteration(); i++) {
-                    final RunEntity run = reasonStream(arguments, file, nb_rules);
-                    // final RunEntity run = reasonBatch(arguments, file);
-                    if (arguments.isPersistMode()) {
-                        ds.save(run);
-                    }
-                    // LOGGER.info(file.getName() + " " + run.getNbInitialTriples() + " " + run.getNbInferedTriples());
-                    // LOGGER.info(file.getName() + " " + run.getInferenceTime() + " " + run.getNbInferedTriples() + " "
-                    // +
-                    // run.getProfile() + " " + run.getTimeout());
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
-                            + run.getRules().size());
+            for (int i = 0; i < arguments.getIteration(); i++) {
+                final RunEntity run = reasonStream(arguments, file);
+                if (arguments.isPersistMode()) {
+                    ds.save(run);
                 }
+                LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
+                        + run.getRules().size());
             }
         }
 
         LOGGER.info("---Done---");
     }
 
-    private static RunEntity reasonStream(final ReasoningArguments arguments, final File file, final int nb_rules) {
+    private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout(), nb_rules);
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
 
         final long start = System.nanoTime();
         reasoner.start();

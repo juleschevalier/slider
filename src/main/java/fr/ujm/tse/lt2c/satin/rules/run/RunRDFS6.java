@@ -37,7 +37,6 @@ public class RunRDFS6 extends AbstractRun {
 
     @Override
     protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
-        System.out.println("mslkddjff");
 
         final long subPropertyOf = AbstractDictionary.subPropertyOf;
         final long type = AbstractDictionary.type;

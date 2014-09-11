@@ -207,14 +207,16 @@ public class ReasonerStreamed extends Thread {
 
         final List<AvaibleRuns> runs = new ArrayList<AvaibleRuns>();
 
-        runs.add(AvaibleRuns.CAX_SCO);
-        runs.add(AvaibleRuns.PRP_RNG);
-        runs.add(AvaibleRuns.PRP_DOM);
-        runs.add(AvaibleRuns.SCM_SPO);
-        runs.add(AvaibleRuns.SCM_DOM2);
-        runs.add(AvaibleRuns.SCM_RNG2);
-        runs.add(AvaibleRuns.SCM_SCO);
-        runs.add(AvaibleRuns.PRP_SPO1);
+        runs.addAll(java.util.Arrays.asList(AvaibleRuns.values()));
+
+        // runs.add(AvaibleRuns.CAX_SCO);
+        // runs.add(AvaibleRuns.PRP_RNG);
+        // runs.add(AvaibleRuns.PRP_DOM);
+        // runs.add(AvaibleRuns.SCM_SPO);
+        // runs.add(AvaibleRuns.SCM_DOM2);
+        // runs.add(AvaibleRuns.SCM_RNG2);
+        // runs.add(AvaibleRuns.SCM_SCO);
+        // runs.add(AvaibleRuns.PRP_SPO1);
 
         Collections.shuffle(runs);
 
