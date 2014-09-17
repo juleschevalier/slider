@@ -60,8 +60,11 @@ public class ReasonerStreamed extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(ReasonerStreamed.class);
 
+    // TODO Insert default parameters here !!!
+
     private int maxThreads = 0;
     private int bufferSize = 100000;
+    private final int timeout = 500;
     private final ReasonerProfile profile;
     private final ExecutorService executor;
     private final TripleStore tripleStore;
@@ -69,6 +72,27 @@ public class ReasonerStreamed extends Thread {
     private final TripleManager tripleManager;
     private final AtomicInteger phaser;
     private boolean running = true;
+
+    /**
+     * Constructors
+     * 
+     * @param tripleStore
+     * @param dictionary
+     * @param profile
+     */
+    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile) {
+        super();
+        this.tripleStore = tripleStore;
+        this.dictionary = dictionary;
+        this.profile = profile;
+        this.tripleManager = new TripleManager(this.timeout);
+        this.phaser = new AtomicInteger();
+        this.executor = Executors.newCachedThreadPool();
+
+        /* Initialize rules used for inference on the defined fragment */
+        this.initialiseReasoner();
+
+    }
 
     /**
      * Constructors
@@ -233,15 +257,6 @@ public class ReasonerStreamed extends Thread {
         final List<AvaibleRuns> runs = new ArrayList<AvaibleRuns>();
 
         runs.addAll(java.util.Arrays.asList(AvaibleRuns.values()));
-
-        // runs.add(AvaibleRuns.CAX_SCO);
-        // runs.add(AvaibleRuns.PRP_RNG);
-        // runs.add(AvaibleRuns.PRP_DOM);
-        // runs.add(AvaibleRuns.SCM_SPO);
-        // runs.add(AvaibleRuns.SCM_DOM2);
-        // runs.add(AvaibleRuns.SCM_RNG2);
-        // runs.add(AvaibleRuns.SCM_SCO);
-        // runs.add(AvaibleRuns.PRP_SPO1);
 
         Collections.shuffle(runs);
 
