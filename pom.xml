@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.ujm.tse.lt2c.satin</groupId>
-	<artifactId>DistributedReasoner</artifactId>
+	<artifactId>slider</artifactId>
 	<version>0.9.5</version>
-	<name>slider</name>
-	<url>https://github.com/telecom-se/distributed-reasoner</url>
+	<name>Slider</name>
+	<url>https://github.com/telecom-se/slider</url>
 	<distributionManagement>
 		<repository>
 			<id>satin-artifactory</id>
