@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.utils;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +40,10 @@ import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
 import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
 
+/**
+ * @author Jules Chevalier
+ *
+ */
 public class ParserImplNaive implements Parser {
 
     private final Dictionary dictionary;
@@ -27,8 +51,8 @@ public class ParserImplNaive implements Parser {
     private final static int STREAM_BLOCK_SIZE = 200;
 
     /**
-     * @param f
-     *            the file to parse
+     * @param dictionary
+     * @param tripleStore
      */
     public ParserImplNaive(final Dictionary dictionary, final TripleStore tripleStore) {
         this.dictionary = dictionary;

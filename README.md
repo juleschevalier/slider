@@ -4,8 +4,10 @@
 
 Slider is a forward-chaining reasoner supporting the following rule sets:
 
- - RhoDF
- - RDFS
+ - RhoDF Default
+ - RhoDF Full
+ - RDFS Default
+ - RDFS Full
 
 Slider allows to custom these fragments by selecting the rules to use for the inference.
 Additional rules can be easily added by implementing a single method.
@@ -29,7 +31,7 @@ They are included as Maven dependencies in the pom.xml file.
 
 ## Installation
 
-To install Slider, clone the repository and compile Slider through Maven:
+To install Slider, clone the repository and compile it through Maven:
 
 ```bash
 git clone git@github.com:telecom-se/distributed-reasoner.git
@@ -38,6 +40,8 @@ mvn clean compile install
 ```
 
 ## Running Slider
+
+###Command Line use
 
 Slider can be run as a standalone software.
 The exec-maven-plugin is configured, and can be used to run it.
@@ -60,48 +64,67 @@ usage: main
  -p,--profile <profile>       set the fragment [RHODF, BRHODF, RDFS, BRDFS]
  -t,--timeout <arg>           set the buffer timeout in ms (0 means no timeout)
 ```
-## Code examples
 
-Slider can also be used as an external library.
+<!--
+| Option                     | Effect                                                               |
+|----------------------------|----------------------------------------------------------------------|
+| -b,--buffer-size <time>    | set the buffer size                                                  |
+| -c,--cumulative            | does not reinit data for each file                                   |
+| -d,--directory <directory> | infers on all ontologies in the directory                            |
+| -h,--help                  | print this message                                                   |
+| -i,--iteration <number>    | how many times each file                                             |
+| -m,--mongo-save            | persists the results in MongoDB                                      |
+| -n,--threads <number>      | set the number of threads by available core (0 means the jvm manage) |
+| -o,--output                | save output into file                                                |
+| -p,--profile <profile>     | set the fragment [RHODF, BRHODF, RDFS, BRDFS]                        |
+| -t,--timeout <arg>         | set the buffer timeout in ms (0 means no timeout)                    |
+-----------------------------------------------------------------------------------------------------
+-->
+
+### Code examples
+
+Slider can also be used as a library.
 It provides both bash and stream reasoning.
 
-### Batch reasoning
-        /* */
-        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
+#### Batch reasoning
+```Java
+    final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+    final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+    final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
 
-        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-        final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
-        reasoner.start();
+    final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+    final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
+    reasoner.start();
 
-        reasoner.addTriples(triples);
+    reasoner.addTriples(triples);
 
-        reasoner.close();
-        try {
-            reasoner.join();
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+    reasoner.close();
+    try {
+        reasoner.join();
+    } catch (final InterruptedException e) {
+        e.printStackTrace();
+    }
+```
 
-### Stream reasoning
+#### Stream reasoning
+```Java
+	final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+    final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+    final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
 
-		final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
+    final long start = System.nanoTime();
+    reasoner.start();
 
-        final long start = System.nanoTime();
-        reasoner.start();
+    final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+    parser.parseStream(file.getAbsolutePath(), reasoner);
 
-        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-        parser.parseStream(file.getAbsolutePath(), reasoner);
-
-        reasoner.close();
-        try {
-            reasoner.join();
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+    reasoner.close();
+    try {
+        reasoner.join();
+    } catch (final InterruptedException e) {
+        e.printStackTrace();
+    }
+```
 
 ## Maven dependency
 
@@ -111,7 +134,7 @@ It provides both bash and stream reasoning.
 
 ## Licence
 
-Slider is provided under Apache License, Version 2.0
+Slider is provided under Apache License, Version 2.0.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
 ## Contact

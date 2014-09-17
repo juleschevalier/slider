@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.buffer;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +53,8 @@ public class TripleManager {
 
     /**
      * Constructor
+     * 
+     * @param timeout
      */
     public TripleManager(final long timeout) {
         super();
@@ -60,7 +82,13 @@ public class TripleManager {
      * Add a rule and connect it with other rules (TripleDistributors with
      * TripleBuffers)
      * 
-     * @param newRule
+     * @param run
+     * @param executor
+     * @param phaser
+     * @param dictionary
+     * @param tripleStore
+     * @param bufferSize
+     * @param maxThreads
      * @see Rule
      */
     public void addRule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary,
@@ -93,7 +121,7 @@ public class TripleManager {
     /**
      * Send new triple to matching rules for inference
      * 
-     * @param triples
+     * @param triple
      */
     public void addTriple(final Triple triple) {
         this.generalDistributor.distribute(triple);

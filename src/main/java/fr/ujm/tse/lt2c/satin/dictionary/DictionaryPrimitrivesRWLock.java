@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.dictionary;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,7 +31,7 @@ import org.apache.log4j.Logger;
 import fr.ujm.tse.lt2c.satin.interfaces.Triple;
 
 /**
- * Concurrent implementation of the {@link interfaces.Dictionary}.
+ * Concurrent implementation of the {@link Dictionary}.
  * Literals and primitives are stores with negative id, concepts with positive ones
  * 
  * @author Jules Chevalier
@@ -107,8 +127,8 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (this.counter ^ (this.counter >>> 32));
-        result = (prime * result) + ((this.triples == null) ? 0 : this.triples.hashCode());
+        result = prime * result + (int) (this.counter ^ this.counter >>> 32);
+        result = prime * result + (this.triples == null ? 0 : this.triples.hashCode());
         return result;
     }
 

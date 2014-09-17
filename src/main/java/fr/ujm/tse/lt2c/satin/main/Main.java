@@ -1,5 +1,25 @@
 package fr.ujm.tse.lt2c.satin.main;
 
+/*
+ * #%L
+ * SLIDeR
+ * %%
+ * Copyright (C) 2014 Université Jean Monnet, Saint Etienne
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +60,7 @@ import fr.ujm.tse.lt2c.satin.utils.RunEntity;
  * usage: main
  * -b,--buffer-size <time>......set the buffer size
  * -c,--cumulative..............does not reinit data for each file
- * -d,--directory <directory>.. infere on all ontologies in the directory
+ * -d,--directory <directory>.. infers on all ontologies in the directory
  * -h,--help....................print this message
  * -i,--iteration <number>......how many times each file
  * -m,--mongo-save..............persists the results in MongoDB
