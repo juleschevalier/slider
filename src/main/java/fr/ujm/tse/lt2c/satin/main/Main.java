@@ -235,7 +235,7 @@ public class Main {
 
         options.addOption("c", "cumulative", false, "does not reinit data for each file");
 
-        final Option directoryO = new Option("d", "directory", true, "infere on all ontologies in the directory");
+        final Option directoryO = new Option("d", "directory", true, "infers on all ontologies in the directory");
         directoryO.setArgName("directory");
         directoryO.setArgs(1);
         directoryO.setType(File.class);
