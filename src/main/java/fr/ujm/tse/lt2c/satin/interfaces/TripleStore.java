@@ -4,38 +4,126 @@ import java.util.Collection;
 
 import com.google.common.collect.Multimap;
 
+/**
+ * @author Jules Chevalier
+ * 
+ *         Interface of a triplestore
+ *         Use Triple interface
+ * @see Triple
+ */
 public interface TripleStore {
 
-	public void add(Triple t);
+    /**
+     * Add the triple t to the TripleStore
+     * 
+     * @param t
+     * @see Triple
+     */
+    boolean add(Triple t);
 
-	public void addAll(Collection<Triple> t);
+    /**
+     * Add the triple <s,p,o> to the TripleStore
+     * 
+     * @param s
+     * @param p
+     * @param o
+     */
+    void add(long s, long p, long o);
 
-	public Collection<Triple> getAll();
+    /**
+     * Calls add for each triple in the collection
+     * 
+     * @param t
+     * @see Triple
+     * @see #add(Triple)
+     */
+    Collection<Triple> addAll(Collection<Triple> t);
 
-	public Collection<Triple> getbySubject(long s);
+    /**
+     * Removes the triple t from the TripleStore
+     * Does nothing if it does not contains t
+     * 
+     * @param t
+     * @see Triple
+     */
+    void remove(Triple t);
 
-	public Collection<Triple> getbyPredicate(long p);
+    /**
+     * @return all the triples in the TripleStore in a Collection
+     * @see Triple
+     */
+    Collection<Triple> getAll();
 
-	public Collection<Triple> getbyObject(long o);
+    /**
+     * @param s
+     * @return the triples with s as subject, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbySubject(long s);
 
-	public long size();
+    /**
+     * @param p
+     * @return the triples with p as predicate, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbyPredicate(long p);
 
-	public int hashCode();
+    /**
+     * @param o
+     * @return the triples with o as object, as a collection
+     * @see Triple
+     */
+    Collection<Triple> getbyObject(long o);
 
-	public boolean equals(Object obj);
+    /**
+     * @return the number of triples in the TripleStore
+     */
+    long size();
 
-	public void writeToFile(String file, Dictionary dictionary);
+    /**
+     * Writes the TripleStore in a file in a defined format
+     * 
+     * @param file
+     * @param dictionary
+     * @see Dictionary
+     */
+    void writeToFile(String file, Dictionary dictionary);
 
-	public boolean isEmpty();
+    /**
+     * @return true if the TripleStore is empty, false else
+     */
+    boolean isEmpty();
 
-	public boolean contains(Triple triple);
+    /**
+     * @param triple
+     * @return true if the TripleStore contains triple, false else
+     * @see Triple
+     */
+    boolean contains(Triple triple);
 
-	/**
-	 * Optional operation
-	 * 
-	 * @param p
-	 * @return
-	 */
-	public Multimap<Long, Long> getMultiMapForPredicate(long p);
+    /**
+     * @param s
+     * @param p
+     * @param o
+     * @return true if the TripleStore contains triple <s,p,o>, false else
+     */
+    boolean contains(long s, long p, long o);
+
+    /**
+     * Remove all the triples
+     */
+    void clear();
+
+    /**
+     * @param p
+     * @return the triples with p as predicate, as a Multimap
+     * @see Multimap
+     */
+    Multimap<Long, Long> getMultiMapForPredicate(long p);
+
+    /**
+     * @return all the predicates in a Collection
+     */
+    Collection<Long> getPredicates();
 
 }

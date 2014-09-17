@@ -2,8 +2,17 @@ package fr.ujm.tse.lt2c.satin.interfaces;
 
 import java.util.EventListener;
 
-public interface BufferListener extends EventListener{
+/**
+ * @author Jules Chevalier
+ * 
+ *         Interface for classes which want to be notified of buffer events
+ * @see TripleBuffer
+ */
+public interface BufferListener extends EventListener {
 
-	public void bufferFull();
-	
+    /**
+     * Method invocated when the buffer is full
+     */
+    boolean bufferFull();
+
 }
