@@ -37,10 +37,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-
-import com.mongodb.MongoClient;
 
 import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
@@ -59,18 +55,19 @@ import fr.ujm.tse.lt2c.satin.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.utils.RunEntity;
 
 /**
- * usage: main
+ * This class provides a command line interface to use Slider
+ * The different options are the following:
  * -b,--buffer-size <time>......set the buffer size
- * -c,--cumulative..............does not reinit data for each file
  * -d,--directory <directory>.. infers on all ontologies in the directory
  * -h,--help....................print this message
  * -i,--iteration <number>......how many times each file
- * -m,--mongo-save..............persists the results in MongoDB
  * -n,--threads <number>........set the number of threads by available core (0 means the jvm manage)
  * -o,--output..................save output into file
  * -p,--profile <profile>...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
- * -t,--timeout <arg>.......... set the buffer timeout in ms (0 means no timeout)
- * 
+ * -r,--batch-reasoning........ enable batch reasoning
+ * -t,--timeout <arg>.......... set the buffer timeout in ms (0 means timeout will be disabled)
+ * -v,--verbose................ enable verbose mode
+ * -w,--warm-up................ insert a warm-up lap before the inference
  * 
  * @author Jules Chevalier
  */
@@ -85,10 +82,11 @@ public class Main {
     private static final int DEFAULT_THREADS_NB = ReasonerStreamed.DEFAULT_THREADS_NB;
     private static final int DEFAULT_BUFFER_SIZE = QueuedTripleBufferLock.DEFAULT_BUFFER_SIZE;
     private static final long DEFAULT_TIMEOUT = BufferTimer.DEFAULT_TIMEOUT;
-    private static final boolean DEFAULT_CUMULATIVE_MODE = false;
-    private static final boolean DEFAULT_DUMP_MODE = false;
-    private static final boolean DEFAULT_PERSIST_MODE = false;
     private static final ReasonerProfile DEFAULT_PROFILE = ReasonerStreamed.DEFAULT_PROFILE;
+    private static final boolean DEFAULT_DUMP_MODE = false;
+    private static final boolean DEFAULT_VERBOSE_MODE = false;
+    private static final boolean DEFAULT_WARMUP_MODE = false;
+    private static final boolean DEFAULT_BATCH_MODE = false;
 
     public static void main(final String[] args) {
 
@@ -103,50 +101,49 @@ public class Main {
             return;
         }
 
-        // LOGGER.info("---Warm-up lap---");
-        // for (final File file : arguments.getFiles()) {
-        // reasonStream(arguments, file, 8);
-        // }
-
-        Datastore ds = null;
-        if (arguments.isPersistMode()) {
-            try {
-                // TODO Customizable IP
-                final MongoClient client = new MongoClient("10.20.0.57");
-                final Morphia morphia = new Morphia();
-                morphia.map(RunEntity.class);
-                ds = morphia.createDatastore(client, "Incremental");
-            } catch (final Exception e) {
-                LOGGER.error("", e);
+        if (arguments.isWarmupMode()) {
+            LOGGER.info("---Warm-up lap---");
+            for (final File file : arguments.getFiles()) {
+                reason(arguments, file, arguments.isBatchMode());
             }
+            LOGGER.info("---Real runs---");
+        } else {
+            LOGGER.info("---Starting inference---");
         }
 
-        LOGGER.info("---Real runs---");
-        LOGGER.info("File Time Infered Profile Sizes");
+        if (arguments.isVerboseMode()) {
+            LOGGER.info("File Time Infered Profile Buffer Timeout");
+        }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
-                final RunEntity run = reasonStream(arguments, file);
-                if (arguments.isPersistMode()) {
-                    ds.save(run);
+                final RunEntity run = reason(arguments, file, arguments.isBatchMode());
+                if (arguments.isVerboseMode()) {
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
+                            + run.getBufferSize() + " " + run.getTimeout());
                 }
-                LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
-                        + run.getRules().size());
             }
         }
 
         LOGGER.info("---Done---");
     }
 
+    private static RunEntity reason(final ReasoningArguments arguments, final File file, final boolean batchMode) {
+        if (batchMode) {
+            return reasonBatch(arguments, file);
+        }
+        return reasonStream(arguments, file);
+    }
+
     private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getNbThreads(),
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getThreadsNb(),
                 arguments.getBufferSize(), arguments.getTimeout());
 
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
         final long start = System.nanoTime();
         reasoner.start();
 
-        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
         final int input_size = parser.parseStream(file.getAbsolutePath(), reasoner);
 
         reasoner.close();
@@ -157,26 +154,26 @@ public class Main {
         }
         final long stop = System.nanoTime();
 
-        // if (arguments.isPersistMode()) {
+        if (arguments.isVerboseMode()) {
 
-        final Collection<String> rules = new HashSet<>();
-        for (final Rule rule : reasoner.getRules()) {
-            rules.add(rule.name());
+            final Collection<String> rules = new HashSet<>();
+            for (final Rule rule : reasoner.getRules()) {
+                rules.add(rule.name());
+            }
+            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.5", arguments.getProfile()
+                    .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, input_size, tripleStore.size() - input_size,
+                    GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
+            GlobalValues.reset();
+            return run;
         }
-        final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "incremental", arguments.getProfile()
-                .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, input_size, tripleStore.size() - input_size,
-                GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
         GlobalValues.reset();
-        return run;
-        // }
-        // GlobalValues.reset();
-        // return null;
+        return null;
     }
 
     private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getNbThreads(),
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getThreadsNb(),
                 arguments.getBufferSize(), arguments.getTimeout());
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
@@ -196,22 +193,21 @@ public class Main {
             e.printStackTrace();
         }
         final long stop = System.nanoTime();
-        // LOGGER.info(file.getName() + " " + tripleStore.size() + " " + (stop - start) / 1000000 + "ms");
 
-        // if (arguments.isPersistMode()) {
-        final Collection<String> rules = new HashSet<>();
-        for (final Rule rule : reasoner.getRules()) {
-            rules.add(rule.name());
+        if (arguments.isVerboseMode()) {
+            final Collection<String> rules = new HashSet<>();
+            for (final Rule rule : reasoner.getRules()) {
+                rules.add(rule.name());
+            }
+            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.5", arguments.getProfile()
+                    .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, triples.size(), tripleStore.size()
+                    - triples.size(), GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(),
+                    GlobalValues.getTimeoutByRule());
+            GlobalValues.reset();
+            return run;
         }
-        final RunEntity run = new RunEntity(arguments.getNbThreads(), arguments.getBufferSize(), arguments.getTimeout(), "total-stream", arguments.getProfile()
-                .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, triples.size(), tripleStore.size()
-                - triples.size(), GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(),
-                GlobalValues.getTimeoutByRule());
         GlobalValues.reset();
-        return run;
-        // }
-        // GlobalValues.reset();
-        // return null;
+        return null;
 
     }
 
@@ -222,16 +218,17 @@ public class Main {
     private static ReasoningArguments getArguments(final String[] args) {
 
         /* Reasoner fields */
-        int threads = DEFAULT_THREADS_NB;
+        int threadsNB = DEFAULT_THREADS_NB;
         int bufferSize = DEFAULT_BUFFER_SIZE;
         long timeout = DEFAULT_TIMEOUT;
         int iteration = 1;
-        boolean cumulativeMode = DEFAULT_CUMULATIVE_MODE;
         ReasonerProfile profile = DEFAULT_PROFILE;
 
         /* Extra fields */
-        boolean persistMode = DEFAULT_PERSIST_MODE;
+        boolean verboseMode = DEFAULT_VERBOSE_MODE;
+        boolean warmupMode = DEFAULT_WARMUP_MODE;
         boolean dumpMode = DEFAULT_DUMP_MODE;
+        boolean batchMode = DEFAULT_BATCH_MODE;
 
         /*
          * Options
@@ -245,7 +242,7 @@ public class Main {
         bufferSizeO.setType(Number.class);
         options.addOption(bufferSizeO);
 
-        final Option timeoutO = new Option("t", "timeout", true, "set the buffer timeout in ms (0 means no timeout)");
+        final Option timeoutO = new Option("t", "timeout", true, "set the buffer timeout in ms (0 means timeout will be disabled)");
         bufferSizeO.setArgName("time");
         bufferSizeO.setArgs(1);
         bufferSizeO.setType(Number.class);
@@ -257,8 +254,6 @@ public class Main {
         iterationO.setType(Number.class);
         options.addOption(iterationO);
 
-        options.addOption("c", "cumulative", false, "does not reinit data for each file");
-
         final Option directoryO = new Option("d", "directory", true, "infers on all ontologies in the directory");
         directoryO.setArgName("directory");
         directoryO.setArgs(1);
@@ -269,7 +264,11 @@ public class Main {
 
         options.addOption("h", "help", false, "print this message");
 
-        options.addOption("m", "mongo-save", false, "persists the results in MongoDB");
+        options.addOption("v", "verbose", false, "enable verbose mode");
+
+        options.addOption("r", "batch-reasoning", false, "enable batch reasoning");
+
+        options.addOption("w", "warm-up", false, "insert a warm-up lap before the inference");
 
         final Option profileO = new Option("p", "profile", true, "set the fragment " + java.util.Arrays.asList(ReasonerProfile.values()));
         profileO.setArgName("profile");
@@ -320,11 +319,18 @@ public class Main {
                 LOGGER.error("Timeout must be a number. Default value used", e);
             }
         }
-        /* cumulative */
-        if (cmd.hasOption("cumulative")) {
-            cumulativeMode = true;
+        /* verbose */
+        if (cmd.hasOption("verbose")) {
+            verboseMode = true;
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cumulative mode enabled");
+                LOGGER.info("Verbose mode enabled");
+            }
+        }
+        /* warm-up */
+        if (cmd.hasOption("warm-up")) {
+            warmupMode = true;
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Warm-up mode enabled");
             }
         }
         /* dump */
@@ -332,6 +338,13 @@ public class Main {
             dumpMode = true;
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Dump mode enabled");
+            }
+        }
+        /* dump */
+        if (cmd.hasOption("batch-reasoning")) {
+            batchMode = true;
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Batch mode enabled");
             }
         }
         /* directory */
@@ -350,13 +363,6 @@ public class Main {
                 } else {
                     dir = directory.getAbsolutePath();
                 }
-            }
-        }
-        /* persist */
-        if (cmd.hasOption("mongo-save")) {
-            persistMode = true;
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Persist mode enabled");
             }
         }
         /* profile */
@@ -386,7 +392,7 @@ public class Main {
         if (cmd.hasOption("threads")) {
             final String arg = cmd.getOptionValue("threads");
             try {
-                threads = Integer.parseInt(arg);
+                threadsNB = Integer.parseInt(arg);
             } catch (final NumberFormatException e) {
                 LOGGER.error("Threads number must be a number. Default value used", e);
             }
@@ -445,17 +451,17 @@ public class Main {
             LOGGER.info("********* OPTIONS *********");
             LOGGER.info("Buffer size:      " + bufferSize);
             LOGGER.info("Profile:          " + profile);
-            if (threads > 0) {
-                LOGGER.info("Threads:          " + threads);
+            if (threadsNB > 0) {
+                LOGGER.info("Threads:          " + threadsNB);
             } else {
-                LOGGER.info("Threads:          Auto");
+                LOGGER.info("Threads:          Automatic");
             }
             LOGGER.info("Iterations:       " + iteration);
             LOGGER.info("Timeout:          " + timeout);
             LOGGER.info("***************************");
         }
 
-        return new ReasoningArguments(threads, bufferSize, timeout, iteration, cumulativeMode, profile, persistMode, dumpMode, files);
+        return new ReasoningArguments(threadsNB, bufferSize, timeout, iteration, profile, verboseMode, warmupMode, dumpMode, batchMode, files);
 
     }
 

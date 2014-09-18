@@ -31,35 +31,37 @@ import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
  */
 public class ReasoningArguments {
 
-    public ReasoningArguments(final int threads, final int bufferSize, final long timeout, final int iteration, final boolean cumulativeMode,
-            final ReasonerProfile profile, final boolean persistMode, final boolean dumpMode, final List<File> files) {
+    public ReasoningArguments(final int threads, final int bufferSize, final long timeout, final int iteration, final ReasonerProfile profile,
+            final boolean verboseMode, final boolean warmupMode, final boolean dumpMode, final boolean batchMode, final List<File> files) {
         super();
-        this.threads = threads;
+        this.threadsNb = threads;
         this.bufferSize = bufferSize;
         this.timeout = timeout;
         this.iteration = iteration;
-        this.cumulativeMode = cumulativeMode;
         this.profile = profile;
-        this.persistMode = persistMode;
+        this.verboseMode = verboseMode;
+        this.warmupMode = warmupMode;
         this.dumpMode = dumpMode;
+        this.batchMode = batchMode;
         this.files = files;
     }
 
     /* Reasoner fields */
-    private final int threads;
+    private final int threadsNb;
     private final int bufferSize;
     private final long timeout;
     private final int iteration;
-    private final boolean cumulativeMode;
     private final ReasonerProfile profile;
 
     /* Extra fields */
-    private final boolean persistMode;
+    private final boolean verboseMode;
+    private final boolean warmupMode;
     private final boolean dumpMode;
+    private final boolean batchMode;
     private final List<File> files;
 
-    public int getNbThreads() {
-        return this.threads;
+    public int getThreadsNb() {
+        return this.threadsNb;
     }
 
     public int getBufferSize() {
@@ -74,20 +76,24 @@ public class ReasoningArguments {
         return this.iteration;
     }
 
-    public boolean isCumulativeMode() {
-        return this.cumulativeMode;
-    }
-
     public ReasonerProfile getProfile() {
         return this.profile;
     }
 
-    public boolean isPersistMode() {
-        return this.persistMode;
+    public boolean isVerboseMode() {
+        return this.verboseMode;
+    }
+
+    public boolean isWarmupMode() {
+        return this.warmupMode;
     }
 
     public boolean isDumpMode() {
         return this.dumpMode;
+    }
+
+    public boolean isBatchMode() {
+        return this.batchMode;
     }
 
     public List<File> getFiles() {
@@ -98,15 +104,16 @@ public class ReasoningArguments {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (this.batchMode ? 1231 : 1237);
         result = prime * result + this.bufferSize;
-        result = prime * result + (this.cumulativeMode ? 1231 : 1237);
         result = prime * result + (this.dumpMode ? 1231 : 1237);
         result = prime * result + (this.files == null ? 0 : this.files.hashCode());
         result = prime * result + this.iteration;
-        result = prime * result + (this.persistMode ? 1231 : 1237);
         result = prime * result + (this.profile == null ? 0 : this.profile.hashCode());
-        result = prime * result + this.threads;
+        result = prime * result + this.threadsNb;
         result = prime * result + (int) (this.timeout ^ this.timeout >>> 32);
+        result = prime * result + (this.verboseMode ? 1231 : 1237);
+        result = prime * result + (this.warmupMode ? 1231 : 1237);
         return result;
     }
 
@@ -122,10 +129,10 @@ public class ReasoningArguments {
             return false;
         }
         final ReasoningArguments other = (ReasoningArguments) obj;
-        if (this.bufferSize != other.bufferSize) {
+        if (this.batchMode != other.batchMode) {
             return false;
         }
-        if (this.cumulativeMode != other.cumulativeMode) {
+        if (this.bufferSize != other.bufferSize) {
             return false;
         }
         if (this.dumpMode != other.dumpMode) {
@@ -141,16 +148,19 @@ public class ReasoningArguments {
         if (this.iteration != other.iteration) {
             return false;
         }
-        if (this.persistMode != other.persistMode) {
-            return false;
-        }
         if (this.profile != other.profile) {
             return false;
         }
-        if (this.threads != other.threads) {
+        if (this.threadsNb != other.threadsNb) {
             return false;
         }
         if (this.timeout != other.timeout) {
+            return false;
+        }
+        if (this.verboseMode != other.verboseMode) {
+            return false;
+        }
+        if (this.warmupMode != other.warmupMode) {
             return false;
         }
         return true;
