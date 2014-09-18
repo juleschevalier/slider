@@ -31,6 +31,8 @@ import fr.ujm.tse.lt2c.satin.rules.Rule;
  */
 public class BufferTimer extends TimerTask {
 
+    public static final long DEFAULT_TIMEOUT = 500;
+
     private final HashMap<Rule, Long> rulesLastFlushes;
     private final long timeout;
 

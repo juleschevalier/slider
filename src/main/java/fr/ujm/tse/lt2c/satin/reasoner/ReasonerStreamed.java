@@ -24,10 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +38,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.buffer.TripleManager;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -60,11 +59,12 @@ public class ReasonerStreamed extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(ReasonerStreamed.class);
 
-    // TODO Insert default parameters here !!!
+    public static final int DEFAULT_THREADS_NB = 0;
+    public static final ReasonerProfile DEFAULT_PROFILE = ReasonerProfile.RHODF;
 
-    private int maxThreads = 0;
-    private int bufferSize = 100000;
-    private final int timeout = 500;
+    private final int maxThreads;
+    private final int bufferSize;
+    private final long timeout;
     private final ReasonerProfile profile;
     private final ExecutorService executor;
     private final TripleStore tripleStore;
@@ -82,9 +82,13 @@ public class ReasonerStreamed extends Thread {
      */
     public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile) {
         super();
+        this.maxThreads = DEFAULT_THREADS_NB;
+        this.bufferSize = QueuedTripleBufferLock.DEFAULT_BUFFER_SIZE;
+        this.timeout = BufferTimer.DEFAULT_TIMEOUT;
+        this.profile = profile;
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
-        this.profile = profile;
+
         this.tripleManager = new TripleManager(this.timeout);
         this.phaser = new AtomicInteger();
         this.executor = Executors.newCachedThreadPool();
@@ -95,57 +99,31 @@ public class ReasonerStreamed extends Thread {
     }
 
     /**
-     * Constructors
+     * Constructor
      * 
+     * @param maxThreads
+     * @param bufferSize
+     * @param timeout
+     * @param profile
      * @param tripleStore
      * @param dictionary
-     * @param profile
-     * @param timeout
      */
-    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final long timeout) {
+    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int maxThreads,
+            final int bufferSize, final long timeout) {
         super();
-        this.tripleStore = tripleStore;
-        this.dictionary = dictionary;
-        this.profile = profile;
-        this.tripleManager = new TripleManager(timeout);
-        this.phaser = new AtomicInteger();
-        this.executor = Executors.newCachedThreadPool();
-
-        /* Initialize rules used for inference on RhoDF */
-        this.initialiseReasoner();
-
-    }
-
-    /*
-     * Constructor with configuration
-     */
-    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final int bufferSize,
-            final int maxThreads, final long timeout) {
-        super();
-        this.tripleStore = tripleStore;
-        this.dictionary = dictionary;
-        this.profile = profile;
-        this.tripleManager = new TripleManager(timeout);
-        this.phaser = new AtomicInteger();
-        this.bufferSize = bufferSize;
         this.maxThreads = maxThreads;
-        this.executor = Executors.newFixedThreadPool(maxThreads);
-
-        /* Initialize rules used for inference on RhoDF */
-        this.initialiseReasoner();
-    }
-
-    public ReasonerStreamed(final TripleStore tripleStore, final Dictionary dictionary, final ReasonerProfile profile, final long timeout, final int nb_rules) {
-        super();
+        this.bufferSize = bufferSize;
+        this.timeout = timeout;
+        this.profile = profile;
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
-        this.profile = profile;
-        this.tripleManager = new TripleManager(timeout);
+
+        this.tripleManager = new TripleManager(this.timeout);
         this.phaser = new AtomicInteger();
         this.executor = Executors.newCachedThreadPool();
 
-        /* Initialize rules used for inference on RhoDF */
-        this.initialiseReasoner(nb_rules);
+        /* Initialize rules used for inference on the defined fragment */
+        this.initialiseReasoner();
     }
 
     public void addTriples(final Collection<Triple> triples) {
@@ -252,18 +230,19 @@ public class ReasonerStreamed extends Thread {
 
     }
 
-    private void initialiseReasoner(final int number) {
-
-        final List<AvaibleRuns> runs = new ArrayList<AvaibleRuns>();
-
-        runs.addAll(java.util.Arrays.asList(AvaibleRuns.values()));
-
-        Collections.shuffle(runs);
-
-        for (int i = 0; i < number; i++) {
-            this.tripleManager.addRule(runs.get(i), this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-        }
-    }
+    // private void initialiseReasoner(final int number) {
+    //
+    // final List<AvaibleRuns> runs = new ArrayList<AvaibleRuns>();
+    //
+    // runs.addAll(java.util.Arrays.asList(AvaibleRuns.values()));
+    //
+    // Collections.shuffle(runs);
+    //
+    // for (int i = 0; i < number; i++) {
+    // this.tripleManager.addRule(runs.get(i), this.executor, this.phaser, this.dictionary, this.tripleStore,
+    // this.bufferSize, this.maxThreads);
+    // }
+    // }
 
     /**
      * Add the tripleStore into Jena Model and use Jena Dumper to write it in a file

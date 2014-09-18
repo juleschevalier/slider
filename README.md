@@ -14,8 +14,15 @@ Additional rules can be easily added by implementing a single method.
 
 Slider provides both batch and stream reasoning.
 
+It is a full Java project.
+
 ## Requirements
 
+ - **Java 1.7** or greater
+ - **Git** to clone the project
+ - **Maven** to install and run it easily
+
+<!--
 ### Necessary Libraries
 
 The following libraries are needed to compile and run Slider.
@@ -28,6 +35,7 @@ They are included as Maven dependencies in the pom.xml file.
  - morphia
  - mongo-java-driver
  - commons-cli
+-->
 
 ## Installation
 
@@ -36,7 +44,7 @@ To install Slider, clone the repository and compile it through Maven:
 ```bash
 git clone git@github.com:telecom-se/distributed-reasoner.git
 cd distributed-reasoner/
-mvn clean compile install
+mvn install
 ```
 
 ## Running Slider
@@ -66,6 +74,12 @@ usage: main
 ```
 
 ####Command line examples
+```bash
+mvn exec:java -q -Dexec.args="-p RhoDF -d ~/Ontologies"
+```
+```bash
+mvn exec:java -q -Dexec.args="-p RhoDF -t 1000 -d ~/Ontologies"
+```
 
 ### Code examples
 
@@ -76,7 +90,9 @@ It provides both bash and stream reasoning.
 ```Java
 final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RDFS);
+final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore,
+													   dictionary,
+													   ReasonerProfile.RDFS);
 
 final Parser parser = new ParserImplNaive(dictionary, tripleStore);
 final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
@@ -96,7 +112,9 @@ try {
 ```Java
 final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RDFS);
+final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore,
+													   dictionary,
+													   ReasonerProfile.RDFS);
 
 final long start = System.nanoTime();
 reasoner.start();
@@ -132,11 +150,11 @@ Setup the server in your pom.xml:
 Then use the following dependency :
 
 ```xml
-    <dependency>
-      <groupId>fr.ujm.tse.lt2c.satin</groupId>
-      <artifactId>slider</artifactId>
-      <version>0.9.5</version>
-    </dependency>
+<dependency>
+    <groupId>fr.ujm.tse.lt2c.satin</groupId>
+    <artifactId>slider</artifactId>
+    <version>0.9.5-SNAPSHOT</version>
+</dependency>
 ```
 
 ## How to reproduce

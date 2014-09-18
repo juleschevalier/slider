@@ -45,6 +45,8 @@ import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
 public class QueuedTripleBufferLock implements TripleBuffer {
     private static Logger logger = Logger.getLogger(QueuedTripleBufferLock.class);
 
+    public static final int DEFAULT_BUFFER_SIZE = 100000;
+
     /* Limit of the buffer (adding the last triple calls bufferfull) */
     private final long bufferSize;
 

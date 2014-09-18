@@ -42,6 +42,8 @@ import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
 
+import fr.ujm.tse.lt2c.satin.buffer.BufferTimer;
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.interfaces.Parser;
@@ -80,13 +82,13 @@ public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class);
 
     /* Initialization of default options */
-    private static final int DEFAULT_THREADS = 0;
-    private static final int DEFAULT_BUFFER_SIZE = 100000;
-    private static final long DEFAULT_TIMEOUT = 500;
+    private static final int DEFAULT_THREADS_NB = ReasonerStreamed.DEFAULT_THREADS_NB;
+    private static final int DEFAULT_BUFFER_SIZE = QueuedTripleBufferLock.DEFAULT_BUFFER_SIZE;
+    private static final long DEFAULT_TIMEOUT = BufferTimer.DEFAULT_TIMEOUT;
     private static final boolean DEFAULT_CUMULATIVE_MODE = false;
     private static final boolean DEFAULT_DUMP_MODE = false;
     private static final boolean DEFAULT_PERSIST_MODE = false;
-    private static final ReasonerProfile DEFAULT_PROFILE = ReasonerProfile.RHODF;
+    private static final ReasonerProfile DEFAULT_PROFILE = ReasonerStreamed.DEFAULT_PROFILE;
 
     public static void main(final String[] args) {
 
@@ -138,7 +140,8 @@ public class Main {
     private static RunEntity reasonStream(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getNbThreads(),
+                arguments.getBufferSize(), arguments.getTimeout());
 
         final long start = System.nanoTime();
         reasoner.start();
@@ -173,7 +176,8 @@ public class Main {
     private static RunEntity reasonBatch(final ReasoningArguments arguments, final File file) {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getTimeout());
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, arguments.getProfile(), arguments.getNbThreads(),
+                arguments.getBufferSize(), arguments.getTimeout());
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
 
@@ -218,7 +222,7 @@ public class Main {
     private static ReasoningArguments getArguments(final String[] args) {
 
         /* Reasoner fields */
-        int threads = DEFAULT_THREADS;
+        int threads = DEFAULT_THREADS_NB;
         int bufferSize = DEFAULT_BUFFER_SIZE;
         long timeout = DEFAULT_TIMEOUT;
         int iteration = 1;

@@ -23,6 +23,7 @@ package fr.ujm.tse.lt2c.satin.triplebuffer.test;
 import java.util.Collection;
 import java.util.HashSet;
 
+import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
@@ -42,7 +43,8 @@ public class TestTimeout {
 
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RHODF, 1000);
+        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RHODF, ReasonerStreamed.DEFAULT_THREADS_NB,
+                QueuedTripleBufferLock.DEFAULT_BUFFER_SIZE, 1000);
 
         reasoner.start();
         /****************/
