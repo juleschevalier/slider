@@ -42,8 +42,8 @@ They are included as Maven dependencies in the pom.xml file.
 To install Slider, clone the repository and compile it through Maven:
 
 ```bash
-git clone git@github.com:telecom-se/distributed-reasoner.git
-cd distributed-reasoner/
+git clone git@github.com:juleschevalier/slider.git
+cd slider/
 mvn install
 ```
 
@@ -147,7 +147,7 @@ Setup the server in your pom.xml:
 <repositories>
     <repository>
         <id>slider-mvn-repo</id>
-        <url>https://raw.github.com/telecom-se/slider/mvn-repo/</url>
+        <url>https://raw.github.com/juleschevalier/slider/mvn-repo/</url>
         <snapshots>
             <enabled>true</enabled>
             <updatePolicy>always</updatePolicy>
@@ -165,7 +165,7 @@ Then use the following dependency :
     <version>0.9.5-SNAPSHOT</version>
 </dependency>
 ```
-Have a look [here](https://github.com/telecom-se/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider) to see all the avalable versions
+Have a look [here](https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider) to see all the available versions
 
 ##Correctness
 
@@ -227,7 +227,7 @@ To run experimentation on the parameters of Slider, please use the same command 
 
 ##Bug reports
 
-If you discover any bug, feel free to create an issue on GitHub: https://github.com/telecom-se/slider/issues.
+If you discover any bug, feel free to create an issue on GitHub: https://github.com/juleschevalier/slider/issues.
 
 ##Licence
 
