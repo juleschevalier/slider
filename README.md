@@ -16,6 +16,13 @@ Slider provides both batch and stream reasoning.
 
 It is a full Java project.
 
+##Contributors
+
+ - Jules Chevalier (jules.chevalier@univ-st-etienne.fr)
+ - Julien Subercaze (julien.subercaze@univ-st-etienne.fr)
+ - Christophe Gravier (christophe.gravier@univ-st-etienne.fr)
+ - Frédérique Laforest (frederique.laforest@univ-st-etienne.fr)
+
 ##Requirements
 
  - **Java 1.7** or greater
@@ -202,7 +209,9 @@ You can download the two real life zipped ontologies here:
  * [wikipediaOntology.zip](http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wikipediaOntology.zip)
  * [wordnetOntology.zip](http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wordnetOntology.zip)
 
-The other ontologies used for anterior experimentations can be found [here]()
+All these ontologies can be downloaded [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider/benchmark)
+
+The other ontologies used for anterior experimentations can be found [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider/tuning/)
 
 ###Run the experimentations
 
@@ -237,3 +246,8 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 ##Contact
 
 For any question, please contact us at jules.chevalier@univ-st-etienne.fr
+
+##Acknowledgement
+
+This work was funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.
+It is part of the [Open Clouware](http://www.opencloudware.org/bin/view/Main/) project.

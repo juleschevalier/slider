@@ -26,10 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
-import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 
 public class TestMultiThreadInsertTripleBuffer {
 

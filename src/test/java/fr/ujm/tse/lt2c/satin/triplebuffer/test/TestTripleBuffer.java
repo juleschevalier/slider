@@ -22,8 +22,8 @@ package fr.ujm.tse.lt2c.satin.triplebuffer.test;
 
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.interfaces.BufferListener;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 
 public class TestTripleBuffer {
 

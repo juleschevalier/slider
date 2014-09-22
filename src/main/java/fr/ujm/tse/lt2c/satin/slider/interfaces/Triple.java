@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.triplestore.test;
+package fr.ujm.tse.lt2c.satin.slider.interfaces;
 
 /*
  * #%L
@@ -20,27 +20,27 @@ package fr.ujm.tse.lt2c.satin.triplestore.test;
  * #L%
  */
 
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * Interface for triple representation
+ * 
+ * @author Jules Chevalier
+ * 
+ */
+public interface Triple {
 
-import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
+    /**
+     * @return the subject of the triple
+     */
+    long getSubject();
 
-public class TestTriple {
+    /**
+     * @return the predicate of the triple
+     */
+    long getPredicate();
 
-    @Test
-    public void testGetters() {
-        long s1 = 1l, p1 = 2l, o1 = 3l;
-        long s2, p2, o2;
+    /**
+     * @return the object of the triple
+     */
+    long getObject();
 
-        Triple t = new ImmutableTriple(s1, p1, o1);
-
-        s2 = t.getSubject();
-        p2 = t.getPredicate();
-        o2 = t.getObject();
-
-        Assert.assertEquals(s1, s2);
-        Assert.assertEquals(p1, p2);
-        Assert.assertEquals(o1, o2);
-    }
 }

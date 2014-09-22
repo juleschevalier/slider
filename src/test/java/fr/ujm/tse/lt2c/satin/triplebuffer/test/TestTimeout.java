@@ -23,16 +23,16 @@ package fr.ujm.tse.lt2c.satin.triplebuffer.test;
 import java.util.Collection;
 import java.util.HashSet;
 
-import fr.ujm.tse.lt2c.satin.buffer.QueuedTripleBufferLock;
-import fr.ujm.tse.lt2c.satin.dictionary.AbstractDictionary;
-import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.reasoner.ReasonerStreamed;
-import fr.ujm.tse.lt2c.satin.rules.ReasonerProfile;
-import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
-import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
+import fr.ujm.tse.lt2c.satin.slider.buffer.QueuedTripleBufferLock;
+import fr.ujm.tse.lt2c.satin.slider.dictionary.AbstractDictionary;
+import fr.ujm.tse.lt2c.satin.slider.dictionary.DictionaryPrimitrivesRWLock;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.slider.reasoner.ReasonerStreamed;
+import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
+import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TestTimeout {
 

@@ -26,10 +26,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.interfaces.Triple;
-import fr.ujm.tse.lt2c.satin.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.triplestore.ImmutableTriple;
-import fr.ujm.tse.lt2c.satin.triplestore.VerticalPartioningTripleStoreRWLock;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
+import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
+import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 
 public class TestVerticalTripleStore {
 

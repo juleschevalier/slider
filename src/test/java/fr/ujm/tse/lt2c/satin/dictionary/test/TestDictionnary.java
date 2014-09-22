@@ -23,8 +23,8 @@ package fr.ujm.tse.lt2c.satin.dictionary.test;
 import org.junit.Assert;
 import org.junit.Test;
 
-import fr.ujm.tse.lt2c.satin.dictionary.DictionaryPrimitrivesRWLock;
-import fr.ujm.tse.lt2c.satin.interfaces.Dictionary;
+import fr.ujm.tse.lt2c.satin.slider.dictionary.DictionaryPrimitrivesRWLock;
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 
 public class TestDictionnary {
 
