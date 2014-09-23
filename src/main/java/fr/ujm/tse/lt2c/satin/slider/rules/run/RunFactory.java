@@ -34,7 +34,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
  * @author Jules Chevalier
  *
  */
-public class RunFactory {
+public final class RunFactory {
 
     private static final Logger LOGGER = Logger.getLogger(RunFactory.class);
 

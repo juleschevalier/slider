@@ -20,6 +20,8 @@ package fr.ujm.tse.lt2c.satin.triplestore.test;
  * #L%
  */
 
+import org.junit.Test;
+
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
@@ -27,7 +29,8 @@ import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWL
 
 public class TestRemove {
 
-    public static void main(final String[] args) {
+    @Test
+    public void test() {
 
         final TripleStore ts = new VerticalPartioningTripleStoreRWLock();
 

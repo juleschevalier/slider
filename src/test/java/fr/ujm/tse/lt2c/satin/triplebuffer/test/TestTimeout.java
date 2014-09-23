@@ -23,6 +23,8 @@ package fr.ujm.tse.lt2c.satin.triplebuffer.test;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.junit.Test;
+
 import fr.ujm.tse.lt2c.satin.slider.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.slider.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.slider.dictionary.DictionaryPrimitrivesRWLock;
@@ -36,10 +38,8 @@ import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWL
 
 public class TestTimeout {
 
-    private TestTimeout() {
-    }
-
-    public static void main(final String[] args) {
+    @Test
+    public void test() {
 
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();

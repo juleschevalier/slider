@@ -105,7 +105,7 @@ public class RunPRP_SPO1 extends AbstractRun {
 
     @Override
     public String toString() {
-        return this.RULENAME;
+        return RunPRP_SPO1.RULENAME;
     }
 
 }

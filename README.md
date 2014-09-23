@@ -29,21 +29,6 @@ It is a full Java project.
  - **Git** to clone the project
  - **Maven** to install and run it easily
 
-<!--
-###Necessary Libraries
-
-The following libraries are needed to compile and run Slider.
-They are included as Maven dependencies in the pom.xml file.
-
- - apache-jena-libs
- - junit
- - log4j
- - guava
- - morphia
- - mongo-java-driver
- - commons-cli
--->
-
 ##Installation
 
 To install Slider, clone the repository and compile it through Maven:
@@ -68,16 +53,16 @@ mvn exec:java -q -Dexec.args="-p RDFS toto.nt"
 Here is the list of the different options (accesible via -h,--help option):
 ```
  -b,--buffer-size <time>......set the buffer size
- -d,--directory <directory>.. infers on all ontologies in the directory
+ -d,--directory <directory>...infers on all ontologies in the directory
  -h,--help....................print this message
  -i,--iteration <number>......how many times each file
  -n,--threads <number>........set the number of threads by available core (0 means the jvm manage)
  -o,--output..................save output into file
- -p,--profile <profile>...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
- -r,--batch-reasoning........ enable batch reasoning
- -t,--timeout <arg>.......... set the buffer timeout in ms (0 means timeout will be disabled)
- -v,--verbose................ enable verbose mode
- -w,--warm-up................ insert a warm-up lap before the inference
+ -p,--profile <profile>.......set the fragment [RHODF, BRHODF, RDFS, BRDFS]
+ -r,--batch-reasoning.........enable batch reasoning
+ -t,--timeout <arg>...........set the buffer timeout in ms (0 means timeout will be disabled)
+ -v,--verbose.................enable verbose mode
+ -w,--warm-up.................insert a warm-up lap before the inference
 ```
 
 ####Examples
