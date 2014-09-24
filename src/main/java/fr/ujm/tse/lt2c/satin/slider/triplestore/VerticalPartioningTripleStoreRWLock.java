@@ -57,9 +57,9 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
     private static Logger logger = Logger.getLogger(VerticalPartioningTripleStoreRWLock.class);
 
-    Map<Long, Multimap<Long, Long>> internalstore;
-    ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
-    int triples;
+    private final Map<Long, Multimap<Long, Long>> internalstore;
+    private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
+    private int triples;
 
     /**
      * Constructor

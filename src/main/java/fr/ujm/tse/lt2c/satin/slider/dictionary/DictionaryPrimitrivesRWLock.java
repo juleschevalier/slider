@@ -41,10 +41,10 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
     private static Logger logger = Logger.getLogger(DictionaryPrimitrivesRWLock.class);
 
     private Map<String, Long> triples = new HashMap<>();
-    long counter;
-    long primitivesCounter;
+    private long counter;
+    private long primitivesCounter;
 
-    ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 
     /**
      * Constructor

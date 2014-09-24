@@ -21,6 +21,7 @@ package fr.ujm.tse.lt2c.satin.slider.buffer;
  */
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TimerTask;
 
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
@@ -33,7 +34,7 @@ public class BufferTimer extends TimerTask {
 
     public static final long DEFAULT_TIMEOUT = 500;
 
-    private final HashMap<Rule, Long> rulesLastFlushes;
+    private final Map<Rule, Long> rulesLastFlushes;
     private final long timeout;
 
     public BufferTimer(final long timeout) {

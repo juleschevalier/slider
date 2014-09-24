@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Jules Chevalier
  *
  */
-public class GlobalValues {
+public final class GlobalValues {
 
     private GlobalValues() {
 

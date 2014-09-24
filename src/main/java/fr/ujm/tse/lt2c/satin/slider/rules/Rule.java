@@ -58,7 +58,7 @@ public class Rule implements BufferListener {
     private final int maxThreads;
     private final BufferTimer timer;
 
-    ExecutorService executor;
+    private final ExecutorService executor;
 
     public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
             final int bufferSize, final int maxThreads, final BufferTimer timer) {

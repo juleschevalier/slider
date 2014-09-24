@@ -79,20 +79,21 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long datatype = 0;
 
     @Override
-    public String printAxiom(String c) {
+    public String printAxiom(final String c) {
+        String axiom = c;
         /* Replace integers, strings... by their value */
-        c = c.replaceAll("(\".*\")\\^\\^.*", "$1");
+        axiom = axiom.replaceAll("(\".*\")\\^\\^.*", "$1");
 
         /* Cut the URL, keep the name */
-        if (c.split("#").length > 1) {
-            c = c.split("#")[1];
+        if (axiom.split("#").length > 1) {
+            axiom = axiom.split("#")[1];
         }
 
         /* Replace all the blank nodes by "BLANKNODE" */
-        c = c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-?[0-9a-z]+", "BLANKNODE");
-        c = c.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-?[0-9a-z]+", "BLANKNODE");
+        axiom = axiom.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-?[0-9a-z]+", "BLANKNODE");
+        axiom = axiom.replaceAll("-?[0-9a-z]+:[0-9a-z]+:-?[0-9a-z]+", "BLANKNODE");
 
-        return c;
+        return axiom;
     }
 
     public void initialize() {

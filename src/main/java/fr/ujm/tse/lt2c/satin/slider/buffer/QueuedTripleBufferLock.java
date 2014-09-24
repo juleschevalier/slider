@@ -57,7 +57,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     private final BufferTimer timer;
     private final Rule rule;
 
-    String debugName;
+    private String debugName;
 
     /**
      * Constructor

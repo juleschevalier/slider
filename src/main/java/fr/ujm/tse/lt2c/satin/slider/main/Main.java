@@ -71,7 +71,7 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
  * 
  * @author Jules Chevalier
  */
-public class Main {
+public final class Main {
 
     private Main() {
     }
@@ -144,13 +144,13 @@ public class Main {
         final long start = System.nanoTime();
         reasoner.start();
 
-        final int input_size = parser.parseStream(file.getAbsolutePath(), reasoner);
+        final int inputSize = parser.parseStream(file.getAbsolutePath(), reasoner);
 
         reasoner.close();
         try {
             reasoner.join();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
 
@@ -161,7 +161,7 @@ public class Main {
                 rules.add(rule.name());
             }
             final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.5", arguments.getProfile()
-                    .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, input_size, tripleStore.size() - input_size,
+                    .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, inputSize, tripleStore.size() - inputSize,
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             GlobalValues.reset();
             return run;
@@ -190,7 +190,7 @@ public class Main {
         try {
             reasoner.join();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
 
