@@ -129,7 +129,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>fr.ujm.tse.lt2c.satin.main.Main</mainClass>
+					<mainClass>fr.ujm.tse.lt2c.satin.slider.main.Main</mainClass>
 					<executable>maven</executable>
 				</configuration>
 			</plugin>
