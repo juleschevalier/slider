@@ -42,61 +42,95 @@ public final class RunFactory {
 
     }
 
-    public static AbstractRun getRunInstance(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore,
-            final TripleBuffer tripleBuffer, final TripleDistributor tripleDistributor, final AtomicInteger phaser, final BufferTimer timer) {
+    public static Thread getRunThread(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
+            final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
+
+        return getRunThread(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser, null, 0);
+    }
+
+    public static Thread getRunThread(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
+            final TripleDistributor tripleDistributor, final AtomicInteger phaser, final BufferTimer timer, final long triplesToRead) {
+
+        AbstractRun abstractRun = null;
 
         switch (run) {
         case CAX_SCO:
-            return new RunCAX_SCO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunCAX_SCO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case PRP_DOM:
-            return new RunPRP_DOM(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunPRP_DOM(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case PRP_RNG:
-            return new RunPRP_RNG(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunPRP_RNG(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case PRP_SPO1:
-            return new RunPRP_SPO1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunPRP_SPO1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_DOM1:
-            return new RunSCM_DOM1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_DOM1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_DOM2:
-            return new RunSCM_DOM2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_DOM2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_EQC2:
-            return new RunSCM_EQC2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_EQC2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_EQP2:
-            return new RunSCM_EQP2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_EQP2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_RNG1:
-            return new RunSCM_RNG1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_RNG1(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_RNG2:
-            return new RunSCM_RNG2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_RNG2(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_SCO:
-            return new RunSCM_SCO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_SCO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case SCM_SPO:
-            return new RunSCM_SPO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunSCM_SPO(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS4:
-            return new RunRDFS4(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS4(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS6:
-            return new RunRDFS6(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS6(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS8:
-            return new RunRDFS8(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS8(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS10:
-            return new RunRDFS10(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS10(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS12:
-            return new RunRDFS12(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS12(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RDFS13:
-            return new RunRDFS13(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRDFS13(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RHODF6a:
-            return new RunRHODF6a(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRHODF6a(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RHODF6b:
-            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RHODF6d:
-            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RHODF7a:
-            return new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRHODF6b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         case RHODF7b:
-            return new RunRHODF7b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            abstractRun = new RunRHODF7b(dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser);
+            break;
         default:
             LOGGER.error("RUN FACTORY Unknown run type: " + run);
             break;
         }
-        return null;
+        if (triplesToRead > 0) {
+            abstractRun.setTimerCall(timer, triplesToRead);
+        }
+        return new Thread(abstractRun);
     }
 
     public static long[] getInputMatchers(final AvaibleRuns run) {

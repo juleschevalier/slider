@@ -21,6 +21,7 @@ package fr.ujm.tse.lt2c.satin.slider.main;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,6 +51,7 @@ import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 import fr.ujm.tse.lt2c.satin.slider.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.slider.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
@@ -65,7 +67,7 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
  * -o,--output..................save output into file
  * -p,--profile <profile>...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
  * -r,--batch-reasoning........ enable batch reasoning
- * -t,--timeout <arg>.......... set the buffer timeout in ms (0 means timeout will be disabled)
+ * -t,--timeout <arg>.......... set the buffer timeout in ms
  * -v,--verbose................ enable verbose mode
  * -w,--warm-up................ insert a warm-up lap before the inference
  * 
@@ -88,8 +90,8 @@ public final class Main {
     private static final boolean DEFAULT_WARMUP_MODE = false;
     private static final boolean DEFAULT_BATCH_MODE = false;
 
-    public static void main(final String[] args) {
-
+    public static void main(final String[] args) throws IOException {
+        // System.in.read();
         final ReasoningArguments arguments = getArguments(args);
 
         if (arguments == null) {
@@ -116,7 +118,16 @@ public final class Main {
         }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
+                MonitoredValues.initialize(arguments.getBufferSize(), 10, file.getName() + ".json");
+                MonitoredValues.start();
+                try {
+                    Thread.sleep(10);
+                } catch (final InterruptedException e) {
+                    e.printStackTrace();
+                }
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
+                MonitoredValues.stop();
+                MonitoredValues.persistInFile();
                 if (arguments.isVerboseMode()) {
                     LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
                             + run.getBufferSize() + " " + run.getTimeout());
@@ -153,6 +164,8 @@ public final class Main {
             LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
+
+        MonitoredValues.updateLastThings(inputSize, tripleStore.size() - inputSize);
 
         if (arguments.isVerboseMode()) {
 
@@ -193,6 +206,8 @@ public final class Main {
             LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
+
+        MonitoredValues.updateLastThings(triples.size(), tripleStore.size() - triples.size());
 
         if (arguments.isVerboseMode()) {
             final Collection<String> rules = new HashSet<>();
@@ -315,6 +330,9 @@ public final class Main {
             final String arg = cmd.getOptionValue("timeout");
             try {
                 timeout = Integer.parseInt(arg);
+                if (timeout <= 0) {
+                    throw new RuntimeException("Timeout must be >0");
+                }
             } catch (final NumberFormatException e) {
                 LOGGER.error("Timeout must be a number. Default value used", e);
             }

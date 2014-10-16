@@ -7,16 +7,6 @@
 	<name>Slider</name>
 	<url>https://github.com/telecom-se/slider</url>
 	<distributionManagement>
-<!-- 		<repository>
-			<id>satin-artifactory</id>
-			<name>satin-releases</name>
-			<url>http://10.20.0.55:8081/artifactory/satin-public</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>satin-snapshots</name>
-			<url>http://10.20.0.55:8081/artifactory/satin-public</url>
-		</snapshotRepository> -->
 		<repository>
 			<id>internal.repo</id>
 			<name>Temporary Staging Repository</name>
@@ -73,17 +63,19 @@
 			<artifactId>commons-cli</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 
 	<build>
 		<plugins>
 
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-deploy-plugin</artifactId> 
+				<version>2.7</version> </plugin> -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -144,12 +136,15 @@
 					<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
 					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
 					<branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-					<includes><include>**/*</include></includes>
+					<includes>
+						<include>**/*</include>
+					</includes>
 					<repositoryName>slider</repositoryName>      <!-- github repo name -->
-					<repositoryOwner>telecom-se</repositoryOwner>    <!-- github username  -->
+					<repositoryOwner>telecom-se</repositoryOwner>    <!-- github username -->
 				</configuration>
 				<executions>
-					<!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
+						'deploy' phase -->
 					<execution>
 						<goals>
 							<goal>site</goal>

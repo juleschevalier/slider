@@ -91,7 +91,11 @@ public class ReasonerStreamed extends Thread {
 
         this.tripleManager = new TripleManager(this.timeout);
         this.phaser = new AtomicInteger();
-        this.executor = Executors.newCachedThreadPool();
+        if (this.maxThreads == 0) {
+            this.executor = Executors.newCachedThreadPool();
+        } else {
+            this.executor = Executors.newFixedThreadPool(this.maxThreads);
+        }
 
         /* Initialize rules used for inference on the defined fragment */
         this.initialiseReasoner();
@@ -120,7 +124,11 @@ public class ReasonerStreamed extends Thread {
 
         this.tripleManager = new TripleManager(this.timeout);
         this.phaser = new AtomicInteger();
-        this.executor = Executors.newCachedThreadPool();
+        if (this.maxThreads == 0) {
+            this.executor = Executors.newCachedThreadPool();
+        } else {
+            this.executor = Executors.newFixedThreadPool(this.maxThreads);
+        }
 
         /* Initialize rules used for inference on the defined fragment */
         this.initialiseReasoner();
@@ -137,9 +145,9 @@ public class ReasonerStreamed extends Thread {
     @Override
     public void run() {
 
-        // this.running = true;
         this.tripleManager.start();
-        long nonEmptyBuffers = this.tripleManager.flushBuffers();
+
+        long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
 
         while (this.running || nonEmptyBuffers > 0) {
 
@@ -155,7 +163,8 @@ public class ReasonerStreamed extends Thread {
                 }
             }
 
-            nonEmptyBuffers = this.tripleManager.flushBuffers();
+            // System.out.println(this.running + " " + nonEmptyBuffers);
+            nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
 
         }
 

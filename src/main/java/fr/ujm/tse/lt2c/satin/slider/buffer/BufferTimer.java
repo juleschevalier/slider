@@ -34,31 +34,50 @@ public class BufferTimer extends TimerTask {
 
     public static final long DEFAULT_TIMEOUT = 500;
 
-    private final Map<Rule, Long> rulesLastFlushes;
+    private final Map<Rule, Long> rulesLastAdd;
+    private final Map<String, Boolean> rulesActivated;
     private final long timeout;
 
     public BufferTimer(final long timeout) {
         super();
-        this.rulesLastFlushes = new HashMap<>();
+        this.rulesLastAdd = new HashMap<>();
+        this.rulesActivated = new HashMap<>();
+        if (timeout <= 0) {
+            throw new RuntimeException("Timeout=0!");
+        }
         this.timeout = timeout;
     }
 
     @Override
     public void run() {
         final Long now = System.nanoTime();
+        final int nsToMs = 1_000_000;
         Long lastAdd;
-        for (final Rule rule : this.rulesLastFlushes.keySet()) {
-            lastAdd = (now - this.rulesLastFlushes.get(rule)) / 1000000;
-            if (lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0) {
-                rule.bufferFull();
+        for (final Rule rule : this.rulesLastAdd.keySet()) {
+            lastAdd = (now - this.rulesLastAdd.get(rule)) / nsToMs;
+            if (!this.isActivated(rule.name()) && lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0
+                    && rule.getTripleBuffer().size() < rule.getTripleBuffer().getBufferLimit()) {
+                // System.out.println("Timer1 " + rule.name() + "! " + rule.getTripleBuffer().size() + " " +
+                // rule.getTripleBuffer().getOccupation());
+                this.rulesActivated.put(rule.name(), true);
+                rule.bufferFullTimer(rule.getTripleBuffer().getOccupation());
+                rule.getTripleBuffer().timerCall(rule.getTripleBuffer().getOccupation());
             }
         }
 
     }
 
+    private boolean isActivated(final String rule) {
+        return this.rulesActivated.containsKey(rule) && this.rulesActivated.get(rule);
+    }
+
     public void notifyAdd(final Rule rule) {
         final long now = System.nanoTime();
-        this.rulesLastFlushes.put(rule, now);
+        this.rulesLastAdd.put(rule, now);
+    }
+
+    public void deactivateRule(final String rule) {
+        this.rulesActivated.put(rule, false);
     }
 
     public void addRule(final Rule rule) {

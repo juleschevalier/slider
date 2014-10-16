@@ -13,6 +13,8 @@ target/
 *.out
 *.csv
 *.log*
+*.sh
+*.json
 # Latex #
 *.synctex.gz
 *.aux

@@ -116,6 +116,12 @@ public class TestMultiThreadInsertTripleBuffer {
             return this.counter.addAndGet(nb);
         }
 
+        @Override
+        public boolean bufferFullTimer(final long triplesToRead) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
     }
 
 }

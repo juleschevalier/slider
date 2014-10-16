@@ -16,13 +16,6 @@ Slider provides both batch and stream reasoning.
 
 It is a full Java project.
 
-##Contributors
-
- - Jules Chevalier (jules.chevalier@univ-st-etienne.fr)
- - Julien Subercaze (julien.subercaze@univ-st-etienne.fr)
- - Christophe Gravier (christophe.gravier@univ-st-etienne.fr)
- - Frédérique Laforest (frederique.laforest@univ-st-etienne.fr)
-
 ##Requirements
 
  - **Java 1.7** or greater
@@ -176,10 +169,6 @@ It generates the following ontologies:
  * dataset_500k.nt
  * dataset_1M.nt
  * dataset_5M.nt
- * dataset_10M.nt
- * dataset_25M.nt
- * dataset_50M.nt
- * dataset_100M.nt
 
 The subClassOf ontologies have been generated thanks to this [script](https://gist.github.com/JulesChevalier/4bd3410cf14bd51e9811).
 We used it to generate the following ontologies:
@@ -223,6 +212,13 @@ To run experimentation on the parameters of Slider, please use the same command 
 
 If you discover any bug, feel free to create an issue on GitHub: https://github.com/juleschevalier/slider/issues.
 
+##Contributors
+
+ - Jules Chevalier [@juleschevalier](https://github.com/JulesChevalier)
+ - Julien Subercaze [@jsubercaze](https://github.com/jsubercaze)
+ - Christophe Gravier [@flaforest](https://github.com/flaforest)
+ - Frédérique Laforest [@cgravier](https://github.com/cgravier)
+
 ##Licence
 
 Slider is provided under Apache License, Version 2.0.
@@ -234,5 +230,4 @@ For any question, please contact us at jules.chevalier@univ-st-etienne.fr
 
 ##Acknowledgement
 
-This work was funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.
-It is part of the [Open Clouware](http://www.opencloudware.org/bin/view/Main/) project.
+This work is part of the [Open Clouware](http://www.opencloudware.org/bin/view/Main/) project, funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.

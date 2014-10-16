@@ -34,6 +34,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.RunFactory;
+import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * @author Jules Chevalier
@@ -49,7 +50,7 @@ public class Rule implements BufferListener {
 
     private final Logger LOGGER = Logger.getLogger(BufferListener.class);
 
-    private final QueuedTripleBufferLock tripleBuffer;
+    private final TripleBuffer tripleBuffer;
     private final TripleDistributor tripleDistributor;
     private final AtomicInteger phaser;
     private final Dictionary dictionary;
@@ -81,15 +82,31 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
+        MonitoredValues.incWaitingRules();
         synchronized (this.phaser) {
-            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.getOccupation() > 0) {
+            if (this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
-                this.executor.submit(RunFactory.getRunInstance(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
-                        this.phaser, this.timer));
+                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
+                        this.phaser));
                 return true;
             }
             return false;
         }
+    }
+
+    @Override
+    public boolean bufferFullTimer(final long triplesToRead) {
+        MonitoredValues.incWaitingRules();
+        synchronized (this.phaser) {
+            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
+                this.phaser.incrementAndGet();
+                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
+                        this.phaser, this.timer, triplesToRead));
+                return true;
+            }
+            return false;
+        }
+
     }
 
     public long[] getInputMatchers() {
@@ -111,4 +128,5 @@ public class Rule implements BufferListener {
     public String name() {
         return RunFactory.getRuleName(this.run);
     }
+
 }

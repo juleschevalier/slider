@@ -128,6 +128,20 @@ public class TripleManager {
     }
 
     /**
+     * 
+     * @return the number of rules with non-empty buffers
+     */
+    public long nonEmptyBuffers() {
+        long total = 0;
+        for (final Rule rule : this.rules) {
+            if (rule.getTripleBuffer().getOccupation() > 0) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    /**
      * Used once all triples are sent.
      * Notify any rules with non-empty buffer to stop waiting for new ones and
      * infers on them

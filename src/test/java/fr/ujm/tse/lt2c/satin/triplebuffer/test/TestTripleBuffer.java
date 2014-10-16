@@ -97,6 +97,12 @@ public class TestTripleBuffer {
             return true;
         }
 
+        @Override
+        public boolean bufferFullTimer(final long triplesToRead) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
     }
 
     class OverFlowListener implements BufferListener {
@@ -118,6 +124,12 @@ public class TestTripleBuffer {
             }
             this.tb.clear();
             return true;
+        }
+
+        @Override
+        public boolean bufferFullTimer(final long triplesToRead) {
+            // TODO Auto-generated method stub
+            return false;
         }
 
     }

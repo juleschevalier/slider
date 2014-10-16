@@ -88,9 +88,14 @@ public interface TripleBuffer {
     String getDebugName();
 
     /**
-     * @return the number of triples stored
+     * @return the number of triples under the limit
      */
     long getOccupation();
+
+    /**
+     * @return the total number of triples stored
+     */
+    long size();
 
     /**
      * Add all the triples to the buffer.
@@ -100,5 +105,9 @@ public interface TripleBuffer {
      * @see Triple
      */
     void addAll(Collection<Triple> triples);
+
+    void timerCall(long triples);
+
+    TripleStore clear(long triplesToRead);
 
 }

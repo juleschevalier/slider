@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.slider.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.slider.buffer.TripleDistributor;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.RuleRun;
@@ -33,6 +34,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
+import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * @author Jules Chevalier
@@ -49,6 +51,8 @@ public abstract class AbstractRun implements RuleRun {
     protected String ruleName = "";
     protected final AtomicInteger phaser;
     protected byte complexity = 2;
+    private long triplesToRead;
+    private BufferTimer timer;
 
     /**
      * Constructor
@@ -69,19 +73,25 @@ public abstract class AbstractRun implements RuleRun {
         this.distributor = tripleDistributor;
         this.tripleBuffer = tripleBuffer;
         this.phaser = phaser;
+        this.timer = null;
+        this.triplesToRead = 0;
     }
 
     @Override
     public void run() {
 
+        MonitoredValues.decWaitingRules();
+        MonitoredValues.incRunningRules();
+
         /*
          * Buffer verification
          */
 
-        if (this.tripleBuffer.getOccupation() == 0) {
+        if (this.tripleBuffer.size() == 0) {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
+                MonitoredValues.decRunningRules();
             }
 
             return;
@@ -92,26 +102,35 @@ public abstract class AbstractRun implements RuleRun {
             /*
              * Get triples from buffer
              */
-            final TripleStore usableTriples = this.tripleBuffer.clear();
+            final TripleStore usableTriples;
+            if (this.triplesToRead > 0) {
+                usableTriples = this.tripleBuffer.clear(this.triplesToRead);
+            } else {
+                usableTriples = this.tripleBuffer.clear();
+
+            }
 
             if (usableTriples == null) {
                 synchronized (this.phaser) {
                     this.phaser.decrementAndGet();
                     this.phaser.notifyAll();
+                    MonitoredValues.decRunningRules();
                 }
 
                 return;
             }
 
             GlobalValues.incRunsByRule(this.ruleName);
+            // System.out.println("run with " + this.ruleName + " " + usableTriples.size() + " " + (this.triplesToRead >
+            // 0 ? "Timer" : ""));
 
             /*
              * Initialize structure and get new triples from process()
              */
             final Collection<Triple> outputTriples = new HashSet<>();
 
+            /* For rules with 2 components */
             if (!usableTriples.isEmpty()) {
-                /* For rules with 2 components */
                 if (this.complexity == 2) {
                     this.process(usableTriples, this.tripleStore, outputTriples);
                     this.process(this.tripleStore, usableTriples, outputTriples);
@@ -134,6 +153,13 @@ public abstract class AbstractRun implements RuleRun {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
+                MonitoredValues.decRunningRules();
+            }
+            if (this.triplesToRead > 0) {
+                // System.out.println("Run done for " + this.triplesToRead + "triples " + this.ruleName);
+                this.timer.deactivateRule(this.ruleName);
+            } else {
+                // System.out.println("Run done for " + this.ruleName);
             }
 
         }
@@ -150,12 +176,16 @@ public abstract class AbstractRun implements RuleRun {
         }
 
         final Collection<Triple> newTriples = this.tripleStore.addAll(outputTriples);
+        MonitoredValues.incCurrentInfered(newTriples.size());
 
         duplicates = outputTriples.size() - newTriples.size();
         GlobalValues.incInferedByRule(this.ruleName, newTriples.size());
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
 
         this.distributor.distributeAll(newTriples);
+        // for (final Triple triple : newTriples) {
+        // this.distributor.distribute(triple);
+        // }
 
         return;
     }
@@ -179,6 +209,11 @@ public abstract class AbstractRun implements RuleRun {
 
     public AtomicInteger getPhaser() {
         return this.phaser;
+    }
+
+    public void setTimerCall(final BufferTimer timer, final long triplesToRead) {
+        this.timer = timer;
+        this.triplesToRead = triplesToRead;
     }
 
 }

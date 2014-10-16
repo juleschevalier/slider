@@ -37,4 +37,11 @@ public interface BufferListener extends EventListener {
      */
     boolean bufferFull();
 
+    /**
+     * Method invocated when the timer asks for clear
+     * 
+     * @return true if the buffer is full, false otherwise
+     */
+    boolean bufferFullTimer(long triplesToRead);
+
 }
