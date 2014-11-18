@@ -118,10 +118,13 @@ public final class Main {
         }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
-                MonitoredValues.initialize(arguments.getBufferSize(), 10, file.getName() + ".json");
+                final File jsonfile = new File("jsons/" + file.getName() + "_" + arguments.getProfile().toString().toLowerCase() + "_"
+                        + arguments.getBufferSize() + "_" + arguments.getTimeout() + ".json");
+                // if (!jsonfile.exists()) {
+                MonitoredValues.initialize(arguments.getProfile().name(), arguments.getBufferSize(), arguments.getTimeout(), file.getName());
                 MonitoredValues.start();
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(100);
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -131,7 +134,12 @@ public final class Main {
                 if (arguments.isVerboseMode()) {
                     LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
                             + run.getBufferSize() + " " + run.getTimeout());
+                    System.out.println(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile()
+                            + " " + run.getBufferSize() + " " + run.getTimeout());
                 }
+                // } else {
+                // System.out.println(file.getName() + " exists");
+                // }
             }
         }
 
@@ -386,17 +394,17 @@ public final class Main {
         /* profile */
         if (cmd.hasOption("profile")) {
             final String string = cmd.getOptionValue("profile");
-            switch (string) {
-            case "RhoDF":
+            switch (string.toLowerCase()) {
+            case "rhodf":
                 profile = ReasonerProfile.RHODF;
                 break;
-            case "BRhoDF":
+            case "brhodf":
                 profile = ReasonerProfile.BRHODF;
                 break;
-            case "RDFS":
+            case "rdfs":
                 profile = ReasonerProfile.RDFS;
                 break;
-            case "BRDFS":
+            case "brdfs":
                 profile = ReasonerProfile.BRDFS;
                 break;
 

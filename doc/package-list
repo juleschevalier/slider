@@ -1,1 +1,14 @@
-fr.ujm.tse.lt2c.satin.interfaces
+fr.ujm.tse.lt2c.satin.dictionary.test
+fr.ujm.tse.lt2c.satin.runs.test
+fr.ujm.tse.lt2c.satin.slider.buffer
+fr.ujm.tse.lt2c.satin.slider.dictionary
+fr.ujm.tse.lt2c.satin.slider.interfaces
+fr.ujm.tse.lt2c.satin.slider.main
+fr.ujm.tse.lt2c.satin.slider.reasoner
+fr.ujm.tse.lt2c.satin.slider.rules
+fr.ujm.tse.lt2c.satin.slider.rules.run
+fr.ujm.tse.lt2c.satin.slider.triplestore
+fr.ujm.tse.lt2c.satin.slider.utils
+fr.ujm.tse.lt2c.satin.triplebuffer.test
+fr.ujm.tse.lt2c.satin.tripledistributor.test
+fr.ujm.tse.lt2c.satin.triplestore.test

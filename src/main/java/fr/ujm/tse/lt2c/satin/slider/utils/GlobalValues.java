@@ -56,6 +56,7 @@ public final class GlobalValues {
     }
 
     public static void incRunsByRule(final String rule) {
+        MonitoredValues.incRunRule(rule);
         synchronized (runsByRule) {
             if (!runsByRule.containsKey(rule)) {
                 runsByRule.put(rule, new AtomicLong(1));
@@ -86,6 +87,7 @@ public final class GlobalValues {
     }
 
     public static void incInferedByRule(final String rule, final long number) {
+        MonitoredValues.incInferredRule(rule, number);
         synchronized (inferedByRule) {
             if (!inferedByRule.containsKey(rule)) {
                 inferedByRule.put(rule, new AtomicLong(number));

@@ -91,7 +91,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>fr.ujm.tse.lt2c.satin.main.Main</mainClass>
+							<mainClass>fr.ujm.tse.lt2c.satin.slider.main.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

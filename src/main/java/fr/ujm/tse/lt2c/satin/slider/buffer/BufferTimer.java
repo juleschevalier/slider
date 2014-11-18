@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TimerTask;
 
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
+import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * @author Jules Chevalier
@@ -57,8 +58,7 @@ public class BufferTimer extends TimerTask {
             lastAdd = (now - this.rulesLastAdd.get(rule)) / nsToMs;
             if (!this.isActivated(rule.name()) && lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0
                     && rule.getTripleBuffer().size() < rule.getTripleBuffer().getBufferLimit()) {
-                // System.out.println("Timer1 " + rule.name() + "! " + rule.getTripleBuffer().size() + " " +
-                // rule.getTripleBuffer().getOccupation());
+                MonitoredValues.tic(rule.name());
                 this.rulesActivated.put(rule.name(), true);
                 rule.bufferFullTimer(rule.getTripleBuffer().getOccupation());
                 rule.getTripleBuffer().timerCall(rule.getTripleBuffer().getOccupation());

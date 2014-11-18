@@ -116,13 +116,11 @@ public abstract class AbstractRun implements RuleRun {
                     this.phaser.notifyAll();
                     MonitoredValues.decRunningRules();
                 }
-
                 return;
             }
 
             GlobalValues.incRunsByRule(this.ruleName);
-            // System.out.println("run with " + this.ruleName + " " + usableTriples.size() + " " + (this.triplesToRead >
-            // 0 ? "Timer" : ""));
+            MonitoredValues.addRuleRun(this.ruleName);
 
             /*
              * Initialize structure and get new triples from process()
@@ -183,9 +181,6 @@ public abstract class AbstractRun implements RuleRun {
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
 
         this.distributor.distributeAll(newTriples);
-        // for (final Triple triple : newTriples) {
-        // this.distributor.distribute(triple);
-        // }
 
         return;
     }

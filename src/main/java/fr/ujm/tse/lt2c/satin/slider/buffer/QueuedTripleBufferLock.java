@@ -86,13 +86,12 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             this.size.incrementAndGet();
             this.timer.notifyAdd(this.rule);
             if (this.currentBuffer.incrementAndGet() >= this.bufferSize) {
-                // System.out.println("Full " + this.rule.name() + " " + this.size() + " " + this.getOccupation());
                 this.currentBuffer.set(0);
                 for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();
                 }
             }
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation(), this.size());
+            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -110,12 +109,11 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             this.size.addAndGet(triples.size());
             this.currentBuffer.set(this.size() % (int) this.bufferSize);
             for (int i = 0; i < this.size() / this.bufferSize; i++) {
-                // System.out.println("Fulla " + this.rule.name() + " " + this.size() + " " + this.getOccupation());s
                 for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();
                 }
             }
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation(), this.size());
+            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -143,7 +141,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 }
             }
             this.size.addAndGet(-ts.size());
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation(), this.size());
+            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -175,7 +173,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 }
             }
             this.size.addAndGet(-ts.size());
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation(), this.size());
+            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
         } catch (final Exception e) {
             logger.error("", e);
         } finally {

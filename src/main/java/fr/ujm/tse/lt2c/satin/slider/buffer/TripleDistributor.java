@@ -50,6 +50,13 @@ public class TripleDistributor {
         this.universalSubscribers = new HashSet<>();
     }
 
+    /* for monitoring only */
+    public TripleDistributor(final boolean input) {
+        super();
+        this.subscribers = HashMultimap.create();
+        this.universalSubscribers = new HashSet<>();
+    }
+
     /**
      * Add a TripleBuffer as subscribers for predicates
      * 
