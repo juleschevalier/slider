@@ -14,8 +14,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.jena.atlas.json.JsonArray;
-import org.apache.jena.atlas.json.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -62,36 +60,6 @@ public class MonitoredValues {
 
     static {
 
-        timer = new Timer();
-        jsons = new ArrayList<JSONObject>();
-
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                MonitoredValues.saveToJSONObject();
-            }
-        };
-
-        MonitoredValues.currentInput = new AtomicLong();
-        MonitoredValues.currentInfered = new AtomicLong();
-        MonitoredValues.runningRules = new AtomicLong();
-        MonitoredValues.waitingRules = new AtomicLong();
-
-        MonitoredValues.fragment = "";
-        MonitoredValues.bufferSize = 0;
-        MonitoredValues.timeout = 0;
-        MonitoredValues.fileName = "";
-
-        MonitoredValues.buffers = Collections.synchronizedMap(new HashMap<String, AtomicLong>());
-        MonitoredValues.runs = Collections.synchronizedMap(new HashMap<String, AtomicLong>());
-        MonitoredValues.timeouts = Collections.synchronizedMap(new HashMap<String, AtomicLong>());
-        MonitoredValues.inferred = Collections.synchronizedMap(new HashMap<String, AtomicLong>());
-        MonitoredValues.lastRun = new ConcurrentLinkedQueue<>();
-
-        MonitoredValues.edges = HashMultimap.create();
-
-        MonitoredValues.tic = Collections.synchronizedCollection(new HashSet<String>());
-
         tips = new HashMap<String, String>();
         MonitoredValues.tips.put("CAX_SCO", "<tr><th>CAX_SCO</th><td>c1 subClassOf c2<br> x type c1 </td><td> x type c2</td></tr>");
         MonitoredValues.tips.put("PRP_DOM", "<tr><th>PRP_DOM</th><td>p domain c<br> x p y </td><td> x type c</td></tr>");
@@ -121,14 +89,7 @@ public class MonitoredValues {
 
     public static void initialize(final String fragment, final long bufferSize, final long timeout, final String fileName) {
 
-        timer = new Timer();
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                MonitoredValues.saveToJSONObject();
-            }
-        };
-
+        jsons = new ArrayList<JSONObject>();
         MonitoredValues.currentInput = new AtomicLong();
         MonitoredValues.currentInfered = new AtomicLong();
         MonitoredValues.runningRules = new AtomicLong();
@@ -149,12 +110,20 @@ public class MonitoredValues {
 
         MonitoredValues.tic = Collections.synchronizedCollection(new HashSet<String>());
 
+        timer = new Timer();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                MonitoredValues.saveToJSONObject();
+            }
+        };
+
         MonitoredValues.saveToJSONObject();
     }
 
-    public static void updateLastThings(final long inputTotal, final long inferedTotal) {
-        MonitoredValues.totalInput = new AtomicLong(inputTotal);
-        MonitoredValues.totalInfered = new AtomicLong(inferedTotal);
+    public static void updateLastThings(final long totalInput, final long totalInfered) {
+        MonitoredValues.totalInput = new AtomicLong(totalInput);
+        MonitoredValues.totalInfered = new AtomicLong(totalInfered);
     }
 
     public static void incCurrentInput(final long value) {
@@ -307,22 +276,22 @@ public class MonitoredValues {
         obj.put("runs", runs);
 
         final JSONObject runTips = new JSONObject();
-        for (final String key : MonitoredValues.tips.keySet()) {
-            if (MonitoredValues.runs.containsKey(key)) {
+        for (final String key : MonitoredValues.buffers.keySet()) {
+            if (MonitoredValues.tips.containsKey(key)) {
                 runTips.put(key, MonitoredValues.tips.get(key));
             }
         }
         obj.put("tips", runTips);
 
-        final JsonObject dependencyGraph = new JsonObject();
-        for (final String from : MonitoredValues.edges.keySet()) {
-            final JsonArray edge = new JsonArray();
-            for (final String to : MonitoredValues.edges.get(from)) {
-                edge.add(to);
-            }
-            dependencyGraph.put(from, edge);
-        }
-        obj.put("dependencyGraph", dependencyGraph);
+        // final JsonObject dependencyGraph = new JsonObject();
+        // for (final String from : MonitoredValues.edges.keySet()) {
+        // final JsonArray edge = new JsonArray();
+        // for (final String to : MonitoredValues.edges.get(from)) {
+        // edge.add(to);
+        // }
+        // dependencyGraph.put(from, edge);
+        // }
+        // obj.put("dependencyGraph", dependencyGraph);
 
         try {
             final String jsonfile = "jsons/" + MonitoredValues.fileName + "_" + MonitoredValues.fragment.toLowerCase() + "_" + MonitoredValues.bufferSize + "_"
@@ -352,7 +321,7 @@ public class MonitoredValues {
 
         sb.append("input: ");
         sb.append(currentInput);
-        sb.append(" infered: ");
+        sb.append(" inferred: ");
         sb.append(currentInfered);
         sb.append(" running: ");
         sb.append(runningRules);

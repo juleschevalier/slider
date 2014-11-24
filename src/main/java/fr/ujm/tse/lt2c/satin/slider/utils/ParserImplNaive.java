@@ -120,7 +120,6 @@ public class ParserImplNaive implements Parser {
         executor.shutdown();
         int total_input = 0;
         while (iter.hasNext()) {
-            total_input++;
             final Triple next = iter.next();
             final String s = next.getSubject().toString();
             final String p = next.getPredicate().toString();
@@ -139,8 +138,9 @@ public class ParserImplNaive implements Parser {
                 }
                 triples.add(triple);
                 if (triples.size() >= STREAM_BLOCK_SIZE) {
-                    reasoner.addTriples(triples);
+                    total_input += triples.size();
                     MonitoredValues.incCurrentInput(triples.size());
+                    reasoner.addTriples(triples);
                     triples.clear();
                 }
             }
