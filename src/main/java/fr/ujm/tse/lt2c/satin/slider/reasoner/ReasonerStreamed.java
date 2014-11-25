@@ -148,6 +148,7 @@ public class ReasonerStreamed extends Thread {
         this.tripleManager.start();
 
         long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        // long nonEmptyBuffers = this.tripleManager.flushBuffers();
 
         while (this.running || nonEmptyBuffers > 0) {
 
@@ -163,9 +164,8 @@ public class ReasonerStreamed extends Thread {
                 }
             }
 
-            // System.out.println(this.running + " " + nonEmptyBuffers);
             nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-
+            // nonEmptyBuffers = this.tripleManager.flushBuffers();
         }
 
         this.tripleManager.stop();

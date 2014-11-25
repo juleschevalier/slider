@@ -34,7 +34,6 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.RunFactory;
-import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * @author Jules Chevalier
@@ -82,7 +81,6 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        MonitoredValues.incWaitingRules();
         synchronized (this.phaser) {
             if (this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
@@ -96,7 +94,6 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFullTimer(final long triplesToRead) {
-        MonitoredValues.incWaitingRules();
         synchronized (this.phaser) {
             if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();

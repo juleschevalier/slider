@@ -34,7 +34,6 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
-import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * @author Jules Chevalier
@@ -80,9 +79,6 @@ public abstract class AbstractRun implements RuleRun {
     @Override
     public void run() {
 
-        MonitoredValues.decWaitingRules();
-        MonitoredValues.incRunningRules();
-
         /*
          * Buffer verification
          */
@@ -91,7 +87,6 @@ public abstract class AbstractRun implements RuleRun {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
-                MonitoredValues.decRunningRules();
             }
 
             return;
@@ -114,13 +109,11 @@ public abstract class AbstractRun implements RuleRun {
                 synchronized (this.phaser) {
                     this.phaser.decrementAndGet();
                     this.phaser.notifyAll();
-                    MonitoredValues.decRunningRules();
                 }
                 return;
             }
 
             GlobalValues.incRunsByRule(this.ruleName);
-            MonitoredValues.addRuleRun(this.ruleName);
 
             /*
              * Initialize structure and get new triples from process()
@@ -151,7 +144,6 @@ public abstract class AbstractRun implements RuleRun {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
-                MonitoredValues.decRunningRules();
             }
             if (this.triplesToRead > 0) {
                 // System.out.println("Run done for " + this.triplesToRead + "triples " + this.ruleName);
@@ -174,7 +166,6 @@ public abstract class AbstractRun implements RuleRun {
         }
 
         final Collection<Triple> newTriples = this.tripleStore.addAll(outputTriples);
-        MonitoredValues.incCurrentInfered(newTriples.size());
 
         duplicates = outputTriples.size() - newTriples.size();
         GlobalValues.incInferedByRule(this.ruleName, newTriples.size());

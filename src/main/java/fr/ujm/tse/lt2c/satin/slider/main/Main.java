@@ -51,7 +51,6 @@ import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
-import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 import fr.ujm.tse.lt2c.satin.slider.utils.ParserImplNaive;
 import fr.ujm.tse.lt2c.satin.slider.utils.ReasoningArguments;
 import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
@@ -118,16 +117,12 @@ public final class Main {
         }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
-                MonitoredValues.initialize(arguments.getProfile().name(), arguments.getBufferSize(), arguments.getTimeout(), file.getName());
-                MonitoredValues.start();
                 try {
                     Thread.sleep(100);
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
-                MonitoredValues.stop();
-                MonitoredValues.persistInFile();
                 if (arguments.isVerboseMode()) {
                     LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
                             + run.getBufferSize() + " " + run.getTimeout());
@@ -164,8 +159,7 @@ public final class Main {
             LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
-
-        MonitoredValues.updateLastThings(inputSize, tripleStore.size() - inputSize);
+        tripleStore.writeToFile("out.nt", dictionary);
 
         if (arguments.isVerboseMode()) {
 
@@ -206,8 +200,6 @@ public final class Main {
             LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
-
-        MonitoredValues.updateLastThings(triples.size(), tripleStore.size() - triples.size());
 
         if (arguments.isVerboseMode()) {
             final Collection<String> rules = new HashSet<>();

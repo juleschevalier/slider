@@ -48,7 +48,7 @@ public class ParserImplNaive implements Parser {
 
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
-    private final static int STREAM_BLOCK_SIZE = 1;
+    private final static int STREAM_BLOCK_SIZE = 1000;
 
     /**
      * @param dictionary
@@ -92,7 +92,6 @@ public class ParserImplNaive implements Parser {
             if (!this.tripleStore.add(triple)) {
                 triples.add(triple);
             }
-            MonitoredValues.incCurrentInput(1);
         }
         return triples;
 
@@ -131,15 +130,9 @@ public class ParserImplNaive implements Parser {
 
             final fr.ujm.tse.lt2c.satin.slider.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
             if (!this.tripleStore.add(triple)) {
-                try {
-                    Thread.sleep(1);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
                 triples.add(triple);
                 if (triples.size() >= STREAM_BLOCK_SIZE) {
                     total_input += triples.size();
-                    MonitoredValues.incCurrentInput(triples.size());
                     reasoner.addTriples(triples);
                     triples.clear();
                 }

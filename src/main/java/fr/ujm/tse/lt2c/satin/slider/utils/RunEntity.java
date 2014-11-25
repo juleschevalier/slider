@@ -27,14 +27,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Transient;
-
-import fr.ujm.tse.lt2c.satin.slider.main.Main;
 
 /**
  * @author Jules Chevalier
@@ -79,9 +75,6 @@ public class RunEntity {
     @Embedded
     private Map<String, AtomicLong> timeoutByRule;
 
-    @Transient
-    private static final Logger LOGGER = Logger.getLogger(Main.class);
-
     public RunEntity() {
         super();
     }
@@ -95,9 +88,7 @@ public class RunEntity {
         this.machineName = "";
         try {
             this.machineName = InetAddress.getLocalHost().getHostName();
-        } catch (final UnknownHostException e) {
-            LOGGER.error("", e);
-        }
+        } catch (final UnknownHostException e) {}
         this.machineName += " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "(" + System.getProperty("os.arch") + ")";
         this.coresNb = Runtime.getRuntime().availableProcessors();
         this.ram = Runtime.getRuntime().totalMemory();

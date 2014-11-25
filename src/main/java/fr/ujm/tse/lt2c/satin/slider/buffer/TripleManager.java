@@ -34,7 +34,6 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
-import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * Links all the buffers together
@@ -96,7 +95,6 @@ public class TripleManager {
             final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
 
         final Rule newRule = new Rule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.bufferTimer);
-        MonitoredValues.updateBuffer(newRule.name(), 0);
         this.rules.add(newRule);
         this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
 
@@ -104,11 +102,9 @@ public class TripleManager {
             if (this.match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
                 final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
                 newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
-                MonitoredValues.addEdge(newRule.name(), rule.name());
             }
             if (rule != newRule && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
                 rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
-                MonitoredValues.addEdge(newRule.name(), rule.name());
             }
         }
     }

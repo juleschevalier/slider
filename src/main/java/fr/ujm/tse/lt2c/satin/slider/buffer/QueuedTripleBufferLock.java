@@ -35,7 +35,6 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
-import fr.ujm.tse.lt2c.satin.slider.utils.MonitoredValues;
 
 /**
  * Concurrent implementation of {@link TripleBuffer} using a ConcurrentLinkedQueue as buffer
@@ -91,7 +90,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                     bufferListener.bufferFull();
                 }
             }
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -113,7 +111,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                     bufferListener.bufferFull();
                 }
             }
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -141,7 +138,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 }
             }
             this.size.addAndGet(-ts.size());
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -173,7 +169,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                 }
             }
             this.size.addAndGet(-ts.size());
-            MonitoredValues.updateBuffer(this.rule.name(), this.getOccupation());
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
