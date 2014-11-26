@@ -113,22 +113,22 @@ public class ParserImplNaive implements Parser {
             }
         };
 
-        final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> triples = new HashSet<>();
-
         executor.submit(parser);
         executor.shutdown();
+
+        final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> triples = new HashSet<>();
         int total_input = 0;
         while (iter.hasNext()) {
+
             final Triple next = iter.next();
             final String s = next.getSubject().toString();
             final String p = next.getPredicate().toString();
             final String o = next.getObject().toString();
-
             final long si = this.dictionary.add(s);
             final long pi = this.dictionary.add(p);
             final long oi = this.dictionary.add(o);
-
             final fr.ujm.tse.lt2c.satin.slider.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
+
             if (!this.tripleStore.add(triple)) {
                 triples.add(triple);
                 if (triples.size() >= STREAM_BLOCK_SIZE) {
@@ -138,6 +138,7 @@ public class ParserImplNaive implements Parser {
                 }
             }
         }
+        total_input += triples.size();
         reasoner.addTriples(triples);
 
         return total_input;

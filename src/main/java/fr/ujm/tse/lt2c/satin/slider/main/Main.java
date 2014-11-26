@@ -119,8 +119,10 @@ public final class Main {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
-                            + run.getBufferSize() + " " + run.getTimeout());
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + " " + run.getNbInferedTriples());
+                    // LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " +
+                    // run.getNbInferedTriples() + " " + run.getProfile() + " "
+                    // + run.getBufferSize() + " " + run.getTimeout());
                 }
             }
         }
