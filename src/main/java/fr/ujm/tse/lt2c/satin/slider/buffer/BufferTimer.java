@@ -32,7 +32,7 @@ import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
  */
 public class BufferTimer extends TimerTask {
 
-    public static final long DEFAULT_TIMEOUT = 500;
+    public static final long DEFAULT_TIMEOUT = 10;
 
     private final Map<Rule, Long> rulesLastAdd;
     private final Map<String, Boolean> rulesActivated;

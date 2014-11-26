@@ -117,11 +117,6 @@ public final class Main {
         }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
-                try {
-                    Thread.sleep(100);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
                     LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " + run.getNbInferedTriples() + " " + run.getProfile() + " "
@@ -159,7 +154,11 @@ public final class Main {
             LOGGER.error("", e);
         }
         final long stop = System.nanoTime();
-        tripleStore.writeToFile("out.nt", dictionary);
+
+        if (arguments.isDumpMode()) {
+            final String output = "inferred_" + file.getName();
+            tripleStore.writeToFile(output, dictionary);
+        }
 
         if (arguments.isVerboseMode()) {
 
@@ -167,7 +166,7 @@ public final class Main {
             for (final Rule rule : reasoner.getRules()) {
                 rules.add(rule.name());
             }
-            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.5", arguments.getProfile()
+            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.6", arguments.getProfile()
                     .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), 0, stop - start, inputSize, tripleStore.size() - inputSize,
                     GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(), GlobalValues.getTimeoutByRule());
             GlobalValues.reset();
@@ -201,12 +200,17 @@ public final class Main {
         }
         final long stop = System.nanoTime();
 
+        if (arguments.isDumpMode()) {
+            final String output = "inferred_" + file.getName();
+            tripleStore.writeToFile(output, dictionary);
+        }
+
         if (arguments.isVerboseMode()) {
             final Collection<String> rules = new HashSet<>();
             for (final Rule rule : reasoner.getRules()) {
                 rules.add(rule.name());
             }
-            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.5", arguments.getProfile()
+            final RunEntity run = new RunEntity(arguments.getThreadsNb(), arguments.getBufferSize(), arguments.getTimeout(), "0.9.6", arguments.getProfile()
                     .toString(), rules, UUID.randomUUID().hashCode(), file.getName(), start - parse, stop - start, triples.size(), tripleStore.size()
                     - triples.size(), GlobalValues.getRunsByRule(), GlobalValues.getDuplicatesByRule(), GlobalValues.getInferedByRule(),
                     GlobalValues.getTimeoutByRule());

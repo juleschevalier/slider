@@ -230,4 +230,4 @@ For any question, please contact us at jules.chevalier@univ-st-etienne.fr
 
 ##Acknowledgement
 
-This work is part of the [Open Clouware](http://www.opencloudware.org/bin/view/Main/) project, funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.
+This work is part of the [Open Cloudware](http://www.opencloudware.org/bin/view/Main/) project, funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.

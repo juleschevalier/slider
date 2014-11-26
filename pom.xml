@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.ujm.tse.lt2c.satin</groupId>
 	<artifactId>slider</artifactId>
-	<version>0.9.5-SNAPSHOT</version>
+	<version>0.9.6-SNAPSHOT</version>
 	<name>Slider</name>
 	<url>https://github.com/telecom-se/slider</url>
 	<distributionManagement>
@@ -140,7 +140,7 @@
 						<include>**/*</include>
 					</includes>
 					<repositoryName>slider</repositoryName>      <!-- github repo name -->
-					<repositoryOwner>telecom-se</repositoryOwner>    <!-- github username -->
+					<repositoryOwner>JulesChevalier</repositoryOwner>    <!-- github username -->
 				</configuration>
 				<executions>
 					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
