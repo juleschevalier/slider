@@ -48,7 +48,7 @@ public class ParserImplNaive implements Parser {
 
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
-    private final static int STREAM_BLOCK_SIZE = 1;
+    private final static int STREAM_BLOCK_SIZE = 10000;
 
     /**
      * @param dictionary
@@ -145,7 +145,10 @@ public class ParserImplNaive implements Parser {
                 }
             }
         }
+        total_input += triples.size();
+        MonitoredValues.incCurrentInput(triples.size());
         reasoner.addTriples(triples);
+        triples.clear();
 
         return total_input;
     }
