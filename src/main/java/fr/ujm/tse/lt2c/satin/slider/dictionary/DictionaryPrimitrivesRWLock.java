@@ -28,6 +28,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
+
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 
 /**
@@ -40,7 +43,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
     private static Logger logger = Logger.getLogger(DictionaryPrimitrivesRWLock.class);
 
-    private Map<String, Long> triples = new HashMap<>();
+    private Map<Node, Long> triples = new HashMap<>();
     private long counter;
     private long primitivesCounter;
 
@@ -63,15 +66,40 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         Long id = null;
         try {
             this.rwlock.writeLock().lock();
-            if (this.triples.containsKey(s)) {
-                id = this.get(s);
+            final Node n = NodeFactory.createURI(s);
+            if (this.triples.containsKey(n)) {
+                id = this.get(n);
             } else {
                 /* Look for primitives */
                 if (s.matches("(\".*\")\\^\\^.*")) {
-                    this.triples.put(s, this.primitivesCounter);
+                    this.triples.put(n, this.primitivesCounter);
                     id = this.primitivesCounter--;
                 } else {
-                    this.triples.put(s, this.counter);
+                    this.triples.put(n, this.counter);
+                    id = this.counter++;
+                }
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.writeLock().unlock();
+        }
+        return id;
+    }
+
+    public final long add(final Node n) {
+        Long id = null;
+        try {
+            this.rwlock.writeLock().lock();
+            if (this.triples.containsKey(n)) {
+                id = this.get(n);
+            } else {
+                /* Look for primitives */
+                if (n.toString().matches("(\".*\")\\^\\^.*")) {
+                    this.triples.put(n, this.primitivesCounter);
+                    id = this.primitivesCounter--;
+                } else {
+                    this.triples.put(n, this.counter);
                     id = this.counter++;
                 }
             }
@@ -85,12 +113,12 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
 
     @Override
     public final String get(final long index) {
-        String value = null;
+        Node value = null;
         try {
             this.rwlock.readLock().lock();
-            final Iterator<Entry<String, Long>> it = this.triples.entrySet().iterator();
+            final Iterator<Entry<Node, Long>> it = this.triples.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<String, Long> pairs = it.next();
+                final Map.Entry<Node, Long> pairs = it.next();
                 if (pairs.getValue().equals(index)) {
                     value = pairs.getKey();
                     break;
@@ -101,7 +129,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         } finally {
             this.rwlock.readLock().unlock();
         }
-        return value;
+        return value.toString();
     }
 
     @Override
@@ -109,7 +137,20 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         Long id = null;
         try {
             this.rwlock.readLock().lock();
-            id = this.triples.get(s);
+            id = this.triples.get(NodeFactory.createURI(s));
+        } catch (final Exception e) {
+            logger.error("", e);
+        } finally {
+            this.rwlock.readLock().unlock();
+        }
+        return id;
+    }
+
+    public final long get(final Node n) {
+        Long id = null;
+        try {
+            this.rwlock.readLock().lock();
+            id = this.triples.get(n);
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
@@ -163,10 +204,10 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         try {
             this.rwlock.readLock().lock();
             sb.append("\n");
-            for (final String s : this.triples.keySet()) {
-                sb.append(this.triples.get(s));
+            for (final Node n : this.triples.keySet()) {
+                sb.append(this.triples.get(n.toString()));
                 sb.append("=");
-                sb.append(this.printAxiom(s));
+                sb.append(this.printAxiom(n.toString()));
                 sb.append("\n");
             }
         } catch (final Exception e) {
@@ -200,8 +241,8 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         final StringBuilder sb = new StringBuilder();
         try {
             this.rwlock.readLock().lock();
-            for (final String s : this.triples.keySet()) {
-                sb.append(s + " ==> " + this.printAxiom(s) + "\n");
+            for (final Node n : this.triples.keySet()) {
+                sb.append(n + " ==> " + this.printAxiom(n.toString()) + "\n");
             }
         } catch (final Exception e) {
             logger.error("", e);
