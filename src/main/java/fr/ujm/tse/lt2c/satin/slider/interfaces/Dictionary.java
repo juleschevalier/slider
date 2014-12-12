@@ -1,5 +1,7 @@
 package fr.ujm.tse.lt2c.satin.slider.interfaces;
 
+import com.hp.hpl.jena.graph.Node;
+
 /*
  * #%L
  * SLIDeR
@@ -37,11 +39,13 @@ public interface Dictionary {
      */
     long add(String s);
 
+    long add(Node n);
+
     /**
      * @param index
-     * @return the name of the axiom indexed with index
+     * @return the node indexed with index
      */
-    String get(long index);
+    Node get(long index);
 
     /**
      * @param s
@@ -72,5 +76,7 @@ public interface Dictionary {
      * @return the entire dictionary in a String
      */
     String printDico();
+
+    long get(Node n);
 
 }

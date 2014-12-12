@@ -20,10 +20,6 @@ package fr.ujm.tse.lt2c.satin.slider.reasoner;
  * #L%
  */
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,12 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import fr.ujm.tse.lt2c.satin.slider.buffer.BufferTimer;
 import fr.ujm.tse.lt2c.satin.slider.buffer.QueuedTripleBufferLock;
@@ -257,24 +247,25 @@ public class ReasonerStreamed extends Thread {
      * Add the tripleStore into Jena Model and use Jena Dumper to write it in a file
      */
     protected static void outputToFile(final TripleStore tripleStore, final Dictionary dictionary, final String ouputFile) {
-        // Create an empty model.
-        final Model model = ModelFactory.createDefaultModel();
-        // Add all the triples into the model
-        for (final Triple triple : tripleStore.getAll()) {
-            final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
-            final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
-            final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
-            model.add(subject, predicate, object);
-        }
-        try {
-            final OutputStream os = new FileOutputStream(ouputFile);
-            model.write(os, "N-TRIPLES");
-            os.close();
-        } catch (final FileNotFoundException e) {
-            LOGGER.error("", e);
-        } catch (final IOException e) {
-            LOGGER.error("", e);
-        }
+        // // Create an empty model.
+        // final Model model = ModelFactory.createDefaultModel();
+        // // Add all the triples into the model
+        // for (final Triple triple : tripleStore.getAll()) {
+        // final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
+        // final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
+        // final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
+        // model.add(subject, predicate, object);
+        // }
+        // try {
+        // final OutputStream os = new FileOutputStream(ouputFile);
+        // model.write(os, "N-TRIPLES");
+        // os.close();
+        // } catch (final FileNotFoundException e) {
+        // LOGGER.error("", e);
+        // } catch (final IOException e) {
+        // LOGGER.error("", e);
+        // }
+        tripleStore.writeToFile(ouputFile, dictionary);
     }
 
     /**

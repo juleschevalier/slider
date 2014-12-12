@@ -30,6 +30,7 @@ import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
 import org.apache.jena.riot.lang.PipedTriplesStream;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -80,9 +81,9 @@ public class ParserImplNaive implements Parser {
         executor.shutdown();
         while (iter.hasNext()) {
             final Triple next = iter.next();
-            final String s = next.getSubject().toString();
-            final String p = next.getPredicate().toString();
-            final String o = next.getObject().toString();
+            final Node s = next.getSubject();
+            final Node p = next.getPredicate();
+            final Node o = next.getObject();
 
             final long si = this.dictionary.add(s);
             final long pi = this.dictionary.add(p);
@@ -121,9 +122,10 @@ public class ParserImplNaive implements Parser {
         while (iter.hasNext()) {
 
             final Triple next = iter.next();
-            final String s = next.getSubject().toString();
-            final String p = next.getPredicate().toString();
-            final String o = next.getObject().toString();
+            final Node s = next.getSubject();
+            final Node p = next.getPredicate();
+            final Node o = next.getObject();
+
             final long si = this.dictionary.add(s);
             final long pi = this.dictionary.add(p);
             final long oi = this.dictionary.add(o);
@@ -151,9 +153,9 @@ public class ParserImplNaive implements Parser {
 
         while (smtIterator.hasNext()) {
             final Triple next = smtIterator.next().asTriple();
-            final String s = next.getSubject().toString();
-            final String p = next.getPredicate().toString();
-            final String o = next.getObject().toString();
+            final Node s = next.getSubject();
+            final Node p = next.getPredicate();
+            final Node o = next.getObject();
 
             final long si = this.dictionary.add(s);
             final long pi = this.dictionary.add(p);

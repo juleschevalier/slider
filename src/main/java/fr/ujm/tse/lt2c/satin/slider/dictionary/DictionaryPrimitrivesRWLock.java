@@ -87,6 +87,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         return id;
     }
 
+    @Override
     public final long add(final Node n) {
         Long id = null;
         try {
@@ -112,7 +113,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
     }
 
     @Override
-    public final String get(final long index) {
+    public final Node get(final long index) {
         Node value = null;
         try {
             this.rwlock.readLock().lock();
@@ -129,7 +130,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         } finally {
             this.rwlock.readLock().unlock();
         }
-        return value.toString();
+        return value;
     }
 
     @Override
@@ -146,6 +147,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         return id;
     }
 
+    @Override
     public final long get(final Node n) {
         Long id = null;
         try {
@@ -224,9 +226,9 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
         String s = null, p = null, o = null;
         try {
             this.rwlock.readLock().lock();
-            s = this.printAxiom(this.get(t.getSubject()));
-            p = this.printAxiom(this.get(t.getPredicate()));
-            o = this.printAxiom(this.get(t.getObject()));
+            s = this.printAxiom(this.get(t.getSubject()).toString());
+            p = this.printAxiom(this.get(t.getPredicate()).toString());
+            o = this.printAxiom(this.get(t.getObject()).toString());
         } catch (final Exception e) {
             logger.error("", e);
         } finally {

@@ -37,11 +37,10 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
@@ -263,10 +262,15 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         final Model model = ModelFactory.createDefaultModel();
         // Add all the triples into the model
         for (final Triple triple : this.getAll()) {
-            final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
-            final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
-            final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
-            model.add(subject, predicate, object);
+            // final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
+            // final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
+            // final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
+            final Node subject = dictionary.get(triple.getSubject());
+            final Node predicate = dictionary.get(triple.getPredicate());
+            final Node object = dictionary.get(triple.getObject());
+            final com.hp.hpl.jena.graph.Triple t = new com.hp.hpl.jena.graph.Triple(subject, predicate, object);
+            final Statement st = model.asStatement(t);
+            model.add(st);
         }
         try {
             final OutputStream os = new FileOutputStream(file);
