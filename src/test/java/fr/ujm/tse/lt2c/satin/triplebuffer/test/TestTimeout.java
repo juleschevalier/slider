@@ -89,13 +89,7 @@ public class TestTimeout {
         }
 
         /****************/
-        reasoner.close();
-
-        try {
-            reasoner.join();
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+        reasoner.closeAndWait();
 
         System.out.println("Total: " + tripleStore.size());
         System.out.println("SCO: " + tripleStore.getbyPredicate(AbstractDictionary.subClassOf).size());

@@ -84,6 +84,9 @@ public class Rule implements BufferListener {
         synchronized (this.phaser) {
             if (this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
+                synchronized (this.dictionary) {
+                    this.dictionary.notify();
+                }
                 this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
                         this.phaser));
                 return true;
@@ -97,6 +100,9 @@ public class Rule implements BufferListener {
         synchronized (this.phaser) {
             if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
+                synchronized (this.dictionary) {
+                    this.dictionary.notify();
+                }
                 this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
                         this.phaser, this.timer, triplesToRead));
                 return true;

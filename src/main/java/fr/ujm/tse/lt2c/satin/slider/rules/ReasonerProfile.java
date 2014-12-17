@@ -25,5 +25,5 @@ package fr.ujm.tse.lt2c.satin.slider.rules;
  *
  */
 public enum ReasonerProfile {
-    RHODF, BRHODF, RDFS, BRDFS;
+    RHODF, BRHODF, RDFS, BRDFS, LRDFS;
 }

@@ -94,8 +94,12 @@ public class ParserImplNaive implements Parser {
                 triples.add(triple);
             }
         }
-        return triples;
 
+        synchronized (this.dictionary) {
+            this.dictionary.notify();
+        }
+
+        return triples;
     }
 
     @Override
@@ -143,6 +147,10 @@ public class ParserImplNaive implements Parser {
         total_input += triples.size();
         reasoner.addTriples(triples);
 
+        synchronized (this.dictionary) {
+            this.dictionary.notify();
+        }
+
         return total_input;
     }
 
@@ -167,6 +175,9 @@ public class ParserImplNaive implements Parser {
             }
         }
 
+        synchronized (this.dictionary) {
+            this.dictionary.notify();
+        }
         return triples;
     }
 

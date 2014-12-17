@@ -45,7 +45,7 @@ import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
  * 
  * @author Jules Chevalier
  */
-public class ReasonerStreamed extends Thread {
+public class ReasonerStreamed {
 
     private static final Logger LOGGER = Logger.getLogger(ReasonerStreamed.class);
 
@@ -132,34 +132,43 @@ public class ReasonerStreamed extends Thread {
         this.tripleManager.addTriple(triple);
     }
 
-    @Override
-    public void run() {
+    public void start() {
 
         this.tripleManager.start();
-
-        long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-        // long nonEmptyBuffers = this.tripleManager.flushBuffers();
-
-        while (this.running || nonEmptyBuffers > 0) {
-
-            synchronized (this.phaser) {
-                long stillRunnning = this.phaser.get();
-                while (stillRunnning > 0) {
-                    try {
-                        this.phaser.wait();
-                    } catch (final InterruptedException e) {
-                        LOGGER.error("", e);
-                    }
-                    stillRunnning = this.phaser.get();
-                }
-            }
-
-            nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-            // nonEmptyBuffers = this.tripleManager.flushBuffers();
-        }
-
-        this.tripleManager.stop();
-        shutdownAndAwaitTermination(this.executor);
+        // int loop = 0, ok = 0;
+        // synchronized (this.dictionary) {
+        // try {
+        // this.dictionary.wait();
+        // } catch (final InterruptedException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        //
+        // long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        // // long nonEmptyBuffers = this.tripleManager.flushBuffers();
+        // while (this.running || nonEmptyBuffers > 0) {
+        //
+        // loop++;
+        //
+        // synchronized (this.phaser) {
+        // long stillRunnning = this.phaser.get();
+        // while (stillRunnning > 0) {
+        // ok++;
+        // try {
+        // this.phaser.wait();
+        // } catch (final InterruptedException e) {
+        // LOGGER.error("", e);
+        // }
+        // stillRunnning = this.phaser.get();
+        // }
+        // }
+        //
+        // nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        // // nonEmptyBuffers = this.tripleManager.flushBuffers();
+        // }
+        // System.out.println(loop + " " + ok);
+        // this.tripleManager.stop();
+        // shutdownAndAwaitTermination(this.executor);
 
     }
 
@@ -204,13 +213,14 @@ public class ReasonerStreamed extends Thread {
             this.tripleManager.addRule(AvaibleRuns.SCM_SPO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             break;
         case BRDFS:
+            this.tripleManager.addRule(AvaibleRuns.RDFS6, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.RDFS10, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+        case RDFS:
             this.tripleManager.addRule(AvaibleRuns.RDFS4, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RDFS8, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RDFS12, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RDFS13, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.RDFS6, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.RDFS10, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-        case RDFS:
+        case LRDFS:
             this.tripleManager.addRule(AvaibleRuns.CAX_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.PRP_DOM, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.PRP_RNG, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
@@ -296,7 +306,33 @@ public class ReasonerStreamed extends Thread {
         }
     }
 
-    public void close() {
+    public void closeAndWait() {
+        long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        while (nonEmptyBuffers > 0) {
+            synchronized (this.dictionary) {
+                try {
+                    this.dictionary.wait();
+                } catch (final InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            synchronized (this.phaser) {
+                long stillRunnning = this.phaser.get();
+                while (stillRunnning > 0) {
+                    try {
+                        this.phaser.wait();
+                    } catch (final InterruptedException e) {
+                        LOGGER.error("", e);
+                    }
+                    stillRunnning = this.phaser.get();
+                }
+            }
+
+            nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        }
+        this.tripleManager.stop();
+        shutdownAndAwaitTermination(this.executor);
         this.running = false;
     }
 

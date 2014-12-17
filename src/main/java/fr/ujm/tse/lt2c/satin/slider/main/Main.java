@@ -90,7 +90,7 @@ public final class Main {
     private static final boolean DEFAULT_BATCH_MODE = false;
 
     public static void main(final String[] args) throws IOException {
-        // System.in.read();
+        System.in.read();
         final ReasoningArguments arguments = getArguments(args);
 
         if (arguments == null) {
@@ -112,17 +112,12 @@ public final class Main {
             LOGGER.info("---Starting inference---");
         }
 
-        if (arguments.isVerboseMode()) {
-            LOGGER.info("File Time Infered Profile Buffer Timeout");
-        }
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + " " + run.getNbInferedTriples());
-                    // LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000.0 + " " +
-                    // run.getNbInferedTriples() + " " + run.getProfile() + " "
-                    // + run.getBufferSize() + " " + run.getTimeout());
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + " " + run.getNbInferedTriples() + " " + 100
+                            * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
                 }
             }
         }
@@ -149,12 +144,8 @@ public final class Main {
 
         final int inputSize = parser.parseStream(file.getAbsolutePath(), reasoner);
 
-        reasoner.close();
-        try {
-            reasoner.join();
-        } catch (final InterruptedException e) {
-            LOGGER.error("", e);
-        }
+        reasoner.closeAndWait();
+
         final long stop = System.nanoTime();
 
         if (arguments.isDumpMode()) {
@@ -194,12 +185,8 @@ public final class Main {
 
         reasoner.addTriples(triples);
 
-        reasoner.close();
-        try {
-            reasoner.join();
-        } catch (final InterruptedException e) {
-            LOGGER.error("", e);
-        }
+        reasoner.closeAndWait();
+
         final long stop = System.nanoTime();
 
         if (arguments.isDumpMode()) {
@@ -396,6 +383,9 @@ public final class Main {
                 break;
             case "brdfs":
                 profile = ReasonerProfile.BRDFS;
+                break;
+            case "lrdfs":
+                profile = ReasonerProfile.LRDFS;
                 break;
 
             default:
