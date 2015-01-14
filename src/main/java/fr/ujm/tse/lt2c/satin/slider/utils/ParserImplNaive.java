@@ -72,6 +72,7 @@ public class ParserImplNaive implements Parser {
 
             @Override
             public void run() {
+                Thread.currentThread().setName("Parser");
                 // Call the parsing process.
                 RDFDataMgr.parse(inputStream, fileInput);
             }

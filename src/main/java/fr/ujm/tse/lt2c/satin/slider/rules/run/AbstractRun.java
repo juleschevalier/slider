@@ -78,6 +78,7 @@ public abstract class AbstractRun implements RuleRun {
 
     @Override
     public void run() {
+        Thread.currentThread().setName(this.ruleName);
 
         /*
          * Buffer verification

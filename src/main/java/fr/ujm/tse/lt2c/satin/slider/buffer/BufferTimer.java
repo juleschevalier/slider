@@ -50,6 +50,7 @@ public class BufferTimer extends TimerTask {
 
     @Override
     public void run() {
+        Thread.currentThread().setName("Timer");
         final Long now = System.nanoTime();
         final int nsToMs = 1_000_000;
         Long lastAdd;

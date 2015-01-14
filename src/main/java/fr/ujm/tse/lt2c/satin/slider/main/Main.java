@@ -90,7 +90,8 @@ public final class Main {
     private static final boolean DEFAULT_BATCH_MODE = false;
 
     public static void main(final String[] args) throws IOException {
-        System.in.read();
+        Thread.currentThread().setName("Main");
+        // System.in.read();
         final ReasoningArguments arguments = getArguments(args);
 
         if (arguments == null) {
@@ -116,13 +117,14 @@ public final class Main {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + " " + run.getNbInferedTriples() + " " + 100
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " " + 100
                             * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
                 }
             }
         }
 
         LOGGER.info("---Done---");
+        // System.in.read();
     }
 
     private static RunEntity reason(final ReasoningArguments arguments, final File file, final boolean batchMode) {
@@ -147,6 +149,8 @@ public final class Main {
         reasoner.closeAndWait();
 
         final long stop = System.nanoTime();
+
+        System.out.println(tripleStore.getPredicates().size());
 
         if (arguments.isDumpMode()) {
             final String output = "inferred_" + file.getName();
