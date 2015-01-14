@@ -257,24 +257,6 @@ public class ReasonerStreamed {
      * Add the tripleStore into Jena Model and use Jena Dumper to write it in a file
      */
     protected static void outputToFile(final TripleStore tripleStore, final Dictionary dictionary, final String ouputFile) {
-        // // Create an empty model.
-        // final Model model = ModelFactory.createDefaultModel();
-        // // Add all the triples into the model
-        // for (final Triple triple : tripleStore.getAll()) {
-        // final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
-        // final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
-        // final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
-        // model.add(subject, predicate, object);
-        // }
-        // try {
-        // final OutputStream os = new FileOutputStream(ouputFile);
-        // model.write(os, "N-TRIPLES");
-        // os.close();
-        // } catch (final FileNotFoundException e) {
-        // LOGGER.error("", e);
-        // } catch (final IOException e) {
-        // LOGGER.error("", e);
-        // }
         tripleStore.writeToFile(ouputFile, dictionary);
     }
 
@@ -308,15 +290,17 @@ public class ReasonerStreamed {
 
     public void closeAndWait() {
         long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        // final int ok = 0;
         while (nonEmptyBuffers > 0) {
+            /* Wait for parsing */
             synchronized (this.dictionary) {
                 try {
                     this.dictionary.wait();
                 } catch (final InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOGGER.error("", e);
                 }
             }
+            /* Wait for last running rule */
             synchronized (this.phaser) {
                 long stillRunnning = this.phaser.get();
                 while (stillRunnning > 0) {
