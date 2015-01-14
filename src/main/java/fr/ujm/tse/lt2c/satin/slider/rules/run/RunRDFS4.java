@@ -60,7 +60,7 @@ public class RunRDFS4 extends AbstractRun {
     @Override
     protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        final long ressouce = AbstractDictionary.ressource;
+        final long ressouce = AbstractDictionary.Resource;
         final long type = AbstractDictionary.type;
 
         int loops = 0;

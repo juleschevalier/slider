@@ -63,7 +63,7 @@ public class RunRDFS8 extends AbstractRun {
 
         final long clazz = AbstractDictionary.classRdfs;
         final long type = AbstractDictionary.type;
-        final long ressource = AbstractDictionary.ressource;
+        final long ressource = AbstractDictionary.Resource;
 
         int loops = 0;
 

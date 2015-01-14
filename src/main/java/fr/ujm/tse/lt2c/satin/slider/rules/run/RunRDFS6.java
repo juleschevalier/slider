@@ -63,7 +63,7 @@ public class RunRDFS6 extends AbstractRun {
 
         final long subPropertyOf = AbstractDictionary.subPropertyOf;
         final long type = AbstractDictionary.type;
-        final long property = AbstractDictionary.property;
+        final long property = AbstractDictionary.Property;
 
         int loops = 0;
 

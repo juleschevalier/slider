@@ -61,10 +61,10 @@ public class RunRDFS13 extends AbstractRun {
     @Override
     protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        final long datatype = AbstractDictionary.datatype;
+        final long datatype = AbstractDictionary.Datatype;
         final long type = AbstractDictionary.type;
         final long subClassOf = AbstractDictionary.subClassOf;
-        final long literal = AbstractDictionary.literal;
+        final long literal = AbstractDictionary.Literal;
 
         int loops = 0;
 

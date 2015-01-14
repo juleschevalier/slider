@@ -61,7 +61,7 @@ public class RunRDFS12 extends AbstractRun {
     @Override
     protected int process(final TripleStore ts1, final TripleStore ts2, final Collection<Triple> outputTriples) {
 
-        final long containerMembershipProperty = AbstractDictionary.containerMembershipProperty;
+        final long containerMembershipProperty = AbstractDictionary.ContainerMembershipProperty;
         final long type = AbstractDictionary.type;
         final long subPropertyOf = AbstractDictionary.subPropertyOf;
         final long member = AbstractDictionary.member;

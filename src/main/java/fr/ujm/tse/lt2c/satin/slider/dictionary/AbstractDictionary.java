@@ -20,6 +20,11 @@ package fr.ujm.tse.lt2c.satin.slider.dictionary;
  * #L%
  */
 
+import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.OWL2;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 
 /**
@@ -38,21 +43,21 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long classRdfs = 0;
     public static long complementOf = 0;
     public static long differentFrom = 0;
-    public static long disjoinWith = 0;
-    public static long distinctmembers = 0;
+    public static long disjointWith = 0;
+    public static long distinctMembers = 0;
     public static long equivalentClass = 0;
     public static long equivalentProperty = 0;
-    public static long functionalProperty = 0;
+    public static long FunctionalProperty = 0;
     public static long hasKey = 0;
     public static long hasValue = 0;
     public static long intersectionOf = 0;
-    public static long inverseFunctionalProperty = 0;
+    public static long InverseFunctionalProperty = 0;
     public static long inverseOf = 0;
-    public static long irreflexiveProperty = 0;
+    public static long IrreflexiveProperty = 0;
     public static long maxCardinality = 0;
     public static long maxQualifiedCardinality = 0;
     public static long member = 0;
-    public static long nothing = 0;
+    public static long Nothing = 0;
     public static long onClass = 0;
     public static long oneOf = 0;
     public static long onProperty = 0;
@@ -72,11 +77,11 @@ public abstract class AbstractDictionary implements Dictionary {
     public static long subClassOf = 0;
     public static long subPropertyOf = 0;
     public static long type = 0;
-    public static long ressource = 0;
-    public static long property = 0;
-    public static long containerMembershipProperty = 0;
-    public static long literal = 0;
-    public static long datatype = 0;
+    public static long Resource = 0;
+    public static long Property = 0;
+    public static long ContainerMembershipProperty = 0;
+    public static long Literal = 0;
+    public static long Datatype = 0;
 
     @Override
     public String printAxiom(final String c) {
@@ -97,57 +102,54 @@ public abstract class AbstractDictionary implements Dictionary {
     }
 
     public void initialize() {
-        /*
-         * All the prefixes come from prefix.cc
-         */
-        domain = this.add("http://www.w3.org/2000/01/rdf-schema#domain");
-        range = this.add("http://www.w3.org/2000/01/rdf-schema#range");
-        type = this.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        subClassOf = this.add("http://www.w3.org/2000/01/rdf-schema#subClassOf");
-        subPropertyOf = this.add("http://www.w3.org/2000/01/rdf-schema#subPropertyOf");
-        equivalentClass = this.add("http://www.w3.org/2002/07/owl#equivalentClass");
-        equivalentProperty = this.add("http://www.w3.org/2002/07/owl#equivalentProperty");
-        sameAs = this.add("http://www.w3.org/2002/07/owl#sameAs");
-        inverseOf = this.add("http://www.w3.org/2002/07/owl#inverseOf");
-        propertyDisjointWith = this.add("http://www.w3.org/2002/07/owl#propertyDisjointWith");
-        differentFrom = this.add("http://www.w3.org/2002/07/owl#differentFrom");
-        allDifferent = this.add("http://www.w3.org/2002/07/owl#AllDifferent");
-        allDisjointClasses = this.add("http://www.w3.org/2002/07/owl#allDisjointClasses");
-        allValuesFrom = this.add("http://www.w3.org/2002/07/owl#allValuesFrom");
-        annotationProperty = this.add("http://www.w3.org/2002/07/owl#AnnotationProperty");
-        assertionProperty = this.add("http://www.w3.org/2002/07/owl#assertionProperty");
-        asymetricProperty = this.add("http://www.w3.org/2002/07/owl#asymetricProperty");
-        classOwl = this.add("http://www.w3.org/2002/07/owl#Class");
-        classRdfs = this.add("http://www.w3.org/2000/01/rdf-schema#");
-        complementOf = this.add("http://www.w3.org/2002/07/owl#complementOf");
-        disjoinWith = this.add("http://www.w3.org/2002/07/owl#disjointWith");
-        distinctmembers = this.add("http://www.w3.org/2002/07/owl#distinctMembers");
-        functionalProperty = this.add("http://www.w3.org/2002/07/owl#functionalProperty");
-        hasKey = this.add("http://www.w3.org/2002/07/owl#hasKey");
-        hasValue = this.add("http://www.w3.org/2002/07/owl#hasValue");
-        intersectionOf = this.add("http://www.w3.org/2002/07/owl#intersectionOf");
-        inverseFunctionalProperty = this.add("http://www.w3.org/2002/07/owl#inverseFunctionalProperty");
-        irreflexiveProperty = this.add("http://www.w3.org/2002/07/owl#irreflexiveProperty");
-        maxCardinality = this.add("http://www.w3.org/2002/07/owl#maxCardinality");
-        maxQualifiedCardinality = this.add("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
-        member = this.add("http://www.w3.org/2002/07/owl#member");
-        nothing = this.add("http://www.w3.org/2002/07/owl#nothing");
-        onClass = this.add("http://www.w3.org/2002/07/owl#onClass");
-        onProperty = this.add("http://www.w3.org/2002/07/owl#onProperty");
-        oneOf = this.add("http://www.w3.org/2002/07/owl#oneOf");
-        propertyChainAxiom = this.add("http://www.w3.org/2002/07/owl#propertyChainAxiom");
-        someValuesFrom = this.add("http://www.w3.org/2002/07/owl#someValuesFrom");
-        sourceIndividual = this.add("http://www.w3.org/2002/07/owl#sourceIndividual");
-        symetricProperty = this.add("http://www.w3.org/2002/07/owl#symetricProperty");
-        targetIndividual = this.add("http://www.w3.org/2002/07/owl#targetIndividual");
-        targetValue = this.add("http://www.w3.org/2002/07/owl#targetValue");
-        thing = this.add("http://www.w3.org/2002/07/owl#Thing");
-        transitiveProperty = this.add("http://www.w3.org/2002/07/owl#TransitiveProperty");
-        unionOf = this.add("http://www.w3.org/2002/07/owl#unionOf");
-        ressource = this.add("http://www.w3.org/2000/01/rdf-schema#ressource");
-        property = this.add("http://www.w3.org/2000/01/rdf-schema#property");
-        containerMembershipProperty = this.add("http://www.w3.org/2000/01/rdf-schema#containerMembershipProperty");
-        literal = this.add("http://www.w3.org/2000/01/rdf-schema#Literal");
-        datatype = this.add("http://www.w3.org/2000/01/rdf-schema#Datatype");
+        domain = this.add(RDFS.domain.asNode());
+        range = this.add(RDFS.range.asNode());
+        type = this.add(RDF.type.asNode());
+        subClassOf = this.add(RDFS.subClassOf.asNode());
+        subPropertyOf = this.add(RDFS.subPropertyOf.asNode());
+        equivalentClass = this.add(OWL.equivalentClass.asNode());
+        equivalentProperty = this.add(OWL.equivalentProperty.asNode());
+        sameAs = this.add(OWL.sameAs.asNode());
+        inverseOf = this.add(OWL.inverseOf.asNode());
+        propertyDisjointWith = this.add(OWL2.propertyDisjointWith.asNode());
+        differentFrom = this.add(OWL.differentFrom.asNode());
+        allDifferent = this.add(OWL.AllDifferent.asNode());
+        allDisjointClasses = this.add(OWL2.AllDisjointClasses.asNode());
+        allValuesFrom = this.add(OWL.allValuesFrom.asNode());
+        annotationProperty = this.add(OWL.AnnotationProperty.asNode());
+        assertionProperty = this.add(OWL2.assertionProperty.asNode());
+        asymetricProperty = this.add(OWL2.AsymmetricProperty.asNode());
+        classOwl = this.add(OWL.Class.asNode());
+        classRdfs = this.add(RDFS.Class.asNode());
+        complementOf = this.add(OWL.complementOf.asNode());
+        disjointWith = this.add(OWL2.disjointWith.asNode());
+        distinctMembers = this.add(OWL2.distinctMembers.asNode());
+        FunctionalProperty = this.add(OWL.FunctionalProperty.asNode());
+        hasKey = this.add(OWL2.hasKey.asNode());
+        hasValue = this.add(OWL.hasValue.asNode());
+        intersectionOf = this.add(OWL.intersectionOf.asNode());
+        InverseFunctionalProperty = this.add(OWL.InverseFunctionalProperty.asNode());
+        IrreflexiveProperty = this.add(OWL2.IrreflexiveProperty.asNode());
+        maxCardinality = this.add(OWL.maxCardinality.asNode());
+        maxQualifiedCardinality = this.add(OWL2.maxQualifiedCardinality.asNode());
+        member = this.add(RDFS.member.asNode());
+        Nothing = this.add(OWL.Nothing.asNode());
+        onClass = this.add(OWL2.onClass.asNode());
+        onProperty = this.add(OWL.onProperty.asNode());
+        oneOf = this.add(OWL.oneOf.asNode());
+        propertyChainAxiom = this.add(OWL2.propertyChainAxiom.asNode());
+        someValuesFrom = this.add(OWL.someValuesFrom.asNode());
+        sourceIndividual = this.add(OWL2.sourceIndividual.asNode());
+        symetricProperty = this.add(OWL2.SymmetricProperty.asNode());
+        targetIndividual = this.add(OWL2.targetIndividual.asNode());
+        targetValue = this.add(OWL2.targetValue.asNode());
+        thing = this.add(OWL.Thing.asNode());
+        transitiveProperty = this.add(OWL.TransitiveProperty.asNode());
+        unionOf = this.add(OWL.unionOf.asNode());
+        Resource = this.add(RDFS.Resource.asNode());
+        Property = this.add(RDF.Property.asNode());
+        ContainerMembershipProperty = this.add(RDFS.ContainerMembershipProperty.asNode());
+        Literal = this.add(RDFS.Literal.asNode());
+        Datatype = this.add(RDFS.Datatype.asNode());
     }
 }
