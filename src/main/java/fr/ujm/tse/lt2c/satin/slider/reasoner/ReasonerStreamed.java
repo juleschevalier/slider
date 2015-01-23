@@ -295,7 +295,11 @@ public class ReasonerStreamed {
             /* Wait for parsing */
             synchronized (this.dictionary) {
                 try {
-                    this.dictionary.wait();
+                    final Long b = System.nanoTime();
+                    this.dictionary.wait(100);
+                    if ((System.nanoTime() - b) / 1000000 >= 100) {
+                        LOGGER.warn("REASONER: wait ends with timeout " + (System.nanoTime() - b));
+                    }
                 } catch (final InterruptedException e) {
                     LOGGER.error("", e);
                 }
@@ -312,12 +316,17 @@ public class ReasonerStreamed {
                     stillRunnning = this.phaser.get();
                 }
             }
-
-            nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+            LOGGER.trace("REASONER no more running");
+            nonEmptyBuffers = this.tripleManager.nonEmptyBuffers() + this.phaser.get();
         }
+        LOGGER.trace("REASONER all buffers empty");
+        nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
+        LOGGER.trace("REASONER check: " + nonEmptyBuffers + " " + this.phaser);
+
         this.tripleManager.stop();
         shutdownAndAwaitTermination(this.executor);
         this.running = false;
+        LOGGER.trace("REASONER stopped");
     }
 
     public Collection<Rule> getRules() {

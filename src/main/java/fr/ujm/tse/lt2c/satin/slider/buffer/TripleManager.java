@@ -134,7 +134,7 @@ public class TripleManager {
     public long nonEmptyBuffers() {
         long total = 0;
         for (final Rule rule : this.rules) {
-            if (rule.getTripleBuffer().getOccupation() > 0) {
+            if (rule.getTripleBuffer().size() > 0) {
                 total++;
             }
         }

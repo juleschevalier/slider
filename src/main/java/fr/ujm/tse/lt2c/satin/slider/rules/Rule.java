@@ -81,8 +81,9 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
+        this.LOGGER.trace(this.run + " bufferFull");
         synchronized (this.phaser) {
-            if (this.tripleBuffer.size() > 0) {
+            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
                 synchronized (this.dictionary) {
                     this.dictionary.notify();
@@ -98,6 +99,8 @@ public class Rule implements BufferListener {
     @Override
     public boolean bufferFullTimer(final long triplesToRead) {
         synchronized (this.phaser) {
+            this.LOGGER.trace(this.run + " bufferFullTimer " + this.maxThreads + " " + this.phaser + " " + this.tripleBuffer.getOccupation() + " "
+                    + this.tripleBuffer.size());
             if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
                 synchronized (this.dictionary) {
@@ -105,10 +108,12 @@ public class Rule implements BufferListener {
                 }
                 this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
                         this.phaser, this.timer, triplesToRead));
+                this.LOGGER.trace(this.name() + " submitted");
                 return true;
             }
-            return false;
         }
+        this.timer.deactivateRule(this.name());
+        return false;
 
     }
 

@@ -94,6 +94,8 @@ public class RunSCM_SCO extends AbstractRun {
                     if (c1a != triple.getSubject() && !ts1.contains(triple.getSubject(), subClassOf, c1a)
                             && !ts2.contains(triple.getSubject(), subClassOf, c1a)) {
                         final Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
+                        LOGGER.trace(this.ruleName + " <" + triple.getSubject() + ",sc," + triple.getObject() + "> + <" + triple.getObject() + ",sc," + c1a
+                                + "> -> <" + triple.getSubject() + ",sc," + c1a + ">");
                         outputTriples.add(result);
                     }
 

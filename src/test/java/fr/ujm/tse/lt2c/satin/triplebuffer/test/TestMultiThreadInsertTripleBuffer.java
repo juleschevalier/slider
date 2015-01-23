@@ -20,15 +20,27 @@ package fr.ujm.tse.lt2c.satin.triplebuffer.test;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Test;
 
+import fr.ujm.tse.lt2c.satin.slider.buffer.BufferTimer;
+import fr.ujm.tse.lt2c.satin.slider.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
+import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
+import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 
 public class TestMultiThreadInsertTripleBuffer {
@@ -37,36 +49,37 @@ public class TestMultiThreadInsertTripleBuffer {
     public static final int THREADS = 5;
     public static final int[] BUFFER_SIZES = { 1, 10, 100, 1000 };
     public static final int MAX_VALUE = 1020;
-    public static final int TESTS = 10;
+    public static final int TESTS = 1000;
 
     @Test
     public void test() {
-        // for (final int bufferSize : BUFFER_SIZES) {
-        // for (int k = 0; k < TESTS; k++) {
-        //
-        // final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize);
-        // final SimpleBufferListener listener = new SimpleBufferListener(tb);
-        // tb.addBufferListener(listener);
-        // final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
-        //
-        // // Test buffer flush
-        // final ExecutorService executor = Executors.newCachedThreadPool();
-        // for (int j = 0; j < THREADS; j++) {
-        // executor.submit(new RunnableAdder(generated, tb, MAX_VALUE));
-        // }
-        // executor.shutdown();
-        // try {
-        // executor.awaitTermination(1, TimeUnit.DAYS);
-        // } catch (final InterruptedException e) {
-        // e.printStackTrace();
-        // }
-        // // Assert set equality
-        // final long listenerf = listener.finish();
-        // assertEquals(generated.size(), listenerf);
-        //
-        // }
-        //
-        // }
+        for (final int bufferSize : BUFFER_SIZES) {
+            for (int k = 0; k < TESTS; k++) {
+
+                final Rule rule = new Rule(AvaibleRuns.CAX_SCO, null, new AtomicInteger(), null, null, bufferSize, 0, null);
+                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize, new BufferTimer(500), rule);
+                final SimpleBufferListener listener = new SimpleBufferListener(tb);
+                tb.addBufferListener(listener);
+                final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
+
+                // Test buffer flush
+                final ExecutorService executor = Executors.newCachedThreadPool();
+                for (int j = 0; j < THREADS; j++) {
+                    executor.submit(new RunnableAdder(generated, tb, MAX_VALUE));
+                }
+                executor.shutdown();
+                try {
+                    executor.awaitTermination(1, TimeUnit.DAYS);
+                } catch (final InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // Assert set equality
+                final long listenerf = listener.finish();
+                assertEquals(generated.size(), listenerf);
+
+            }
+
+        }
     }
 
     class RunnableAdder implements Runnable {

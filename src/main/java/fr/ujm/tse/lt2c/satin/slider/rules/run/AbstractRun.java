@@ -41,7 +41,7 @@ import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
  */
 public abstract class AbstractRun implements RuleRun {
 
-    private static Logger logger = Logger.getLogger(AbstractRun.class);
+    private static Logger LOGGER = Logger.getLogger(AbstractRun.class);
 
     protected final Dictionary dictionary;
     protected final TripleStore tripleStore;
@@ -79,6 +79,7 @@ public abstract class AbstractRun implements RuleRun {
     @Override
     public void run() {
         Thread.currentThread().setName(this.ruleName);
+        LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " new run");
 
         /*
          * Buffer verification
@@ -90,6 +91,7 @@ public abstract class AbstractRun implements RuleRun {
                 this.phaser.notifyAll();
             }
 
+            LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
             return;
         }
 
@@ -111,6 +113,7 @@ public abstract class AbstractRun implements RuleRun {
                     this.phaser.decrementAndGet();
                     this.phaser.notifyAll();
                 }
+                LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
                 return;
             }
 
@@ -137,7 +140,7 @@ public abstract class AbstractRun implements RuleRun {
             this.addNewTriples(outputTriples);
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             /*
              * Unregister from phaser and notifies the Reasoner
@@ -147,11 +150,9 @@ public abstract class AbstractRun implements RuleRun {
                 this.phaser.notifyAll();
             }
             if (this.triplesToRead > 0) {
-                // System.out.println("Run done for " + this.triplesToRead + "triples " + this.ruleName);
                 this.timer.deactivateRule(this.ruleName);
-            } else {
-                // System.out.println("Run done for " + this.ruleName);
             }
+            LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
 
         }
     }
@@ -173,6 +174,7 @@ public abstract class AbstractRun implements RuleRun {
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
 
         this.distributor.distributeAll(newTriples);
+        LOGGER.trace(this.ruleName + " infers " + newTriples.size() + "/" + outputTriples.size());
 
         return;
     }

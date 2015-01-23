@@ -58,7 +58,7 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
 /**
  * This class provides a command line interface to use Slider
  * The different options are the following:
- * -b,--buffer-size <time>......set the buffer size
+ * -b,--buffer-size <size>......set the buffer size
  * -d,--directory <directory>.. infers on all ontologies in the directory
  * -h,--help....................print this message
  * -i,--iteration <number>......how many times each file
@@ -117,8 +117,13 @@ public final class Main {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " " + 100
-                            * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " "
+                            + run.getRunsByRule().get("SCM_SCO") + " " + 100 * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
+                    // if (run.getNbInferedTriples() != 36 || run.getRunsByRule().get("SCM_SCO").get() != 5) {
+                    // LOGGER.info(file.getName() + " " + run.getNbInferedTriples() + " " +
+                    // run.getRunsByRule().get("SCM_SCO"));
+                    // System.exit(-1);
+                    // }
                 }
             }
         }
@@ -149,8 +154,6 @@ public final class Main {
         reasoner.closeAndWait();
 
         final long stop = System.nanoTime();
-
-        System.out.println(tripleStore.getPredicates().size());
 
         if (arguments.isDumpMode()) {
             final String output = "inferred_" + file.getName();

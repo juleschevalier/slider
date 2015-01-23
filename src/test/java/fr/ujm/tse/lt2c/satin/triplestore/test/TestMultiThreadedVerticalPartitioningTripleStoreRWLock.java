@@ -37,29 +37,36 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 
-public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
+public class TestMultiThreadedVerticalPartitioningTripleStoreRWLock {
 
     public static final int THREADS = 50;
 
     @Test
     public void test() {
-        final TripleStore ts = new VerticalPartioningTripleStoreRWLock();
-        final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
 
-        final ExecutorService executor = Executors.newCachedThreadPool();
-        for (int j = 0; j < THREADS; j++) {
-            executor.submit(new RunnableAdder(generated, ts));
-        }
-        executor.shutdown();
-        try {
-            executor.awaitTermination(1, TimeUnit.DAYS);
-            // Thread.sleep(10000);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+        for (int i = 0; i < 1000; i++) {
 
-        assertEquals(ts.size(), generated.size());
-        assertEquals(ts.getAll().size(), generated.size());
+            System.out.println(i);
+
+            final TripleStore ts = new VerticalPartioningTripleStoreRWLock();
+            final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());
+
+            final ExecutorService executor = Executors.newCachedThreadPool();
+            for (int j = 0; j < THREADS; j++) {
+                executor.submit(new RunnableAdder(generated, ts));
+                // executor.submit(new RunnableGetter(ts));
+            }
+            executor.shutdown();
+            try {
+                executor.awaitTermination(1, TimeUnit.DAYS);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            assertEquals(generated.size(), ts.size());
+            assertEquals(generated.size(), ts.getAll().size());
+
+        }
 
     }
 
@@ -83,7 +90,24 @@ public class TestMultiThreadAddVerticalPartitioningTripleStoreRWLock {
             }
 
         }
-
     };
+
+    class RunnableGetter implements Runnable {
+        TripleStore ts;
+
+        public RunnableGetter(final TripleStore ts) {
+            super();
+            this.ts = ts;
+        }
+
+        @Override
+        public void run() {
+            final Random random = new Random();
+            for (int i = 0; i < 10000; i++) {
+                this.ts.getbyPredicate(random.nextInt(100));
+            }
+        }
+
+    }
 
 }
