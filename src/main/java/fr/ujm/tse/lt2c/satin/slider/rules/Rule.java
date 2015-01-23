@@ -81,7 +81,6 @@ public class Rule implements BufferListener {
 
     @Override
     public boolean bufferFull() {
-        this.LOGGER.trace(this.run + " bufferFull");
         synchronized (this.phaser) {
             if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
@@ -99,8 +98,6 @@ public class Rule implements BufferListener {
     @Override
     public boolean bufferFullTimer(final long triplesToRead) {
         synchronized (this.phaser) {
-            this.LOGGER.trace(this.run + " bufferFullTimer " + this.maxThreads + " " + this.phaser + " " + this.tripleBuffer.getOccupation() + " "
-                    + this.tripleBuffer.size());
             if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
                 this.phaser.incrementAndGet();
                 synchronized (this.dictionary) {
@@ -108,7 +105,6 @@ public class Rule implements BufferListener {
                 }
                 this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
                         this.phaser, this.timer, triplesToRead));
-                this.LOGGER.trace(this.name() + " submitted");
                 return true;
             }
         }
@@ -135,6 +131,10 @@ public class Rule implements BufferListener {
 
     public String name() {
         return RunFactory.getRuleName(this.run);
+    }
+
+    public Dictionary getDictionary() {
+        return this.dictionary;
     }
 
 }

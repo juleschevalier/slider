@@ -83,7 +83,6 @@ public class TripleDistributor {
      */
     public void distributeAll(final Collection<Triple> triples) {
         for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
-            this.LOGGER.trace("DISTRIBUTOR " + triples.size() + " to " + tripleBuffer.getDebugName());
             tripleBuffer.addAll(triples);
         }
         for (final Triple triple : triples) {
@@ -100,7 +99,6 @@ public class TripleDistributor {
     public long distribute(final Triple triple) {
         long debugDistributed = 0;
         for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
-            this.LOGGER.trace("DISTRIBUTOR 1 to " + tripleBuffer.getDebugName());
             tripleBuffer.add(triple);
             debugDistributed++;
         }

@@ -90,7 +90,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                     bufferListener.bufferFull();
                 }
             }
-            LOGGER.trace("BUFFER-" + this.debugName + " receives 1 triple(" + this.occupation + "/" + this.size() + ")");
 
         } catch (final Exception e) {
             LOGGER.error("", e);
@@ -112,7 +111,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
                     bufferListener.bufferFull();
                 }
             }
-            LOGGER.trace("BUFFER-" + this.debugName + " receives " + triples.size() + " triples(" + this.occupation + "/" + this.size() + ")");
 
         } catch (final Exception e) {
             LOGGER.error("", e);
@@ -130,8 +128,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         try {
             this.rwlock.writeLock().lock();
 
-            LOGGER.trace("BUFFER-" + this.debugName + " before clear: " + this.occupation + "/" + this.size);
-
             ts = new VerticalPartioningTripleStore();
 
             int read = 0;
@@ -143,8 +139,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             }
             this.size.addAndGet(-read);
 
-            LOGGER.trace("BUFFER-" + this.debugName + " " + read + " triples removed(" + triplesToRead + " planned), still " + this.occupation + "/"
-                    + this.size);
         } catch (final Exception e) {
             LOGGER.error("", e);
         } finally {
@@ -174,7 +168,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             }
             this.size.addAndGet(-read);
 
-            LOGGER.trace("BUFFER-" + this.debugName + " " + (read - 1) + " triples removed, still " + this.occupation + "/" + this.size());
         } catch (final Exception e) {
             LOGGER.error("", e);
         } finally {
@@ -230,7 +223,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public void sendFullBuffer() {
         try {
             this.rwlock.writeLock().lock();
-            LOGGER.trace("BUFFER-" + this.debugName + " send fullBuffer signal");
             if (!(this.occupation.get() > this.bufferSize)) {
                 for (final BufferListener bufferListener : this.bufferListeners) {
                     bufferListener.bufferFull();

@@ -26,6 +26,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
 
 /**
@@ -41,6 +42,7 @@ public class BufferTimer extends TimerTask {
     /* Need synchronization ?? */
     private final Map<Rule, Long> rulesLastAdd;
     private final Map<String, Boolean> rulesActivated;
+    private Dictionary dictionary;
     private final long timeout;
 
     public BufferTimer(final long timeout) {
@@ -51,6 +53,7 @@ public class BufferTimer extends TimerTask {
             throw new RuntimeException("Timeout=0!");
         }
         this.timeout = timeout;
+        this.dictionary = null;
     }
 
     @Override
@@ -64,24 +67,14 @@ public class BufferTimer extends TimerTask {
             if (!this.isActivated(rule.name()) && lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0
                     && rule.getTripleBuffer().size() < rule.getTripleBuffer().getBufferLimit()) {
                 this.rulesActivated.put(rule.name(), true);
-                LOGGER.trace("BTIMER" + Thread.currentThread().getId() + " calls " + rule.name());
                 final long toRead = rule.getTripleBuffer().getOccupation();
                 rule.getTripleBuffer().timerCall(toRead);
-                LOGGER.trace("BTIMER " + rule.name() + " " + rule.bufferFullTimer(toRead));
-            } else {
-                if (this.isActivated(rule.name())) {
-                    LOGGER.trace("BTIMER" + Thread.currentThread().getId() + " doesn't call " + rule.name() + " - already called");
-                }
-                if (lastAdd < this.timeout) {
-                    LOGGER.trace("BTIMER" + Thread.currentThread().getId() + " doesn't call " + rule.name() + " - too soon");
-                }
-                if (rule.getTripleBuffer().getOccupation() == 0) {
-                    LOGGER.trace("BTIMER" + Thread.currentThread().getId() + " doesn't call " + rule.name() + " - occupation at 0 (size="
-                            + rule.getTripleBuffer().size() + ")");
-                }
-                if (rule.getTripleBuffer().size() > rule.getTripleBuffer().getBufferLimit()) {
-                    LOGGER.trace("BTIMER" + Thread.currentThread().getId() + " doesn't call " + rule.name() + " - size is over buffer size");
-                }
+                rule.bufferFullTimer(toRead);
+            }
+        }
+        if (this.dictionary != null) {
+            synchronized (this.dictionary) {
+                this.dictionary.notify();
             }
         }
 
@@ -94,6 +87,9 @@ public class BufferTimer extends TimerTask {
     public void notifyAdd(final Rule rule) {
         final long now = System.nanoTime();
         this.rulesLastAdd.put(rule, now);
+        if (this.dictionary == null) {
+            this.dictionary = rule.getDictionary();
+        }
     }
 
     public void deactivateRule(final String rule) {

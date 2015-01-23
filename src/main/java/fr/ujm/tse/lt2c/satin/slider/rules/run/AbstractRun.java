@@ -79,7 +79,6 @@ public abstract class AbstractRun implements RuleRun {
     @Override
     public void run() {
         Thread.currentThread().setName(this.ruleName);
-        LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " new run");
 
         /*
          * Buffer verification
@@ -91,7 +90,6 @@ public abstract class AbstractRun implements RuleRun {
                 this.phaser.notifyAll();
             }
 
-            LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
             return;
         }
 
@@ -113,7 +111,6 @@ public abstract class AbstractRun implements RuleRun {
                     this.phaser.decrementAndGet();
                     this.phaser.notifyAll();
                 }
-                LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
                 return;
             }
 
@@ -152,7 +149,6 @@ public abstract class AbstractRun implements RuleRun {
             if (this.triplesToRead > 0) {
                 this.timer.deactivateRule(this.ruleName);
             }
-            LOGGER.trace(this.ruleName + " " + Thread.currentThread().getId() + " end run");
 
         }
     }
@@ -174,7 +170,6 @@ public abstract class AbstractRun implements RuleRun {
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
 
         this.distributor.distributeAll(newTriples);
-        LOGGER.trace(this.ruleName + " infers " + newTriples.size() + "/" + outputTriples.size());
 
         return;
     }

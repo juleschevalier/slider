@@ -135,40 +135,6 @@ public class ReasonerStreamed {
     public void start() {
 
         this.tripleManager.start();
-        // int loop = 0, ok = 0;
-        // synchronized (this.dictionary) {
-        // try {
-        // this.dictionary.wait();
-        // } catch (final InterruptedException e) {
-        // e.printStackTrace();
-        // }
-        // }
-        //
-        // long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-        // // long nonEmptyBuffers = this.tripleManager.flushBuffers();
-        // while (this.running || nonEmptyBuffers > 0) {
-        //
-        // loop++;
-        //
-        // synchronized (this.phaser) {
-        // long stillRunnning = this.phaser.get();
-        // while (stillRunnning > 0) {
-        // ok++;
-        // try {
-        // this.phaser.wait();
-        // } catch (final InterruptedException e) {
-        // LOGGER.error("", e);
-        // }
-        // stillRunnning = this.phaser.get();
-        // }
-        // }
-        //
-        // nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-        // // nonEmptyBuffers = this.tripleManager.flushBuffers();
-        // }
-        // System.out.println(loop + " " + ok);
-        // this.tripleManager.stop();
-        // shutdownAndAwaitTermination(this.executor);
 
     }
 
@@ -296,10 +262,7 @@ public class ReasonerStreamed {
             synchronized (this.dictionary) {
                 try {
                     final Long b = System.nanoTime();
-                    this.dictionary.wait(100);
-                    if ((System.nanoTime() - b) / 1000000 >= 100) {
-                        LOGGER.warn("REASONER: wait ends with timeout " + (System.nanoTime() - b));
-                    }
+                    this.dictionary.wait();
                 } catch (final InterruptedException e) {
                     LOGGER.error("", e);
                 }
@@ -316,17 +279,12 @@ public class ReasonerStreamed {
                     stillRunnning = this.phaser.get();
                 }
             }
-            LOGGER.trace("REASONER no more running");
             nonEmptyBuffers = this.tripleManager.nonEmptyBuffers() + this.phaser.get();
         }
-        LOGGER.trace("REASONER all buffers empty");
-        nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-        LOGGER.trace("REASONER check: " + nonEmptyBuffers + " " + this.phaser);
 
         this.tripleManager.stop();
         shutdownAndAwaitTermination(this.executor);
         this.running = false;
-        LOGGER.trace("REASONER stopped");
     }
 
     public Collection<Rule> getRules() {
