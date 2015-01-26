@@ -255,7 +255,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
         return result;
     }

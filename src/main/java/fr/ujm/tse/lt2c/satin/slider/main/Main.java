@@ -91,7 +91,7 @@ public final class Main {
 
     public static void main(final String[] args) throws IOException {
         Thread.currentThread().setName("Main");
-        // System.in.read();
+        System.in.read();
         final ReasoningArguments arguments = getArguments(args);
 
         if (arguments == null) {
@@ -117,13 +117,8 @@ public final class Main {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " "
-                            + run.getRunsByRule().get("SCM_SCO") + " " + 100 * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
-                    // if (run.getNbInferedTriples() != 36 || run.getRunsByRule().get("SCM_SCO").get() != 5) {
-                    // LOGGER.info(file.getName() + " " + run.getNbInferedTriples() + " " +
-                    // run.getRunsByRule().get("SCM_SCO"));
-                    // System.exit(-1);
-                    // }
+                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " " + 100
+                            * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
                 }
             }
         }

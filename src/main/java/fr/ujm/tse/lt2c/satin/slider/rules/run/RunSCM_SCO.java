@@ -91,8 +91,7 @@ public class RunSCM_SCO extends AbstractRun {
                 loops++;
                 for (final Long c1a : c3s) {
 
-                    if (c1a != triple.getSubject() && !ts1.contains(triple.getSubject(), subClassOf, c1a)
-                            && !ts2.contains(triple.getSubject(), subClassOf, c1a)) {
+                    if (c1a != triple.getSubject()) {
                         final Triple result = new ImmutableTriple(triple.getSubject(), subClassOf, c1a);
                         outputTriples.add(result);
                     }
