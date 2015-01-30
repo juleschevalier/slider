@@ -62,7 +62,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
     private final Map<Long, Multimap<Long, Long>> internalstore;
     private final Map<Long, ReentrantReadWriteLock> predicatesLocks;
     private final ReentrantReadWriteLock globalLock;
-    private final AtomicInteger triples;
+    private final AtomicInteger size;
 
     /**
      * Constructor
@@ -71,7 +71,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         this.internalstore = new HashMap<Long, Multimap<Long, Long>>();
         this.predicatesLocks = new ConcurrentHashMap<Long, ReentrantReadWriteLock>();
         this.globalLock = new ReentrantReadWriteLock();
-        this.triples = new AtomicInteger();
+        this.size = new AtomicInteger();
     }
 
     private ReentrantReadWriteLock getLock(final long p) {
@@ -85,29 +85,59 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
     public boolean add(final Triple t) {
         /* Get predicate's multimap */
         boolean exists = false;
-        this.globalLock.writeLock().lock();
-        Multimap<Long, Long> map = null;
-        try {
-            if (!this.internalstore.containsKey(t.getPredicate())) {
-                map = HashMultimap.create();
-                this.internalstore.put(t.getPredicate(), map);
-            } else {
-                map = this.internalstore.get(t.getPredicate());
-            }
-        } catch (final Exception e) {
-            logger.error("", e);
-        } finally {
-            this.globalLock.writeLock().unlock();
-        }
-        /* Add triple */
         final ReentrantReadWriteLock lock = this.getLock(t.getPredicate());
         lock.writeLock().lock();
         try {
-            if (map.containsEntry(t.getSubject(), t.getObject()) || !map.put(t.getSubject(), t.getObject())) {
-                exists = true;
+
+            // this.globalLock.readLock().lock();
+            // boolean needWrite = false;
+            // Multimap<Long, Long> map = null;
+            // try {
+            // if (this.internalstore.containsKey(t.getPredicate())) {
+            // map = this.internalstore.get(t.getPredicate());
+            // } else {
+            // needWrite = true;
+            // }
+            // } catch (final Exception e) {
+            // logger.error("", e);
+            // } finally {
+            // this.globalLock.readLock().unlock();
+            // }
+            // if (needWrite) {
+            // this.globalLock.writeLock().lock();
+            // try {
+            // if (!this.internalstore.containsKey(t.getPredicate())) {
+            // map = HashMultimap.create();
+            // this.internalstore.put(t.getPredicate(), map);
+            // } else {
+            // map = this.internalstore.get(t.getPredicate());
+            // }
+            // } catch (final Exception e) {
+            // logger.error("", e);
+            // } finally {
+            // this.globalLock.writeLock().unlock();
+            // }
+            // }
+
+            this.globalLock.writeLock().lock();
+            Multimap<Long, Long> map = null;
+            try {
+                if (!this.internalstore.containsKey(t.getPredicate())) {
+                    map = HashMultimap.create();
+                    this.internalstore.put(t.getPredicate(), map);
+                } else {
+                    map = this.internalstore.get(t.getPredicate());
+                }
+            } catch (final Exception e) {
+                logger.error("", e);
+            } finally {
+                this.globalLock.writeLock().unlock();
             }
-            if (!exists) {
-                this.triples.incrementAndGet();
+
+            if (map.put(t.getSubject(), t.getObject())) {
+                this.size.incrementAndGet();
+            } else {
+                exists = true;
             }
         } catch (final Exception e) {
             logger.error("", e);
@@ -123,7 +153,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         // TODO to improve
         final Collection<Triple> newTriples = new HashSet<>();
         for (final Triple triple : triples) {
-            if (this.add(triple)) {
+            if (!this.add(triple)) {
                 newTriples.add(triple);
             }
         }
@@ -153,7 +183,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         lock.writeLock().lock();
         try {
             if (map.remove(t.getSubject(), t.getObject())) {
-                this.triples.decrementAndGet();
+                this.size.decrementAndGet();
             }
         } catch (final Exception e) {
             logger.error("", e);
@@ -182,7 +212,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
     @Override
     public Collection<Triple> getAll() {
         this.globalLock.readLock().lock();
-        final Collection<Triple> result = new ArrayList<Triple>(this.triples.get());
+        final Collection<Triple> result = new ArrayList<Triple>(this.size.get());
         try {
             for (final Long predicate : this.internalstore.keySet()) {
 
@@ -209,7 +239,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
 
     @Override
     public Collection<Triple> getbySubject(final long s) {
-        final Collection<Triple> result = new ArrayList<>(this.triples.get());
+        final Collection<Triple> result = new ArrayList<>(this.size.get());
         try {
             for (final Long predicate : this.internalstore.keySet()) {
                 final Multimap<Long, Long> multimap = this.internalstore.get(predicate);
@@ -232,22 +262,22 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
     public Collection<Triple> getbyPredicate(final long p) {
         /* Get predicate's multimap */
         Collection<Triple> result = null;
-        this.globalLock.readLock().lock();
-        Multimap<Long, Long> map = null;
-        try {
-            map = this.internalstore.get(p);
-        } catch (final Exception e) {
-            logger.error("", e);
-        } finally {
-            this.globalLock.readLock().unlock();
-            if (map == null) {
-                return new ArrayList<Triple>();
-            }
-        }
         /* construct list of all triples */
         final ReentrantReadWriteLock lock = this.getLock(p);
-        lock.writeLock().lock();
+        lock.readLock().lock();
         try {
+            this.globalLock.readLock().lock();
+            Multimap<Long, Long> map = null;
+            try {
+                map = this.internalstore.get(p);
+            } catch (final Exception e) {
+                logger.error("", e);
+            } finally {
+                this.globalLock.readLock().unlock();
+                if (map == null) {
+                    return new ArrayList<Triple>();
+                }
+            }
             result = new ArrayList<Triple>();
             for (final Entry<Long, Long> entry : map.entries()) {
                 result.add(new ImmutableTriple(entry.getKey(), p, entry.getValue()));
@@ -255,7 +285,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            lock.writeLock().unlock();
+            lock.readLock().unlock();
         }
         return result;
     }
@@ -263,7 +293,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
     @Override
     public Collection<Triple> getbyObject(final long o) {
         this.globalLock.readLock().lock();
-        final Collection<Triple> result = new ArrayList<>(this.triples.get());
+        final Collection<Triple> result = new ArrayList<>(this.size.get());
         try {
             for (final Long predicate : this.internalstore.keySet()) {
                 final Multimap<Long, Long> multimap = this.internalstore.get(predicate);
@@ -286,7 +316,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
 
     @Override
     public long size() {
-        return this.triples.get();
+        return this.size.get();
     }
 
     @Override
@@ -294,7 +324,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         this.globalLock.readLock().lock();
         boolean result = false;
         try {
-            result = this.triples.get() == 0;
+            result = this.size.get() == 0;
 
         } catch (final Exception e) {
             logger.error("", e);
@@ -372,7 +402,8 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
 
     @Override
     public Multimap<Long, Long> getMultiMapForPredicate(final long p) {
-        this.globalLock.readLock().lock();
+        final ReentrantReadWriteLock lock = this.getLock(p);
+        lock.readLock().lock();
         Multimap<Long, Long> multimap = null;
         try {
             if (this.internalstore.get(p) != null) {
@@ -381,27 +412,26 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            this.globalLock.readLock().unlock();
+            lock.readLock().unlock();
         }
         return multimap;
     }
 
     @Override
     public Collection<Long> getPredicates() {
-
         return this.internalstore.keySet();
     }
 
     @Override
     public void clear() {
-        this.globalLock.readLock().lock();
+        this.globalLock.writeLock().lock();
         try {
             this.internalstore.clear();
-            this.triples.set(0);
+            this.size.set(0);
         } catch (final Exception e) {
             logger.error("", e);
         } finally {
-            this.globalLock.readLock().unlock();
+            this.globalLock.writeLock().unlock();
         }
 
     }
@@ -415,11 +445,11 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 final Multimap<Long, Long> newmap = HashMultimap.create();
                 newmap.put(s, o);
                 this.internalstore.put(p, newmap);
-                this.triples.incrementAndGet();
+                this.size.incrementAndGet();
 
             } else {
                 if (!this.internalstore.get(p).containsEntry(s, o) && this.internalstore.get(p).put(s, o)) {
-                    this.triples.incrementAndGet();
+                    this.size.incrementAndGet();
                 }
             }
         } catch (final Exception e) {
@@ -436,7 +466,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         final int prime = 31;
         int result = 1;
         result = prime * result + (this.internalstore == null ? 0 : this.internalstore.hashCode());
-        result = prime * result + (this.triples == null ? 0 : this.triples.hashCode());
+        result = prime * result + (this.size == null ? 0 : this.size.hashCode());
         return result;
     }
 
@@ -459,11 +489,11 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         } else if (!this.internalstore.equals(other.internalstore)) {
             return false;
         }
-        if (this.triples == null) {
-            if (other.triples != null) {
+        if (this.size == null) {
+            if (other.size != null) {
                 return false;
             }
-        } else if (!this.triples.equals(other.triples)) {
+        } else if (!this.size.equals(other.size)) {
             return false;
         }
         return true;
