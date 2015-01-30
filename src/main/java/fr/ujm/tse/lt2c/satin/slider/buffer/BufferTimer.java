@@ -62,12 +62,13 @@ public class BufferTimer extends TimerTask {
         final Long now = System.nanoTime();
         final int nsToMs = 1_000_000;
         Long lastAdd;
+        long toRead;
         for (final Rule rule : this.rulesLastAdd.keySet()) {
             lastAdd = (now - this.rulesLastAdd.get(rule)) / nsToMs;
             if (!this.isActivated(rule.name()) && lastAdd > this.timeout && rule.getTripleBuffer().getOccupation() > 0
                     && rule.getTripleBuffer().size() < rule.getTripleBuffer().getBufferLimit()) {
                 this.rulesActivated.put(rule.name(), true);
-                final long toRead = rule.getTripleBuffer().getOccupation();
+                toRead = rule.getTripleBuffer().getOccupation();
                 rule.getTripleBuffer().timerCall(toRead);
                 rule.bufferFullTimer(toRead);
             }
