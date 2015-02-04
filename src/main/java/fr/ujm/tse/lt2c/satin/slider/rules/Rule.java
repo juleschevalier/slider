@@ -47,7 +47,7 @@ public class Rule implements BufferListener {
      * The distributor sends the new triples to the subscribers
      */
 
-    private final Logger LOGGER = Logger.getLogger(BufferListener.class);
+    private static final Logger LOGGER = Logger.getLogger(BufferListener.class);
 
     private final TripleBuffer tripleBuffer;
     private final TripleDistributor tripleDistributor;
@@ -82,7 +82,7 @@ public class Rule implements BufferListener {
     @Override
     public boolean bufferFull() {
         synchronized (this.phaser) {
-            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
+            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && !this.tripleBuffer.isEmpty()) {
                 this.phaser.incrementAndGet();
                 synchronized (this.dictionary) {
                     this.dictionary.notify();
@@ -98,7 +98,7 @@ public class Rule implements BufferListener {
     @Override
     public boolean bufferFullTimer(final long triplesToRead) {
         synchronized (this.phaser) {
-            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && this.tripleBuffer.size() > 0) {
+            if ((this.maxThreads == 0 || this.phaser.get() < this.maxThreads) && !this.tripleBuffer.isEmpty()) {
                 this.phaser.incrementAndGet();
                 synchronized (this.dictionary) {
                     this.dictionary.notify();

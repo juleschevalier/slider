@@ -37,7 +37,7 @@ public class BufferTimer extends TimerTask {
 
     public static final long DEFAULT_TIMEOUT = 10;
 
-    private static Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
+    private static final Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
 
     private final Map<Rule, Long> rulesLastAdd;
     private final Map<String, Boolean> rulesActivated;
@@ -49,7 +49,7 @@ public class BufferTimer extends TimerTask {
         this.rulesLastAdd = new HashMap<>();
         this.rulesActivated = new HashMap<>();
         if (timeout <= 0) {
-            throw new RuntimeException("Timeout=0!");
+            throw new IllegalArgumentException("Timeout=0!");
         }
         this.timeout = timeout;
         this.dictionary = null;

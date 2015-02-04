@@ -22,6 +22,7 @@ package fr.ujm.tse.lt2c.satin.slider.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -71,7 +72,7 @@ public class RunPRP_DOM extends AbstractRun {
         final Multimap<Long, Long> domainMultiMap = ts1.getMultiMapForPredicate(domain);
         if (domainMultiMap != null && !domainMultiMap.isEmpty()) {
 
-            final HashMap<Long, Collection<Triple>> cachePredicates = new HashMap<>();
+            final Map<Long, Collection<Triple>> cachePredicates = new HashMap<>();
 
             for (final Long p : domainMultiMap.keySet()) {
 

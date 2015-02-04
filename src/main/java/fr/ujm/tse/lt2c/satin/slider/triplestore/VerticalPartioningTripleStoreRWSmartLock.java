@@ -57,7 +57,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
  */
 public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
 
-    private static Logger logger = Logger.getLogger(VerticalPartioningTripleStoreRWSmartLock.class);
+    private static final Logger LOGGER = Logger.getLogger(VerticalPartioningTripleStoreRWSmartLock.class);
 
     private final Map<Long, Multimap<Long, Long>> internalstore;
     private final Map<Long, ReentrantReadWriteLock> predicatesLocks;
@@ -99,7 +99,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                     map = this.internalstore.get(t.getPredicate());
                 }
             } catch (final Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             } finally {
                 this.globalLock.writeLock().unlock();
             }
@@ -110,7 +110,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 exists = true;
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             lock.writeLock().unlock();
         }
@@ -141,12 +141,12 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 map = this.internalstore.get(t.getPredicate());
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
-            if (map == null) {
-                return;
-            }
+        }
+        if (map == null) {
+            return;
         }
         /* Remove triple */
         final ReentrantReadWriteLock lock = this.getLock(t.getPredicate());
@@ -156,7 +156,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 this.size.decrementAndGet();
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             lock.writeLock().unlock();
         }
@@ -170,12 +170,9 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 this.internalstore.remove(t.getPredicate());
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.writeLock().unlock();
-            if (map == null) {
-                return;
-            }
         }
     }
 
@@ -194,13 +191,13 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                         result.add(new ImmutableTriple(entry.getKey(), predicate, entry.getValue()));
                     }
                 } catch (final Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 } finally {
                     lock.readLock().unlock();
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
         }
@@ -209,6 +206,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
 
     @Override
     public Collection<Triple> getbySubject(final long s) {
+        this.globalLock.readLock().lock();
         final Collection<Triple> result = new ArrayList<>(this.size.get());
         try {
             for (final Long predicate : this.internalstore.keySet()) {
@@ -223,8 +221,10 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
-        } finally {}
+            LOGGER.error("", e);
+        } finally {
+            this.globalLock.readLock().unlock();
+        }
         return result;
     }
 
@@ -241,19 +241,19 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             try {
                 map = this.internalstore.get(p);
             } catch (final Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             } finally {
                 this.globalLock.readLock().unlock();
-                if (map == null) {
-                    return new ArrayList<Triple>();
-                }
+            }
+            if (map == null) {
+                return new ArrayList<Triple>();
             }
             result = new ArrayList<Triple>();
             for (final Entry<Long, Long> entry : map.entries()) {
                 result.add(new ImmutableTriple(entry.getKey(), p, entry.getValue()));
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             lock.readLock().unlock();
         }
@@ -277,7 +277,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
         }
@@ -297,7 +297,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             result = this.size.get() == 0;
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
         }
@@ -322,9 +322,9 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } catch (final IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
     }
@@ -337,7 +337,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             result = this.containsNoLock(triple.getSubject(), triple.getPredicate(), triple.getObject());
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
         }
@@ -352,7 +352,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             result = this.containsNoLock(s, p, o);
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.readLock().unlock();
         }
@@ -377,7 +377,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 multimap = ImmutableMultimap.copyOf(this.internalstore.get(p));
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             lock.readLock().unlock();
         }
@@ -396,7 +396,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             this.internalstore.clear();
             this.size.set(0);
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.writeLock().unlock();
         }
@@ -420,7 +420,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.globalLock.writeLock().unlock();
         }
@@ -460,7 +460,7 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
             if (other.size != null) {
                 return false;
             }
-        } else if (!this.size.equals(other.size)) {
+        } else if (!(this.size.get() == other.size.get())) {
             return false;
         }
         return true;

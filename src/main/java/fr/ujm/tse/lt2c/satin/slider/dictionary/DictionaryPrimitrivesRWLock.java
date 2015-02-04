@@ -41,7 +41,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
  * 
  */
 public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
-    private static Logger logger = Logger.getLogger(DictionaryPrimitrivesRWLock.class);
+    private static final Logger LOGGER = Logger.getLogger(DictionaryPrimitrivesRWLock.class);
 
     private Map<Node, Long> triples = new HashMap<>();
     private long counter;
@@ -80,7 +80,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
@@ -105,7 +105,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
@@ -126,7 +126,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -140,7 +140,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
             this.rwlock.readLock().lock();
             id = this.triples.get(NodeFactory.createURI(s));
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -154,7 +154,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
             this.rwlock.readLock().lock();
             id = this.triples.get(n);
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -213,7 +213,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
                 sb.append("\n");
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -230,7 +230,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
             p = this.printAxiom(this.get(t.getPredicate()).toString());
             o = this.printAxiom(this.get(t.getObject()).toString());
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -247,7 +247,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
                 sb.append(n + " ==> " + this.printAxiom(n.toString()) + "\n");
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }

@@ -54,7 +54,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
  */
 public class VerticalPartioningTripleStoreRWLock implements TripleStore {
 
-    private static Logger logger = Logger.getLogger(VerticalPartioningTripleStoreRWLock.class);
+    private static final Logger LOGGER = Logger.getLogger(VerticalPartioningTripleStoreRWLock.class);
 
     private final Map<Long, Multimap<Long, Long>> internalstore;
     private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
@@ -75,7 +75,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
         try {
             exists = this.addNoLock(t);
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
@@ -113,7 +113,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
@@ -134,7 +134,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }
@@ -152,7 +152,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -176,7 +176,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -195,7 +195,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -219,7 +219,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -234,7 +234,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             result = this.triples;
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -249,7 +249,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             result = this.triples == 0;
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -274,9 +274,9 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } catch (final IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
     }
@@ -289,7 +289,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             result = this.containsNoLock(triple.getSubject(), triple.getPredicate(), triple.getObject());
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -304,7 +304,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             result = this.containsNoLock(s, p, o);
 
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -328,7 +328,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 multimap = ImmutableMultimap.copyOf(this.internalstore.get(p));
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -348,7 +348,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
             this.internalstore.clear();
             this.triples = 0;
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.readLock().unlock();
         }
@@ -372,7 +372,7 @@ public class VerticalPartioningTripleStoreRWLock implements TripleStore {
                 }
             }
         } catch (final Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             this.rwlock.writeLock().unlock();
         }

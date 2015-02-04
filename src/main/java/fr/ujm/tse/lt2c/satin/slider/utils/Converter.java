@@ -6,10 +6,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStore;
+
 public class Converter {
+    private static final Logger LOGGER = Logger.getLogger(VerticalPartioningTripleStore.class);
+
+    private Converter() {
+        super();
+    }
 
     public static void main(final String[] args) {
 
@@ -24,11 +33,9 @@ public class Converter {
             os.close();
 
         } catch (final FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("", e);
         } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
     }
 

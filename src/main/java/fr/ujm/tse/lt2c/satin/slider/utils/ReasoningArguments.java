@@ -31,6 +31,20 @@ import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
  */
 public class ReasoningArguments {
 
+    /* Reasoner fields */
+    private final int threadsNb;
+    private final int bufferSize;
+    private final long timeout;
+    private final int iteration;
+    private final ReasonerProfile profile;
+
+    /* Extra fields */
+    private final boolean verboseMode;
+    private final boolean warmupMode;
+    private final boolean dumpMode;
+    private final boolean batchMode;
+    private final List<File> files;
+
     public ReasoningArguments(final int threads, final int bufferSize, final long timeout, final int iteration, final ReasonerProfile profile,
             final boolean verboseMode, final boolean warmupMode, final boolean dumpMode, final boolean batchMode, final List<File> files) {
         super();
@@ -45,20 +59,6 @@ public class ReasoningArguments {
         this.batchMode = batchMode;
         this.files = files;
     }
-
-    /* Reasoner fields */
-    private final int threadsNb;
-    private final int bufferSize;
-    private final long timeout;
-    private final int iteration;
-    private final ReasonerProfile profile;
-
-    /* Extra fields */
-    private final boolean verboseMode;
-    private final boolean warmupMode;
-    private final boolean dumpMode;
-    private final boolean batchMode;
-    private final List<File> files;
 
     public int getThreadsNb() {
         return this.threadsNb;

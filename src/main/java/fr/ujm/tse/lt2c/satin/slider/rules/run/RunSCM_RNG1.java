@@ -22,6 +22,7 @@ package fr.ujm.tse.lt2c.satin.slider.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -72,7 +73,7 @@ public class RunSCM_RNG1 extends AbstractRun {
 
             final Collection<Triple> rangeTriples = ts2.getbyPredicate(range);
 
-            final HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            final Map<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
             /* For each type triple */
             for (final Triple triple : rangeTriples) {

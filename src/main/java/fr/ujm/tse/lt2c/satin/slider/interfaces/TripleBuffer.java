@@ -118,4 +118,12 @@ public interface TripleBuffer {
      */
     void timerCall(long triples);
 
+    /**
+     * @return true if the buffer contains no triples
+     *         BE CAREFUL : there is a difference between the occupation (triples not marked for next flush), and the
+     *         size (total number of triples still in the buffer)
+     *         The buffer is empty if there is no more triples at all
+     */
+    boolean isEmpty();
+
 }

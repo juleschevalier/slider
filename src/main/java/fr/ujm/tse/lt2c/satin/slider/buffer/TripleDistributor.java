@@ -40,7 +40,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
  */
 public class TripleDistributor {
 
-    private final Logger LOGGER = Logger.getLogger(TripleDistributor.class);
+    private static final Logger LOGGER = Logger.getLogger(TripleDistributor.class);
 
     private final Multimap<Long, TripleBuffer> subscribers;
     private final Collection<TripleBuffer> universalSubscribers;

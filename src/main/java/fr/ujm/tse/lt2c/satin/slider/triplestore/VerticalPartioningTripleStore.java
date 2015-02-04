@@ -55,7 +55,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
  */
 public class VerticalPartioningTripleStore implements TripleStore {
 
-    private static Logger logger = Logger.getLogger(VerticalPartioningTripleStore.class);
+    private static final Logger LOGGER = Logger.getLogger(VerticalPartioningTripleStore.class);
 
     private final Map<Long, Multimap<Long, Long>> internalstore;
     private int triples;
@@ -199,9 +199,9 @@ public class VerticalPartioningTripleStore implements TripleStore {
             model.write(os, "N-TRIPLES");
             os.close();
         } catch (final FileNotFoundException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         } catch (final IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
     }

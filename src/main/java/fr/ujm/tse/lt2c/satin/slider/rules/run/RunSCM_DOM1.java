@@ -22,6 +22,7 @@ package fr.ujm.tse.lt2c.satin.slider.rules.run;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -71,7 +72,7 @@ public class RunSCM_DOM1 extends AbstractRun {
         final Multimap<Long, Long> subclassMultimap = ts1.getMultiMapForPredicate(subClassOf);
         if (subclassMultimap != null && !subclassMultimap.isEmpty()) {
 
-            final HashMap<Long, Collection<Long>> cachePredicates = new HashMap<>();
+            final Map<Long, Collection<Long>> cachePredicates = new HashMap<>();
 
             final Collection<Triple> domainTriples = ts2.getbyPredicate(domain);
 

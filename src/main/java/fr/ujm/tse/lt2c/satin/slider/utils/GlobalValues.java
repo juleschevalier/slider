@@ -30,15 +30,15 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class GlobalValues {
 
-    private GlobalValues() {
-
-    }
-
     private static Map<String, AtomicLong> runsByRule;
     private static Map<String, AtomicLong> duplicatesByRule;
     private static Map<String, AtomicLong> inferedByRule;
     private static Map<String, AtomicLong> timeoutByRule;
     private static Map<String, Long> timeByFile;
+
+    private GlobalValues() {
+
+    }
 
     static {
         runsByRule = new HashMap<String, AtomicLong>();

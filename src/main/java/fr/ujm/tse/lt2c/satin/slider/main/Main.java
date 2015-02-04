@@ -74,9 +74,6 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
  */
 public final class Main {
 
-    private Main() {
-    }
-
     private static final Logger LOGGER = Logger.getLogger(Main.class);
 
     /* Initialization of default options */
@@ -88,6 +85,9 @@ public final class Main {
     private static final boolean DEFAULT_VERBOSE_MODE = false;
     private static final boolean DEFAULT_WARMUP_MODE = false;
     private static final boolean DEFAULT_BATCH_MODE = false;
+
+    private Main() {
+    }
 
     public static void main(final String[] args) throws IOException {
         Thread.currentThread().setName("Main");
@@ -317,7 +317,7 @@ public final class Main {
             try {
                 timeout = Integer.parseInt(arg);
                 if (timeout <= 0) {
-                    throw new RuntimeException("Timeout must be >0");
+                    throw new IllegalArgumentException("Timeout must be >0");
                 }
             } catch (final NumberFormatException e) {
                 LOGGER.error("Timeout must be a number. Default value used", e);

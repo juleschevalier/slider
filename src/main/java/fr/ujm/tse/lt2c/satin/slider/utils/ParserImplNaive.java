@@ -49,7 +49,7 @@ public class ParserImplNaive implements Parser {
 
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
-    private final static int STREAM_BLOCK_SIZE = 1000;
+    private static final int STREAM_BLOCK_SIZE = 1000;
 
     /**
      * @param dictionary
@@ -124,7 +124,7 @@ public class ParserImplNaive implements Parser {
 
         final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> triples = new HashSet<>();
         final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> toAdd = new HashSet<>();
-        int total_input = 0;
+        int totalInput = 0;
         while (iter.hasNext()) {
 
             final Triple next = iter.next();
@@ -140,13 +140,13 @@ public class ParserImplNaive implements Parser {
             triples.add(triple);
             if (triples.size() >= STREAM_BLOCK_SIZE) {
                 toAdd.addAll(this.tripleStore.addAll(triples));
-                total_input += toAdd.size();
+                totalInput += toAdd.size();
                 reasoner.addTriples(toAdd);
                 triples.clear();
                 toAdd.clear();
             }
         }
-        total_input += triples.size();
+        totalInput += triples.size();
         this.tripleStore.addAll(triples);
         reasoner.addTriples(triples);
 
@@ -154,7 +154,7 @@ public class ParserImplNaive implements Parser {
             this.dictionary.notify();
         }
 
-        return total_input;
+        return totalInput;
     }
 
     @Override

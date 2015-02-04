@@ -43,7 +43,7 @@ import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStore;
  * @see TripleBuffer
  */
 public class QueuedTripleBufferLock implements TripleBuffer {
-    private static Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
+    private static final Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
 
     public static final int DEFAULT_BUFFER_SIZE = 100000;
 
@@ -207,6 +207,11 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public long getOccupation() {
         return this.occupation.get();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.size.get() == 0;
     }
 
     @Override

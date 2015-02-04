@@ -43,7 +43,7 @@ import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
  */
 public class TripleManager {
 
-    private final Logger LOGGER = Logger.getLogger(TripleManager.class);
+    private static final Logger LOGGER = Logger.getLogger(TripleManager.class);
 
     private final List<Rule> rules;
     private final TripleDistributor generalDistributor;
@@ -134,7 +134,7 @@ public class TripleManager {
     public long nonEmptyBuffers() {
         long total = 0;
         for (final Rule rule : this.rules) {
-            if (rule.getTripleBuffer().size() > 0) {
+            if (!rule.getTripleBuffer().isEmpty()) {
                 total++;
             }
         }

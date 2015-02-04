@@ -41,7 +41,7 @@ import fr.ujm.tse.lt2c.satin.slider.utils.GlobalValues;
  */
 public abstract class AbstractRun implements RuleRun {
 
-    private static Logger LOGGER = Logger.getLogger(AbstractRun.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractRun.class);
 
     protected final Dictionary dictionary;
     protected final TripleStore tripleStore;
@@ -84,7 +84,7 @@ public abstract class AbstractRun implements RuleRun {
          * Buffer verification
          */
 
-        if (this.tripleBuffer.size() == 0) {
+        if (!this.tripleBuffer.isEmpty()) {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
