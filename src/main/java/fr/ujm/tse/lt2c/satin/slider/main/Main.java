@@ -91,7 +91,7 @@ public final class Main {
 
     public static void main(final String[] args) throws IOException {
         Thread.currentThread().setName("Main");
-        System.in.read();
+
         final ReasoningArguments arguments = getArguments(args);
 
         if (arguments == null) {
@@ -124,7 +124,6 @@ public final class Main {
         }
 
         LOGGER.info("---Done---");
-        // System.in.read();
     }
 
     private static RunEntity reason(final ReasoningArguments arguments, final File file, final boolean batchMode) {

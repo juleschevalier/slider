@@ -39,6 +39,11 @@ public interface Dictionary {
      */
     long add(String s);
 
+    /**
+     * @param n
+     * @return the id of the axiom from the Jena Node n, just added in the dictionary
+     *         If the axiom was already present, it just return the id
+     */
     long add(Node n);
 
     /**
@@ -52,6 +57,12 @@ public interface Dictionary {
      * @return the id of the axiom named s
      */
     long get(String s);
+
+    /**
+     * @param n
+     * @return the id of the axiom from the Jena Node n
+     */
+    long get(Node n);
 
     /**
      * @return the number of axioms
@@ -76,7 +87,5 @@ public interface Dictionary {
      * @return the entire dictionary in a String
      */
     String printDico();
-
-    long get(Node n);
 
 }

@@ -187,9 +187,6 @@ public class VerticalPartioningTripleStore implements TripleStore {
         final Model model = ModelFactory.createDefaultModel();
         // Add all the triples into the model
         for (final Triple triple : this.getAll()) {
-            // final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
-            // final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
-            // final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
             final Node subject = dictionary.get(triple.getSubject());
             final Node predicate = dictionary.get(triple.getPredicate());
             final Node object = dictionary.get(triple.getObject());
@@ -259,6 +256,7 @@ public class VerticalPartioningTripleStore implements TripleStore {
 
     @Override
     public int hashCode() {
+        // TODO Hashcode is not implemented in atomic type
         final int prime = 31;
         int result = 1;
         result = prime * result + (this.internalstore == null ? 0 : this.internalstore.hashCode());

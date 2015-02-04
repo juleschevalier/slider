@@ -248,7 +248,6 @@ public class QueuedTripleBufferLock implements TripleBuffer {
 
     @Override
     public void timerCall(final long triples) {
-        // System.out.println(this.currentBuffer.get());
         try {
             this.rwlock.writeLock().lock();
             this.occupation.addAndGet(-triples);
@@ -257,6 +256,5 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         } finally {
             this.rwlock.writeLock().unlock();
         }
-        // System.out.println(this.currentBuffer.get());
     }
 }

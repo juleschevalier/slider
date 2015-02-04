@@ -89,36 +89,6 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         lock.writeLock().lock();
         try {
 
-            // this.globalLock.readLock().lock();
-            // boolean needWrite = false;
-            // Multimap<Long, Long> map = null;
-            // try {
-            // if (this.internalstore.containsKey(t.getPredicate())) {
-            // map = this.internalstore.get(t.getPredicate());
-            // } else {
-            // needWrite = true;
-            // }
-            // } catch (final Exception e) {
-            // logger.error("", e);
-            // } finally {
-            // this.globalLock.readLock().unlock();
-            // }
-            // if (needWrite) {
-            // this.globalLock.writeLock().lock();
-            // try {
-            // if (!this.internalstore.containsKey(t.getPredicate())) {
-            // map = HashMultimap.create();
-            // this.internalstore.put(t.getPredicate(), map);
-            // } else {
-            // map = this.internalstore.get(t.getPredicate());
-            // }
-            // } catch (final Exception e) {
-            // logger.error("", e);
-            // } finally {
-            // this.globalLock.writeLock().unlock();
-            // }
-            // }
-
             this.globalLock.writeLock().lock();
             Multimap<Long, Long> map = null;
             try {
@@ -340,9 +310,6 @@ public class VerticalPartioningTripleStoreRWSmartLock implements TripleStore {
         final Model model = ModelFactory.createDefaultModel();
         // Add all the triples into the model
         for (final Triple triple : this.getAll()) {
-            // final Resource subject = ResourceFactory.createResource(dictionary.get(triple.getSubject()));
-            // final Property predicate = ResourceFactory.createProperty(dictionary.get(triple.getPredicate()));
-            // final Resource object = ResourceFactory.createResource(dictionary.get(triple.getObject()));
             final Node subject = dictionary.get(triple.getSubject());
             final Node predicate = dictionary.get(triple.getPredicate());
             final Node object = dictionary.get(triple.getObject());

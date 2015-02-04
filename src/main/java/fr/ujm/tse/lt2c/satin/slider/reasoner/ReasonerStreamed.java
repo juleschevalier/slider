@@ -61,7 +61,6 @@ public class ReasonerStreamed {
     private final Dictionary dictionary;
     private final TripleManager tripleManager;
     private final AtomicInteger phaser;
-    private boolean running = true;
 
     /**
      * Constructors
@@ -205,20 +204,6 @@ public class ReasonerStreamed {
 
     }
 
-    // private void initialiseReasoner(final int number) {
-    //
-    // final List<AvaibleRuns> runs = new ArrayList<AvaibleRuns>();
-    //
-    // runs.addAll(java.util.Arrays.asList(AvaibleRuns.values()));
-    //
-    // Collections.shuffle(runs);
-    //
-    // for (int i = 0; i < number; i++) {
-    // this.tripleManager.addRule(runs.get(i), this.executor, this.phaser, this.dictionary, this.tripleStore,
-    // this.bufferSize, this.maxThreads);
-    // }
-    // }
-
     /**
      * Add the tripleStore into Jena Model and use Jena Dumper to write it in a file
      */
@@ -254,20 +239,21 @@ public class ReasonerStreamed {
         }
     }
 
+    /**
+     * Waits for the end of the inference and stops reasoners' threads
+     */
     public void closeAndWait() {
         long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
-        // final int ok = 0;
         while (nonEmptyBuffers > 0) {
-            /* Wait for parsing */
+            /* Waits for parsing */
             synchronized (this.dictionary) {
                 try {
-                    final Long b = System.nanoTime();
                     this.dictionary.wait();
                 } catch (final InterruptedException e) {
                     LOGGER.error("", e);
                 }
             }
-            /* Wait for last running rule */
+            /* Waits for last running rule */
             synchronized (this.phaser) {
                 long stillRunnning = this.phaser.get();
                 while (stillRunnning > 0) {
@@ -284,7 +270,6 @@ public class ReasonerStreamed {
 
         this.tripleManager.stop();
         shutdownAndAwaitTermination(this.executor);
-        this.running = false;
     }
 
     public Collection<Rule> getRules() {

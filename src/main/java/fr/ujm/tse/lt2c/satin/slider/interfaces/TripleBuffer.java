@@ -46,6 +46,12 @@ public interface TripleBuffer {
     TripleStore clear();
 
     /**
+     * @return the <i>triplesToRead</i> first triples inserted in a TripleStore
+     * @see TripleStore
+     */
+    TripleStore clear(long triplesToRead);
+
+    /**
      * Add a listener to the buffer's events
      * 
      * @param bufferListener
@@ -106,8 +112,10 @@ public interface TripleBuffer {
      */
     void addAll(Collection<Triple> triples);
 
+    /**
+     * @param triples
+     *            Notifies the buffer the timer calls for a flush of <i>triples</i> triples
+     */
     void timerCall(long triples);
-
-    TripleStore clear(long triplesToRead);
 
 }

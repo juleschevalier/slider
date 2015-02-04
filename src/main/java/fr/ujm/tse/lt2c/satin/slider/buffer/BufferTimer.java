@@ -39,7 +39,6 @@ public class BufferTimer extends TimerTask {
 
     private static Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
 
-    /* Need synchronization ?? */
     private final Map<Rule, Long> rulesLastAdd;
     private final Map<String, Boolean> rulesActivated;
     private Dictionary dictionary;
