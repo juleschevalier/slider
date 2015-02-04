@@ -123,6 +123,7 @@ public class ParserImplNaive implements Parser {
         executor.shutdown();
 
         final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> triples = new HashSet<>();
+        final Collection<fr.ujm.tse.lt2c.satin.slider.interfaces.Triple> toAdd = new HashSet<>();
         int total_input = 0;
         while (iter.hasNext()) {
 
@@ -136,16 +137,17 @@ public class ParserImplNaive implements Parser {
             final long oi = this.dictionary.add(o);
             final fr.ujm.tse.lt2c.satin.slider.interfaces.Triple triple = new ImmutableTriple(si, pi, oi);
 
-            if (!this.tripleStore.add(triple)) {
-                triples.add(triple);
-                if (triples.size() >= STREAM_BLOCK_SIZE) {
-                    total_input += triples.size();
-                    reasoner.addTriples(triples);
-                    triples.clear();
-                }
+            triples.add(triple);
+            if (triples.size() >= STREAM_BLOCK_SIZE) {
+                toAdd.addAll(this.tripleStore.addAll(triples));
+                total_input += toAdd.size();
+                reasoner.addTriples(toAdd);
+                triples.clear();
+                toAdd.clear();
             }
         }
         total_input += triples.size();
+        this.tripleStore.addAll(triples);
         reasoner.addTriples(triples);
 
         synchronized (this.dictionary) {
