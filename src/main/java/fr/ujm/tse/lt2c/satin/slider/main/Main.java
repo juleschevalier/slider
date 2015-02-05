@@ -58,17 +58,17 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
 /**
  * This class provides a command line interface to use Slider
  * The different options are the following:
- * -b,--buffer-size <size>......set the buffer size
- * -d,--directory <directory>.. infers on all ontologies in the directory
+ * -b,--buffer-size <time>......set the buffer size
+ * -d,--directory <directory>...infers on all ontologies in the directory
  * -h,--help....................print this message
  * -i,--iteration <number>......how many times each file
  * -n,--threads <number>........set the number of threads by available core (0 means the jvm manage)
  * -o,--output..................save output into file
- * -p,--profile <profile>...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
- * -r,--batch-reasoning........ enable batch reasoning
- * -t,--timeout <arg>.......... set the buffer timeout in ms
- * -v,--verbose................ enable verbose mode
- * -w,--warm-up................ insert a warm-up lap before the inference
+ * -p,--profile <profile>.......set the fragment [RHODF, BRHODF, RDFS, BRDFS, LRDFS]
+ * -r,--batch-reasoning.........enable batch reasoning
+ * -t,--timeout <arg>...........set the buffer timeout in ms
+ * -v,--verbose.................enable verbose mode
+ * -w,--warm-up.................insert a warm-up lap before the inference
  * 
  * @author Jules Chevalier
  */
@@ -243,7 +243,7 @@ public final class Main {
         bufferSizeO.setType(Number.class);
         options.addOption(bufferSizeO);
 
-        final Option timeoutO = new Option("t", "timeout", true, "set the buffer timeout in ms (0 means timeout will be disabled)");
+        final Option timeoutO = new Option("t", "timeout", true, "set the buffer timeout in ms");
         bufferSizeO.setArgName("time");
         bufferSizeO.setArgs(1);
         bufferSizeO.setType(Number.class);

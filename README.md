@@ -6,6 +6,7 @@ Slider is a forward-chaining reasoner supporting the following rule sets:
 
  - RhoDF Default
  - RhoDF Full
+ - RDFS Light
  - RDFS Default
  - RDFS Full
 
@@ -45,15 +46,16 @@ mvn exec:java -q -Dexec.args="-p RDFS toto.nt"
 
 Here is the list of the different options (accesible via -h,--help option):
 ```
+usage: main
  -b,--buffer-size <time>......set the buffer size
  -d,--directory <directory>...infers on all ontologies in the directory
  -h,--help....................print this message
  -i,--iteration <number>......how many times each file
  -n,--threads <number>........set the number of threads by available core (0 means the jvm manage)
  -o,--output..................save output into file
- -p,--profile <profile>.......set the fragment [RHODF, BRHODF, RDFS, BRDFS]
+ -p,--profile <profile>.......set the fragment [RHODF, BRHODF, RDFS, BRDFS, LRDFS]
  -r,--batch-reasoning.........enable batch reasoning
- -t,--timeout <arg>...........set the buffer timeout in ms (0 means timeout will be disabled)
+ -t,--timeout <arg>...........set the buffer timeout in ms
  -v,--verbose.................enable verbose mode
  -w,--warm-up.................insert a warm-up lap before the inference
 ```
@@ -95,7 +97,7 @@ reasoner.start();
 
 reasoner.addTriples(triples);
 
-reasoner.close();
+reasoner.closeAndWait();
 try {
     reasoner.join();
 } catch (final InterruptedException e) {
@@ -116,7 +118,7 @@ reasoner.start();
 
 parser.parseStream(file.getAbsolutePath(), reasoner);
 
-reasoner.close();
+reasoner.closeAndWait();
 try {
     reasoner.join();
 } catch (final InterruptedException e) {
@@ -147,7 +149,7 @@ Then use the following dependency :
 <dependency>
     <groupId>fr.ujm.tse.lt2c.satin</groupId>
     <artifactId>slider</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6-SNAPSHOT</version>
 </dependency>
 ```
 Have a look [here](https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider) to see all the available versions
@@ -183,9 +185,9 @@ You can download the two real life zipped ontologies here:
  * [wikipediaOntology.zip](http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wikipediaOntology.zip)
  * [wordnetOntology.zip](http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wordnetOntology.zip)
 
-All these ontologies can be downloaded [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider/benchmark)
+All these ontologies can be downloaded [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider)
 
-The other ontologies used for anterior experimentations can be found [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider/tuning/)
+<!-- The other ontologies used for anterior experimentations can be found [here](http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider/tuning/) -->
 
 ###Run the experimentations
 
