@@ -84,7 +84,7 @@ public abstract class AbstractRun implements RuleRun {
          * Buffer verification
          */
 
-        if (!this.tripleBuffer.isEmpty()) {
+        if (this.tripleBuffer.isEmpty()) {
             synchronized (this.phaser) {
                 this.phaser.decrementAndGet();
                 this.phaser.notifyAll();
