@@ -59,11 +59,11 @@ public class ReasonerStreamed {
     private final ExecutorService executor;
     private final TripleStore tripleStore;
     private final Dictionary dictionary;
-    private final TripleManager tripleManager;
+    private TripleManager tripleManager;
     private final AtomicInteger phaser;
 
     /**
-     * Constructors
+     * Constructor
      * 
      * @param tripleStore
      * @param dictionary
@@ -138,7 +138,7 @@ public class ReasonerStreamed {
     }
 
     /**
-     * Creates and add rules to the reasoner according to the fragment
+     * Creates and add rules to the reasoner according to the fragment for 1st pass
      * 
      * @param profile
      * @param tripleStore
@@ -150,12 +150,55 @@ public class ReasonerStreamed {
     private void initialiseReasoner() {
         switch (this.profile) {
         case BRHODF:
+        case RHODF:
+            this.tripleManager.addRule(AvaibleRuns.CAX_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_DOM, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_RNG, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_SPO1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_DOM2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_RNG2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_SPO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            break;
+        case BRDFS:
+        case RDFS:
+        case LRDFS:
+            this.tripleManager.addRule(AvaibleRuns.CAX_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_DOM, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_RNG, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.PRP_SPO1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_DOM1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_DOM2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_RNG1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_RNG2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            this.tripleManager.addRule(AvaibleRuns.SCM_SPO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
+            break;
+        default:
+            LOGGER.error("Reasoner profile unknown: " + this.profile);
+            break;
+        }
+
+    }
+
+    /**
+     * Creates and add rules to the reasoner according to the fragment for 2nd pass
+     * 
+     * @param profile
+     * @param tripleStore
+     * @param dictionary
+     * @param tripleManager
+     * @param phaser
+     * @param executor
+     */
+    private void initialiseReasoner2ndPass() {
+        switch (this.profile) {
+        case BRHODF:
             this.tripleManager.addRule(AvaibleRuns.RHODF6a, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RHODF6b, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RHODF6d, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RHODF7a, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RHODF7b, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-
             /* Axiomatic triples */
             final long subPropertyOf = AbstractDictionary.subPropertyOf;
             final long subClassOf = AbstractDictionary.subClassOf;
@@ -168,14 +211,6 @@ public class ReasonerStreamed {
             this.tripleStore.add(new ImmutableTriple(range, subPropertyOf, range));
             this.tripleStore.add(new ImmutableTriple(type, subPropertyOf, type));
         case RHODF:
-            this.tripleManager.addRule(AvaibleRuns.CAX_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_DOM, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_RNG, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_SPO1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_DOM2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_RNG2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_SPO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             break;
         case BRDFS:
             this.tripleManager.addRule(AvaibleRuns.RDFS6, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
@@ -186,16 +221,6 @@ public class ReasonerStreamed {
             this.tripleManager.addRule(AvaibleRuns.RDFS12, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             this.tripleManager.addRule(AvaibleRuns.RDFS13, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
         case LRDFS:
-            this.tripleManager.addRule(AvaibleRuns.CAX_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_DOM, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_RNG, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.PRP_SPO1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_DOM1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_DOM2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_RNG1, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_RNG2, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_SCO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
-            this.tripleManager.addRule(AvaibleRuns.SCM_SPO, this.executor, this.phaser, this.dictionary, this.tripleStore, this.bufferSize, this.maxThreads);
             break;
         default:
             LOGGER.error("Reasoner profile unknown: " + this.profile);
@@ -243,6 +268,18 @@ public class ReasonerStreamed {
      * Waits for the end of the inference and stops reasoners' threads
      */
     public void closeAndWait() {
+        this.waitFixPoint();
+        this.tripleManager.stop();
+        this.tripleManager = new TripleManager(this.timeout);
+        this.tripleManager.start();
+        this.initialiseReasoner2ndPass();
+        this.tripleManager.addTriples(this.tripleStore.getAll());
+        this.waitFixPoint();
+        this.tripleManager.stop();
+        shutdownAndAwaitTermination(this.executor);
+    }
+
+    private void waitFixPoint() {
         long nonEmptyBuffers = this.tripleManager.nonEmptyBuffers();
         while (nonEmptyBuffers > 0) {
             /* Waits for parsing */
@@ -267,9 +304,6 @@ public class ReasonerStreamed {
             }
             nonEmptyBuffers = this.tripleManager.nonEmptyBuffers() + this.phaser.get();
         }
-
-        this.tripleManager.stop();
-        shutdownAndAwaitTermination(this.executor);
     }
 
     public Collection<Rule> getRules() {
