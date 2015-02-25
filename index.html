@@ -31,10 +31,7 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h1>
-<a id="slider" class="anchor" href="#slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>SLIDER</h1>
-
-<h2>
+        <h2>
 <a id="what-is-slider" class="anchor" href="#what-is-slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Slider?</h2>
 
 <p>Slider is a forward-chaining reasoner supporting the following rule sets:</p>
@@ -42,6 +39,7 @@
 <ul>
 <li>RhoDF Default</li>
 <li>RhoDF Full</li>
+<li>RDFS Light</li>
 <li>RDFS Default</li>
 <li>RDFS Full</li>
 </ul>
@@ -64,8 +62,6 @@ Additional rules can be easily added by implementing a single method.</p>
 <li>
 <strong>Maven</strong> to install and run it easily</li>
 </ul>
-
-
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
@@ -90,17 +86,18 @@ For example, for launch the inference on the file "toto.nt" for RDFS:</p>
 
 <p>Here is the list of the different options (accesible via -h,--help option):</p>
 
-<pre><code> -b,--buffer-size &lt;time&gt;......set the buffer size
- -d,--directory &lt;directory&gt;.. infers on all ontologies in the directory
+<pre><code>usage: main
+ -b,--buffer-size &lt;time&gt;......set the buffer size
+ -d,--directory &lt;directory&gt;...infers on all ontologies in the directory
  -h,--help....................print this message
  -i,--iteration &lt;number&gt;......how many times each file
  -n,--threads &lt;number&gt;........set the number of threads by available core (0 means the jvm manage)
  -o,--output..................save output into file
- -p,--profile &lt;profile&gt;...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
- -r,--batch-reasoning........ enable batch reasoning
- -t,--timeout &lt;arg&gt;.......... set the buffer timeout in ms (0 means timeout will be disabled)
- -v,--verbose................ enable verbose mode
- -w,--warm-up................ insert a warm-up lap before the inference
+ -p,--profile &lt;profile&gt;.......set the fragment [RHODF, BRHODF, RDFS, BRDFS, LRDFS]
+ -r,--batch-reasoning.........enable batch reasoning
+ -t,--timeout &lt;arg&gt;...........set the buffer timeout in ms
+ -v,--verbose.................enable verbose mode
+ -w,--warm-up.................insert a warm-up lap before the inference
 </code></pre>
 
 <h4>
@@ -143,7 +140,7 @@ reasoner<span class="pl-k">.</span>start();
 
 reasoner<span class="pl-k">.</span>addTriples(triples);
 
-reasoner<span class="pl-k">.</span>close();
+reasoner<span class="pl-k">.</span>closeAndWait();
 <span class="pl-k">try</span> {
     reasoner<span class="pl-k">.</span>join();
 } <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
@@ -164,7 +161,7 @@ reasoner<span class="pl-k">.</span>start();
 
 parser<span class="pl-k">.</span>parseStream(file<span class="pl-k">.</span>getAbsolutePath(), reasoner);
 
-reasoner<span class="pl-k">.</span>close();
+reasoner<span class="pl-k">.</span>closeAndWait();
 <span class="pl-k">try</span> {
     reasoner<span class="pl-k">.</span>join();
 } <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
@@ -192,7 +189,7 @@ reasoner<span class="pl-k">.</span>close();
 <div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
     &lt;<span class="pl-ent">groupId</span>&gt;fr.ujm.tse.lt2c.satin&lt;/<span class="pl-ent">groupId</span>&gt;
     &lt;<span class="pl-ent">artifactId</span>&gt;slider&lt;/<span class="pl-ent">artifactId</span>&gt;
-    &lt;<span class="pl-ent">version</span>&gt;0.9.5-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+    &lt;<span class="pl-ent">version</span>&gt;0.9.6-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
 &lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
 <p>Have a look <a href="https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider">here</a> to see all the available versions</p>
@@ -219,10 +216,6 @@ It generates the following ontologies:</p>
 <li>dataset_500k.nt</li>
 <li>dataset_1M.nt</li>
 <li>dataset_5M.nt</li>
-<li>dataset_10M.nt</li>
-<li>dataset_25M.nt</li>
-<li>dataset_50M.nt</li>
-<li>dataset_100M.nt</li>
 </ul>
 
 <p>The subClassOf ontologies have been generated thanks to this <a href="https://gist.github.com/JulesChevalier/4bd3410cf14bd51e9811">script</a>.
@@ -244,7 +237,9 @@ We used it to generate the following ontologies:</p>
 <li><a href="http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wordnetOntology.zip">wordnetOntology.zip</a></li>
 </ul>
 
-<p>The other ontologies used for anterior experimentations can be found <a href="">here</a></p>
+<p>All these ontologies can be downloaded <a href="http://datasets-satin.telecom-st-etienne.fr/jchevalier/slider">here</a></p>
+
+
 
 <h3>
 <a id="run-the-experimentations" class="anchor" href="#run-the-experimentations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run the experimentations</h3>
@@ -272,6 +267,20 @@ This first step allow Java to operate the on-the-fly optimisation of the binarie
 <p>If you discover any bug, feel free to create an issue on GitHub: <a href="https://github.com/juleschevalier/slider/issues">https://github.com/juleschevalier/slider/issues</a>.</p>
 
 <h2>
+<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h2>
+
+<ul>
+<li>Jules Chevalier <a href="https://github.com/juleschevalier">@juleschevalier</a>
+</li>
+<li>Julien Subercaze <a href="https://github.com/jsubercaze">@jsubercaze</a>
+</li>
+<li>Christophe Gravier <a href="https://github.com/flaforest">@flaforest</a>
+</li>
+<li>Frédérique Laforest <a href="https://github.com/cgravier">@cgravier</a>
+</li>
+</ul>
+
+<h2>
 <a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
 
 <p>Slider is provided under Apache License, Version 2.0.
@@ -281,6 +290,11 @@ You may obtain a copy of the License at <a href="http://www.apache.org/licenses/
 <a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
 
 <p>For any question, please contact us at <a href="mailto:jules.chevalier@univ-st-etienne.fr">jules.chevalier@univ-st-etienne.fr</a></p>
+
+<h2>
+<a id="acknowledgement" class="anchor" href="#acknowledgement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgement</h2>
+
+<p>This work is part of the <a href="http://www.opencloudware.org/bin/view/Main/">Open Cloudware</a> project, funded by the French Fonds national pour la Société Numérique(FSN), and supported by Pôles Minalogic, Systematic and SCS.</p>
       </section>
     </div>
 
