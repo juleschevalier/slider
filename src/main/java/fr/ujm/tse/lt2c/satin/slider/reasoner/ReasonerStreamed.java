@@ -270,12 +270,16 @@ public class ReasonerStreamed {
     public void closeAndWait() {
         this.waitFixPoint();
         this.tripleManager.stop();
+
         this.tripleManager = new TripleManager(this.timeout);
         this.tripleManager.start();
         this.initialiseReasoner2ndPass();
-        this.tripleManager.addTriples(this.tripleStore.getAll());
-        this.waitFixPoint();
+        if (this.tripleManager.getRules().size() > 0) {
+            this.tripleManager.addTriples(this.tripleStore.getAll());
+            this.waitFixPoint();
+        }
         this.tripleManager.stop();
+
         shutdownAndAwaitTermination(this.executor);
     }
 
