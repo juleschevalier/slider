@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Slider : An Efficient Incremental Reasoner">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Slider</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/JulesChevalier/slider">View on GitHub</a>
+
+          <h1 id="project_title">Slider</h1>
+          <h2 id="project_tagline">An Efficient Incremental Reasoner</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/JulesChevalier/slider/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/JulesChevalier/slider/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="slider" class="anchor" href="#slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>SLIDER</h1>
+
+<h2>
+<a id="what-is-slider" class="anchor" href="#what-is-slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Slider?</h2>
+
+<p>Slider is a forward-chaining reasoner supporting the following rule sets:</p>
+
+<ul>
+<li>RhoDF Default</li>
+<li>RhoDF Full</li>
+<li>RDFS Default</li>
+<li>RDFS Full</li>
+</ul>
+
+<p>Slider allows to custom these fragments by selecting the rules to use for the inference.
+Additional rules can be easily added by implementing a single method.</p>
+
+<p>Slider provides both batch and stream reasoning.</p>
+
+<p>It is a full Java project.</p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>
+<strong>Java 1.7</strong> or greater</li>
+<li>
+<strong>Git</strong> to clone the project</li>
+<li>
+<strong>Maven</strong> to install and run it easily</li>
+</ul>
+
+
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>To install Slider, clone the repository and compile it through Maven:</p>
+
+<div class="highlight highlight-bash"><pre>git clone git@github.com:juleschevalier/slider.git
+<span class="pl-s3">cd</span> slider/
+mvn install</pre></div>
+
+<h2>
+<a id="running-slider" class="anchor" href="#running-slider" aria-hidden="true"><span class="octicon octicon-link"></span></a> Running Slider</h2>
+
+<h3>
+<a id="command-line-use" class="anchor" href="#command-line-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>Command Line use</h3>
+
+<p>Slider can be run as a standalone software.
+The exec-maven-plugin is configured, and can be used to run it.
+For example, for launch the inference on the file "toto.nt" for RDFS:</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS toto.nt<span class="pl-pds">"</span></span></pre></div>
+
+<p>Here is the list of the different options (accesible via -h,--help option):</p>
+
+<pre><code> -b,--buffer-size &lt;time&gt;......set the buffer size
+ -d,--directory &lt;directory&gt;.. infers on all ontologies in the directory
+ -h,--help....................print this message
+ -i,--iteration &lt;number&gt;......how many times each file
+ -n,--threads &lt;number&gt;........set the number of threads by available core (0 means the jvm manage)
+ -o,--output..................save output into file
+ -p,--profile &lt;profile&gt;...... set the fragment [RHODF, BRHODF, RDFS, BRDFS]
+ -r,--batch-reasoning........ enable batch reasoning
+ -t,--timeout &lt;arg&gt;.......... set the buffer timeout in ms (0 means timeout will be disabled)
+ -v,--verbose................ enable verbose mode
+ -w,--warm-up................ insert a warm-up lap before the inference
+</code></pre>
+
+<h4>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<p>Reason on all ontologies in the folder "~/Ontologies" with RDFS</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+
+<p>Reason over the ontology "ontology1.nt" with RhoDF with a buffer timeout of 1000ms</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RhoDF -t 1000 ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
+
+<p>Reason on all ontologies in the folder "~/Ontologies" with RDFS with a warm-up lap (no included in results) and 10 iterations for each file</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -w -i 10 -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+
+<p>Reason over the ontology "ontology1.nt" with RhoDF and write the output into "infered1.nt"</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RhoDF -o infered.nt ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
+
+<h3>
+<a id="use-sliders-api" class="anchor" href="#use-sliders-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use Slider's API</h3>
+
+<p>Slider can also be used as a library.
+It provides both bash and stream reasoning.</p>
+
+<h4>
+<a id="batch-reasoning" class="anchor" href="#batch-reasoning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Batch reasoning</h4>
+
+<div class="highlight highlight-Java"><pre><span class="pl-s">final</span> <span class="pl-stj">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">VerticalPartioningTripleStoreRWLock</span>();
+<span class="pl-s">final</span> <span class="pl-stj">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">DictionaryPrimitrivesRWLock</span>();
+<span class="pl-s">final</span> <span class="pl-stj">ReasonerStreamed</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ReasonerStreamed</span>(tripleStore,
+                                                       dictionary,
+                                                       <span class="pl-stj">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
+
+<span class="pl-s">final</span> <span class="pl-stj">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ParserImplNaive</span>(dictionary, tripleStore);
+<span class="pl-s">final</span> <span class="pl-st">Collection&lt;<span class="pl-stj">Triple</span>&gt;</span> triples <span class="pl-k">=</span> parser<span class="pl-k">.</span>parse(file<span class="pl-k">.</span>getAbsolutePath());
+reasoner<span class="pl-k">.</span>start();
+
+reasoner<span class="pl-k">.</span>addTriples(triples);
+
+reasoner<span class="pl-k">.</span>close();
+<span class="pl-k">try</span> {
+    reasoner<span class="pl-k">.</span>join();
+} <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
+    e<span class="pl-k">.</span>printStackTrace();
+}</pre></div>
+
+<h4>
+<a id="stream-reasoning" class="anchor" href="#stream-reasoning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stream reasoning</h4>
+
+<div class="highlight highlight-Java"><pre><span class="pl-s">final</span> <span class="pl-stj">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">VerticalPartioningTripleStoreRWLock</span>();
+<span class="pl-s">final</span> <span class="pl-stj">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">DictionaryPrimitrivesRWLock</span>();
+<span class="pl-s">final</span> <span class="pl-stj">ReasonerStreamed</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ReasonerStreamed</span>(tripleStore,
+                                                       dictionary,
+                                                       <span class="pl-stj">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
+
+<span class="pl-s">final</span> <span class="pl-stj">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ParserImplNaive</span>(dictionary, tripleStore);
+reasoner<span class="pl-k">.</span>start();
+
+parser<span class="pl-k">.</span>parseStream(file<span class="pl-k">.</span>getAbsolutePath(), reasoner);
+
+reasoner<span class="pl-k">.</span>close();
+<span class="pl-k">try</span> {
+    reasoner<span class="pl-k">.</span>join();
+} <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
+    e<span class="pl-k">.</span>printStackTrace();
+}</pre></div>
+
+<h2>
+<a id="maven-dependency" class="anchor" href="#maven-dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maven dependency</h2>
+
+<p>Setup the server in your pom.xml:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">repositories</span>&gt;
+    &lt;<span class="pl-ent">repository</span>&gt;
+        &lt;<span class="pl-ent">id</span>&gt;slider-mvn-repo&lt;/<span class="pl-ent">id</span>&gt;
+        &lt;<span class="pl-ent">url</span>&gt;https://raw.github.com/juleschevalier/slider/mvn-repo/&lt;/<span class="pl-ent">url</span>&gt;
+        &lt;<span class="pl-ent">snapshots</span>&gt;
+            &lt;<span class="pl-ent">enabled</span>&gt;true&lt;/<span class="pl-ent">enabled</span>&gt;
+            &lt;<span class="pl-ent">updatePolicy</span>&gt;always&lt;/<span class="pl-ent">updatePolicy</span>&gt;
+        &lt;/<span class="pl-ent">snapshots</span>&gt;
+    &lt;/<span class="pl-ent">repository</span>&gt;
+&lt;/<span class="pl-ent">repositories</span>&gt;</pre></div>
+
+<p>Then use the following dependency :</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+    &lt;<span class="pl-ent">groupId</span>&gt;fr.ujm.tse.lt2c.satin&lt;/<span class="pl-ent">groupId</span>&gt;
+    &lt;<span class="pl-ent">artifactId</span>&gt;slider&lt;/<span class="pl-ent">artifactId</span>&gt;
+    &lt;<span class="pl-ent">version</span>&gt;0.9.5-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+&lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
+
+<p>Have a look <a href="https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider">here</a> to see all the available versions</p>
+
+<h2>
+<a id="correctness" class="anchor" href="#correctness" aria-hidden="true"><span class="octicon octicon-link"></span></a>Correctness</h2>
+
+<p>The correctness of Slider's inference has been verified using <a href="https://jena.apache.org/documentation/inference/index.html">Jena</a>'s reasoner as ground truth.</p>
+
+<h2>
+<a id="how-to-reproduce" class="anchor" href="#how-to-reproduce" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to reproduce</h2>
+
+<p>All the details to reproduce our experimentations on Slider.</p>
+
+<h3>
+<a id="ontologies" class="anchor" href="#ontologies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ontologies</h3>
+
+<p>The <a href="http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/">BSBM</a> ontologies have been generated thanks to this <a href="https://gist.github.com/cgravier/8658389">script</a>.
+It generates the following ontologies:</p>
+
+<ul>
+<li>dataset_100k.nt</li>
+<li>dataset_200k.nt</li>
+<li>dataset_500k.nt</li>
+<li>dataset_1M.nt</li>
+<li>dataset_5M.nt</li>
+<li>dataset_10M.nt</li>
+<li>dataset_25M.nt</li>
+<li>dataset_50M.nt</li>
+<li>dataset_100M.nt</li>
+</ul>
+
+<p>The subClassOf ontologies have been generated thanks to this <a href="https://gist.github.com/JulesChevalier/4bd3410cf14bd51e9811">script</a>.
+We used it to generate the following ontologies:</p>
+
+<ul>
+<li>subClassOf10.nt</li>
+<li>subClassOf20.nt</li>
+<li>subClassOf50.nt</li>
+<li>subClassOf100.nt</li>
+<li>subClassOf200.nt</li>
+<li>subClassOf500.nt</li>
+</ul>
+
+<p>You can download the two real life zipped ontologies here:</p>
+
+<ul>
+<li><a href="http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wikipediaOntology.zip">wikipediaOntology.zip</a></li>
+<li><a href="http://datasets-satin.telecom-st-etienne.fr/cgravier/inferray/wordnetOntology.zip">wordnetOntology.zip</a></li>
+</ul>
+
+<p>The other ontologies used for anterior experimentations can be found <a href="">here</a></p>
+
+<h3>
+<a id="run-the-experimentations" class="anchor" href="#run-the-experimentations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run the experimentations</h3>
+
+<p>To benchmark Slider's performances, the easiest way is to use the commande line interface provided by the Main class.
+You can use the maven exec plugin preconfigured.
+First install Slider (see section Installation).
+For better results, we launch the inference 10 times on each ontology, and used the average time.
+We also add a <em>warm-up</em> lap, which is a first iteration of inference which does not appear in the results.
+This first step allow Java to operate the on-the-fly optimisation of the binaries.</p>
+
+<p>To run an experimentation on the ontologies contained in a folder "Ontologies" for RDFS, please use the following command</p>
+
+<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -i 10 -w -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+
+<p>To run experimentation on the parameters of Slider, please use the same command with the corresponding options:</p>
+
+<div class="highlight highlight-bash"><pre> -b,--buffer-size <span class="pl-k">&lt;</span><span class="pl-k">time</span><span class="pl-k">&gt;</span>......<span class="pl-s3">set</span> the buffer size
+ -n,--threads <span class="pl-k">&lt;</span>number<span class="pl-k">&gt;</span>........<span class="pl-s3">set</span> the number of threads by available core (0 means the jvm manage)
+ -t,--timeout <span class="pl-k">&lt;</span>arg<span class="pl-k">&gt;</span>.......... <span class="pl-s3">set</span> the buffer timeout <span class="pl-k">in</span> ms (0 means timeout will be disabled)</pre></div>
+
+<h2>
+<a id="bug-reports" class="anchor" href="#bug-reports" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bug reports</h2>
+
+<p>If you discover any bug, feel free to create an issue on GitHub: <a href="https://github.com/juleschevalier/slider/issues">https://github.com/juleschevalier/slider/issues</a>.</p>
+
+<h2>
+<a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
+
+<p>Slider is provided under Apache License, Version 2.0.
+You may obtain a copy of the License at <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>.</p>
+
+<h2>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>For any question, please contact us at <a href="mailto:jules.chevalier@univ-st-etienne.fr">jules.chevalier@univ-st-etienne.fr</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Slider maintained by <a href="https://github.com/JulesChevalier">JulesChevalier</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
