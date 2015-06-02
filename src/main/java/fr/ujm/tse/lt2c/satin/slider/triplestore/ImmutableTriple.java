@@ -67,9 +67,9 @@ public final class ImmutableTriple implements Triple {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (this.object ^ (this.object >>> 32));
-        result = (prime * result) + (int) (this.predicate ^ (this.predicate >>> 32));
-        result = (prime * result) + (int) (this.subject ^ (this.subject >>> 32));
+        result = prime * result + (int) (this.object ^ this.object >>> 32);
+        result = prime * result + (int) (this.predicate ^ this.predicate >>> 32);
+        result = prime * result + (int) (this.subject ^ this.subject >>> 32);
         return result;
     }
 
@@ -99,7 +99,7 @@ public final class ImmutableTriple implements Triple {
 
     @Override
     public String toString() {
-        return "[" + this.subject + ", " + this.predicate + ", " + this.object + "]";
+        return "(" + this.subject + ", " + this.predicate + ", " + this.object + ")";
     }
 
 }

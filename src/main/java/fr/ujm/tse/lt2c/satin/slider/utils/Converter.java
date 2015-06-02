@@ -23,12 +23,12 @@ public class Converter {
     public static void main(final String[] args) {
 
         final Model model = ModelFactory.createDefaultModel();
-        model.read("/home/jules/Documents/Ontologies/News/mammalian_phenotype.owl");
+        model.read("/home/jules/GitRepositories/Manuscrit/code/pets.rdf");
 
         OutputStream os;
         try {
 
-            os = new FileOutputStream(new File("/home/jules/Documents/Ontologies/News/mammalian_phenotype.nt"));
+            os = new FileOutputStream(new File("/home/jules/GitRepositories/Manuscrit/code/pets.nt"));
             model.write(os, "N-TRIPLES");
             os.close();
 

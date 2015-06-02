@@ -2,7 +2,7 @@
 
 ##What is Slider?
 
-Slider is a forward-chaining reasoner supporting the following rule sets:
+Slider is an incremental forward-chaining reasoner supporting the following rule sets:
 
  - RhoDF Default
  - RhoDF Full
@@ -13,7 +13,7 @@ Slider is a forward-chaining reasoner supporting the following rule sets:
 Slider allows to custom these fragments by selecting the rules to use for the inference.
 Additional rules can be easily added by implementing a single method.
 
-Slider provides both batch and stream reasoning.
+Slider provides both batch and incremental reasoning, and supports data streams.
 
 It is a full Java project.
 
@@ -81,7 +81,7 @@ mvn exec:java -q -Dexec.args="-p RhoDF -o infered.nt ~/Ontologies/ontology1.nt"
 ###Use Slider's API
 
 Slider can also be used as a library.
-It provides both bash and stream reasoning.
+It provides both bash and incremental reasoning.
 
 ####Batch reasoning
 ```Java
@@ -105,7 +105,7 @@ try {
 }
 ```
 
-####Stream reasoning
+####Incremental reasoning
 ```Java
 final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
 final Dictionary dictionary = new DictionaryPrimitrivesRWLock();

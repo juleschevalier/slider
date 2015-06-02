@@ -95,7 +95,7 @@ public class DictionaryPrimitrivesRWLock extends AbstractDictionary {
             if (this.triples.containsKey(n)) {
                 id = this.get(n);
             } else {
-                /* Look for primitives */
+                /* Look for primitives (Integers, Strings, etc) */
                 if (n.toString().matches("(\".*\")\\^\\^.*")) {
                     this.triples.put(n, this.primitivesCounter);
                     id = this.primitivesCounter--;

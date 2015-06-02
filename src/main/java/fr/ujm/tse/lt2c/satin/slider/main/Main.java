@@ -113,15 +113,22 @@ public final class Main {
             LOGGER.info("---Starting inference---");
         }
 
+        int errors = 0;
+
         for (final File file : arguments.getFiles()) {
             for (int i = 0; i < arguments.getIteration(); i++) {
                 final RunEntity run = reason(arguments, file, arguments.isBatchMode());
                 if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " " + 100
-                            * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
+                    LOGGER.info(i + "(" + errors + ")" + file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " "
+                            + 100 * run.getNbInferedTriples() / run.getNbInitialTriples() + "%");
+                }
+                if (run.getNbInferedTriples() != 754) {
+                    errors++;
                 }
             }
         }
+
+        System.out.println("ERRORS: " + errors);
 
         LOGGER.info("---Done---");
     }
@@ -433,7 +440,7 @@ public final class Main {
             }
             final File file = new File(arg);
             if (!file.exists()) {
-                LOGGER.warn("**Cant not find " + file);
+                LOGGER.warn("**Can not find " + file);
             } else if (file.isDirectory()) {
                 LOGGER.warn("**" + file + " is a directory");
             } else {

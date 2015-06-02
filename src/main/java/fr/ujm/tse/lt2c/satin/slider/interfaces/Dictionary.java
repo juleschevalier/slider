@@ -23,26 +23,24 @@ import com.hp.hpl.jena.graph.Node;
  */
 
 /**
+ * 
+ * Interface for a dictionnary mapping Nodes (RDF concepts) to Long id
+ * 
  * @author Jules Chevalier
- * 
- *         Interface for dictionary
- *         Stores axioms as strings and gives them an unique id
- *         No duplicates
- * 
  */
 public interface Dictionary {
 
     /**
      * @param s
-     * @return the id of the axiom named s, just added in the dictionary
-     *         If the axiom was already present, it just return the id
+     * @return Adds the concept represented by s, and returns the id if it
+     *         If the Node was already present, just returns the id
      */
     long add(String s);
 
     /**
      * @param n
-     * @return the id of the axiom from the Jena Node n, just added in the dictionary
-     *         If the axiom was already present, it just return the id
+     * @return Adds the concept represented by n, and returns the id if it
+     *         If the Node was already present, just returns the id
      */
     long add(Node n);
 

@@ -21,7 +21,7 @@ package fr.ujm.tse.lt2c.satin.slider.interfaces;
  */
 
 /**
- * Interface for triple representation
+ * Interface for triple represented by three Long
  * 
  * @author Jules Chevalier
  * 
