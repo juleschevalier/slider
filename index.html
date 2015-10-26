@@ -31,14 +31,17 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>
+        <h1>
+<a id="slider" class="anchor" href="#slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>SLIDER</h1>
+
+<h2>
 <a id="what-is-slider" class="anchor" href="#what-is-slider" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Slider?</h2>
 
-<p>Slider is a forward-chaining reasoner supporting the following rule sets:</p>
+<p>Slider is an incremental forward-chaining reasoner supporting the following rule sets:</p>
 
 <ul>
-<li>&rho;DF Default</li>
-<li>&rho;DF Full</li>
+<li>ρdf Default</li>
+<li>ρdf Full</li>
 <li>RDFS Light</li>
 <li>RDFS Default</li>
 <li>RDFS Full</li>
@@ -47,7 +50,7 @@
 <p>Slider allows to custom these fragments by selecting the rules to use for the inference.
 Additional rules can be easily added by implementing a single method.</p>
 
-<p>Slider provides both batch and stream reasoning.</p>
+<p>Slider provides both batch and incremental reasoning, and supports data streams.</p>
 
 <p>It is a full Java project.</p>
 
@@ -68,8 +71,8 @@ Additional rules can be easily added by implementing a single method.</p>
 
 <p>To install Slider, clone the repository and compile it through Maven:</p>
 
-<div class="highlight highlight-bash"><pre>git clone git@github.com:juleschevalier/slider.git
-<span class="pl-s3">cd</span> slider/
+<div class="highlight highlight-source-shell"><pre>git clone git@github.com:juleschevalier/slider.git
+<span class="pl-c1">cd</span> slider/
 mvn install</pre></div>
 
 <h2>
@@ -82,7 +85,7 @@ mvn install</pre></div>
 The exec-maven-plugin is configured, and can be used to run it.
 For example, for launch the inference on the file "toto.nt" for RDFS:</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS toto.nt<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p RDFS toto.nt<span class="pl-pds">"</span></span></pre></div>
 
 <p>Here is the list of the different options (accesible via -h,--help option):</p>
 
@@ -94,7 +97,6 @@ For example, for launch the inference on the file "toto.nt" for RDFS:</p>
  -n,--threads &lt;number&gt;........set the number of threads by available core (0 means the jvm manage)
  -o,--output..................save output into file
  -p,--profile &lt;profile&gt;.......set the fragment [RHODF, BRHODF, RDFS, BRDFS, LRDFS]
- -r,--batch-reasoning.........enable batch reasoning
  -t,--timeout &lt;arg&gt;...........set the buffer timeout in ms
  -v,--verbose.................enable verbose mode
  -w,--warm-up.................insert a warm-up lap before the inference
@@ -105,75 +107,58 @@ For example, for launch the inference on the file "toto.nt" for RDFS:</p>
 
 <p>Reason on all ontologies in the folder "~/Ontologies" with RDFS</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p RDFS -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
 
-<p>Reason over the ontology "ontology1.nt" with RhoDF with a buffer timeout of 1000ms</p>
+<p>Reason over the ontology "ontology1.nt" with ρdf with a buffer timeout of 1000ms</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RhoDF -t 1000 ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p rhodf -t 1000 ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
 
 <p>Reason on all ontologies in the folder "~/Ontologies" with RDFS with a warm-up lap (no included in results) and 10 iterations for each file</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -w -i 10 -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p RDFS -w -i 10 -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
 
-<p>Reason over the ontology "ontology1.nt" with RhoDF and write the output into "infered1.nt"</p>
+<p>Reason over the ontology "ontology1.nt" with ρdf and write the output into "infered1.nt"</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RhoDF -o infered.nt ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p rhodf -o infered.nt ~/Ontologies/ontology1.nt<span class="pl-pds">"</span></span></pre></div>
 
 <h3>
 <a id="use-sliders-api" class="anchor" href="#use-sliders-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use Slider's API</h3>
 
 <p>Slider can also be used as a library.
-It provides both bash and stream reasoning.</p>
+It provides both bash and incremental reasoning.</p>
 
 <h4>
 <a id="batch-reasoning" class="anchor" href="#batch-reasoning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Batch reasoning</h4>
 
-<div class="highlight highlight-Java"><pre><span class="pl-s">final</span> <span class="pl-stj">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">VerticalPartioningTripleStoreRWLock</span>();
-<span class="pl-s">final</span> <span class="pl-stj">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">DictionaryPrimitrivesRWLock</span>();
-<span class="pl-s">final</span> <span class="pl-stj">ReasonerStreamed</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ReasonerStreamed</span>(tripleStore,
-                                                       dictionary,
-                                                       <span class="pl-stj">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
+<div class="highlight highlight-source-java"><pre>        <span class="pl-k">final</span> <span class="pl-smi">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">VerticalPartioningTripleStoreRWLock</span>();
+        <span class="pl-k">final</span> <span class="pl-smi">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">DictionaryPrimitrivesRWLock</span>();
+        <span class="pl-k">final</span> <span class="pl-smi">BatchReasoner</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BatchReasoner</span>(tripleStore, dictionary, <span class="pl-smi">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
 
-<span class="pl-s">final</span> <span class="pl-stj">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ParserImplNaive</span>(dictionary, tripleStore);
-<span class="pl-s">final</span> <span class="pl-st">Collection&lt;<span class="pl-stj">Triple</span>&gt;</span> triples <span class="pl-k">=</span> parser<span class="pl-k">.</span>parse(file<span class="pl-k">.</span>getAbsolutePath());
-reasoner<span class="pl-k">.</span>start();
+        <span class="pl-k">final</span> <span class="pl-smi">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ParserImplNaive</span>(dictionary, tripleStore);
+        <span class="pl-k">final</span> <span class="pl-k">Collection&lt;<span class="pl-smi">Triple</span>&gt;</span> triples <span class="pl-k">=</span> parser<span class="pl-k">.</span>parse(file);
 
-reasoner<span class="pl-k">.</span>addTriples(triples);
-
-reasoner<span class="pl-k">.</span>closeAndWait();
-<span class="pl-k">try</span> {
-    reasoner<span class="pl-k">.</span>join();
-} <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
-    e<span class="pl-k">.</span>printStackTrace();
-}</pre></div>
+        reasoner<span class="pl-k">.</span>reasonOn(triples);</pre></div>
 
 <h4>
-<a id="stream-reasoning" class="anchor" href="#stream-reasoning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stream reasoning</h4>
+<a id="incremental-reasoning" class="anchor" href="#incremental-reasoning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Incremental reasoning</h4>
 
-<div class="highlight highlight-Java"><pre><span class="pl-s">final</span> <span class="pl-stj">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">VerticalPartioningTripleStoreRWLock</span>();
-<span class="pl-s">final</span> <span class="pl-stj">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">DictionaryPrimitrivesRWLock</span>();
-<span class="pl-s">final</span> <span class="pl-stj">ReasonerStreamed</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ReasonerStreamed</span>(tripleStore,
-                                                       dictionary,
-                                                       <span class="pl-stj">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
+<div class="highlight highlight-source-java"><pre>        <span class="pl-k">final</span> <span class="pl-smi">TripleStore</span> tripleStore <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">VerticalPartioningTripleStoreRWLock</span>();
+        <span class="pl-k">final</span> <span class="pl-smi">Dictionary</span> dictionary <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">DictionaryPrimitrivesRWLock</span>();
+        <span class="pl-k">final</span> <span class="pl-smi">IncrementalReasoner</span> reasoner <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">IncrementalReasoner</span>(tripleStore, dictionary, <span class="pl-smi">ReasonerProfile</span><span class="pl-c1"><span class="pl-k">.</span>RDFS</span>);
 
-<span class="pl-s">final</span> <span class="pl-stj">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ParserImplNaive</span>(dictionary, tripleStore);
-reasoner<span class="pl-k">.</span>start();
+        <span class="pl-k">final</span> <span class="pl-smi">Parser</span> parser <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ParserImplNaive</span>(dictionary, tripleStore);
+        reasoner<span class="pl-k">.</span>start();
 
-parser<span class="pl-k">.</span>parseStream(file<span class="pl-k">.</span>getAbsolutePath(), reasoner);
+        parser<span class="pl-k">.</span>parseStream(file<span class="pl-k">.</span>getAbsolutePath(), reasoner);
 
-reasoner<span class="pl-k">.</span>closeAndWait();
-<span class="pl-k">try</span> {
-    reasoner<span class="pl-k">.</span>join();
-} <span class="pl-k">catch</span> (<span class="pl-s">final</span> <span class="pl-stj">InterruptedException</span> e) {
-    e<span class="pl-k">.</span>printStackTrace();
-}</pre></div>
+        reasoner<span class="pl-k">.</span>closeAndWait();</pre></div>
 
 <h2>
 <a id="maven-dependency" class="anchor" href="#maven-dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maven dependency</h2>
 
 <p>Setup the server in your pom.xml:</p>
 
-<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">repositories</span>&gt;
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">repositories</span>&gt;
     &lt;<span class="pl-ent">repository</span>&gt;
         &lt;<span class="pl-ent">id</span>&gt;slider-mvn-repo&lt;/<span class="pl-ent">id</span>&gt;
         &lt;<span class="pl-ent">url</span>&gt;https://raw.github.com/juleschevalier/slider/mvn-repo/&lt;/<span class="pl-ent">url</span>&gt;
@@ -186,13 +171,13 @@ reasoner<span class="pl-k">.</span>closeAndWait();
 
 <p>Then use the following dependency :</p>
 
-<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
     &lt;<span class="pl-ent">groupId</span>&gt;fr.ujm.tse.lt2c.satin&lt;/<span class="pl-ent">groupId</span>&gt;
     &lt;<span class="pl-ent">artifactId</span>&gt;slider&lt;/<span class="pl-ent">artifactId</span>&gt;
-    &lt;<span class="pl-ent">version</span>&gt;0.9.6-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+    &lt;<span class="pl-ent">version</span>&gt;0.9.7-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
 &lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
-<p>Have a look <a href="https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider">here</a> to see all the available versions</p>
+
 
 <h2>
 <a id="correctness" class="anchor" href="#correctness" aria-hidden="true"><span class="octicon octicon-link"></span></a>Correctness</h2>
@@ -253,13 +238,13 @@ This first step allow Java to operate the on-the-fly optimisation of the binarie
 
 <p>To run an experimentation on the ontologies contained in a folder "Ontologies" for RDFS, please use the following command</p>
 
-<div class="highlight highlight-bash"><pre>mvn <span class="pl-s3">exec</span>:java -q -Dexec.args=<span class="pl-s1"><span class="pl-pds">"</span>-p RDFS -i 10 -w -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>mvn <span class="pl-c1">exec</span>:java -q -Dexec.args=<span class="pl-s"><span class="pl-pds">"</span>-p RDFS -i 10 -w -d ~/Ontologies<span class="pl-pds">"</span></span></pre></div>
 
 <p>To run experimentation on the parameters of Slider, please use the same command with the corresponding options:</p>
 
-<div class="highlight highlight-bash"><pre> -b,--buffer-size <span class="pl-k">&lt;</span><span class="pl-k">time</span><span class="pl-k">&gt;</span>......<span class="pl-s3">set</span> the buffer size
- -n,--threads <span class="pl-k">&lt;</span>number<span class="pl-k">&gt;</span>........<span class="pl-s3">set</span> the number of threads by available core (0 means the jvm manage)
- -t,--timeout <span class="pl-k">&lt;</span>arg<span class="pl-k">&gt;</span>.......... <span class="pl-s3">set</span> the buffer timeout <span class="pl-k">in</span> ms (0 means timeout will be disabled)</pre></div>
+<div class="highlight highlight-source-shell"><pre> -b,--buffer-size <span class="pl-k">&lt;</span><span class="pl-k">time</span><span class="pl-k">&gt;</span>......<span class="pl-c1">set</span> the buffer size
+ -n,--threads <span class="pl-k">&lt;</span>number<span class="pl-k">&gt;</span>........<span class="pl-c1">set</span> the number of threads by available core (0 means the jvm manage)
+ -t,--timeout <span class="pl-k">&lt;</span>arg<span class="pl-k">&gt;</span>.......... <span class="pl-c1">set</span> the buffer timeout <span class="pl-k">in</span> ms (0 means timeout will be disabled)</pre></div>
 
 <h2>
 <a id="bug-reports" class="anchor" href="#bug-reports" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bug reports</h2>
@@ -302,7 +287,7 @@ You may obtain a copy of the License at <a href="http://www.apache.org/licenses/
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p class="copyright">Slider maintained by <a href="https://github.com/JulesChevalier">JulesChevalier</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
 
