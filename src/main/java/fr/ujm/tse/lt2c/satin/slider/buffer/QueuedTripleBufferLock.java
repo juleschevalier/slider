@@ -33,7 +33,7 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
+import fr.ujm.tse.lt2c.satin.slider.rules.RuleModule;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStore;
 
 /**
@@ -55,7 +55,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     private final Collection<BufferListener> bufferListeners;
     private final AtomicLong occupation;
     private final BufferTimer timer;
-    private final Rule rule;
+    private final RuleModule ruleModule;
     private final AtomicLong size;
 
     private String debugName;
@@ -67,13 +67,13 @@ public class QueuedTripleBufferLock implements TripleBuffer {
      * @param timer
      * @param rule
      */
-    public QueuedTripleBufferLock(final long bufferSize, final BufferTimer timer, final Rule rule) {
+    public QueuedTripleBufferLock(final long bufferSize, final BufferTimer timer, final RuleModule ruleModule) {
         this.triples = new ConcurrentLinkedQueue<>();
         this.bufferListeners = new HashSet<>();
         this.occupation = new AtomicLong();
         this.bufferSize = bufferSize;
         this.timer = timer;
-        this.rule = rule;
+        this.ruleModule = ruleModule;
         this.size = new AtomicLong();
     }
 
@@ -83,7 +83,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
             this.rwlock.writeLock().lock();
             this.triples.add(triple);
             this.size.incrementAndGet();
-            this.timer.notifyAdd(this.rule);
+            this.timer.notifyAdd(this.ruleModule);
             if (this.occupation.incrementAndGet() >= this.bufferSize) {
                 this.occupation.set(0);
                 for (final BufferListener bufferListener : this.bufferListeners) {
@@ -103,7 +103,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
         try {
             this.rwlock.writeLock().lock();
             this.triples.addAll(triples);
-            this.timer.notifyAdd(this.rule);
+            this.timer.notifyAdd(this.ruleModule);
             this.size.addAndGet(triples.size());
             this.occupation.set(this.size() % (int) this.bufferSize);
             for (int i = 0; i < this.size() / this.bufferSize; i++) {

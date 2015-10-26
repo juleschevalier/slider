@@ -23,7 +23,7 @@ package fr.ujm.tse.lt2c.satin.slider.utils;
 import java.io.File;
 import java.util.List;
 
-import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.slider.rules.Ruleset;
 
 /**
  * @author Jules Chevalier
@@ -36,7 +36,7 @@ public class ReasoningArguments {
     private final int bufferSize;
     private final long timeout;
     private final int iteration;
-    private final ReasonerProfile profile;
+    private final Ruleset profile;
 
     /* Extra fields */
     private final boolean verboseMode;
@@ -45,7 +45,7 @@ public class ReasoningArguments {
     private final boolean batchMode;
     private final List<File> files;
 
-    public ReasoningArguments(final int threads, final int bufferSize, final long timeout, final int iteration, final ReasonerProfile profile,
+    public ReasoningArguments(final int threads, final int bufferSize, final long timeout, final int iteration, final Ruleset profile,
             final boolean verboseMode, final boolean warmupMode, final boolean dumpMode, final boolean batchMode, final List<File> files) {
         super();
         this.threadsNb = threads;
@@ -76,7 +76,7 @@ public class ReasoningArguments {
         return this.iteration;
     }
 
-    public ReasonerProfile getProfile() {
+    public Ruleset getProfile() {
         return this.profile;
     }
 

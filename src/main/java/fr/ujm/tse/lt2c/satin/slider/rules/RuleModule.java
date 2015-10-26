@@ -32,14 +32,14 @@ import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
+import fr.ujm.tse.lt2c.satin.slider.rules.run.Rule;
 import fr.ujm.tse.lt2c.satin.slider.rules.run.RunFactory;
 
 /**
  * @author Jules Chevalier
  *
  */
-public class Rule implements BufferListener {
+public class RuleModule implements BufferListener {
 
     /**
      * The Buffer receives the triples, notify the object when it's full
@@ -54,13 +54,13 @@ public class Rule implements BufferListener {
     private final AtomicInteger phaser;
     private final Dictionary dictionary;
     private final TripleStore tripleStore;
-    private final AvaibleRuns run;
+    private final Rule run;
     private final int maxThreads;
     private final BufferTimer timer;
 
     private final ExecutorService executor;
 
-    public Rule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
+    public RuleModule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
             final int bufferSize, final int maxThreads, final BufferTimer timer) {
         super();
         this.run = run;

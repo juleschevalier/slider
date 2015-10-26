@@ -86,7 +86,9 @@ public class TripleDistributor {
             tripleBuffer.addAll(triples);
         }
         for (final Triple triple : triples) {
-            this.distribute(triple);
+            for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
+                tripleBuffer.add(triple);
+            }
         }
     }
 
@@ -98,6 +100,9 @@ public class TripleDistributor {
      */
     public long distribute(final Triple triple) {
         long debugDistributed = 0;
+        for (final TripleBuffer tripleBuffer : this.universalSubscribers) {
+            tripleBuffer.add(triple);
+        }
         for (final TripleBuffer tripleBuffer : this.subscribers.get(triple.getPredicate())) {
             tripleBuffer.add(triple);
             debugDistributed++;

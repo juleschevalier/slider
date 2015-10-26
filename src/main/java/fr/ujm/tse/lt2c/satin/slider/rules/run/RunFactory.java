@@ -42,13 +42,13 @@ public final class RunFactory {
 
     }
 
-    public static Thread getRunThread(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
+    public static Thread getRunThread(final Rule run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
             final TripleDistributor tripleDistributor, final AtomicInteger phaser) {
 
         return getRunThread(run, dictionary, tripleStore, tripleBuffer, tripleDistributor, phaser, null, 0);
     }
 
-    public static Thread getRunThread(final AvaibleRuns run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
+    public static Thread getRunThread(final Rule run, final Dictionary dictionary, final TripleStore tripleStore, final TripleBuffer tripleBuffer,
             final TripleDistributor tripleDistributor, final AtomicInteger phaser, final BufferTimer timer, final long triplesToRead) {
 
         AbstractRun abstractRun = null;
@@ -133,7 +133,7 @@ public final class RunFactory {
         return new Thread(abstractRun);
     }
 
-    public static long[] getInputMatchers(final AvaibleRuns run) {
+    public static long[] getInputMatchers(final Rule run) {
         switch (run) {
         case CAX_SCO:
             return RunCAX_SCO.INPUT_MATCHERS;
@@ -188,7 +188,7 @@ public final class RunFactory {
         return new long[0];
     }
 
-    public static long[] getOutputMatchers(final AvaibleRuns run) {
+    public static long[] getOutputMatchers(final Rule run) {
         switch (run) {
         case CAX_SCO:
             return RunCAX_SCO.OUTPUT_MATCHERS;
@@ -244,7 +244,7 @@ public final class RunFactory {
 
     }
 
-    public static String getRuleName(final AvaibleRuns run) {
+    public static String getRuleName(final Rule run) {
         switch (run) {
         case CAX_SCO:
             return "CAX_SCO";

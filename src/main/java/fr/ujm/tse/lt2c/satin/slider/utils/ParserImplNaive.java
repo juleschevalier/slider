@@ -38,7 +38,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Parser;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.slider.reasoner.ReasonerStreamed;
+import fr.ujm.tse.lt2c.satin.slider.reasoner.IncrementalReasoner;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 
 /**
@@ -104,7 +104,7 @@ public class ParserImplNaive implements Parser {
     }
 
     @Override
-    public int parseStream(final String fileInput, final ReasonerStreamed reasoner) {
+    public int parseStream(final String fileInput, final IncrementalReasoner reasoner) {
 
         final PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         final PipedRDFStream<Triple> inputStream = new PipedTriplesStream(iter);

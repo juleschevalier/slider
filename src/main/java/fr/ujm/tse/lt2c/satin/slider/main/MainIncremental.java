@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -73,9 +72,9 @@ import fr.ujm.tse.lt2c.satin.slider.utils.RunEntity;
  * 
  * @author Jules Chevalier
  */
-public final class Main {
+public final class MainIncremental {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class);
+    private static final Logger LOGGER = Logger.getLogger(MainIncremental.class);
 
     /* Initialization of default options */
     private static final int DEFAULT_THREADS_NB = IncrementalReasoner.DEFAULT_THREADS_NB;
@@ -87,10 +86,7 @@ public final class Main {
     private static final boolean DEFAULT_WARMUP_MODE = false;
     private static final boolean DEFAULT_BATCH_MODE = false;
 
-    /* Other options */
-    private static final int WARMUP_LAPS = 2;
-
-    private Main() {
+    private MainIncremental() {
     }
 
     public static void main(final String[] args) throws IOException {
@@ -108,25 +104,44 @@ public final class Main {
         }
 
         if (arguments.isWarmupMode()) {
-            LOGGER.info("---Warm-up laps---");
+            LOGGER.info("---Warm-up lap---");
             for (final File file : arguments.getFiles()) {
-                for (int i = 0; i < WARMUP_LAPS; i++) {
-                    reason(arguments, file, arguments.isBatchMode());
-                }
+                reason(arguments, file, arguments.isBatchMode());
             }
             LOGGER.info("---Real runs---");
         } else {
             LOGGER.info("---Starting inference---");
         }
 
-        for (final File file : arguments.getFiles()) {
-            for (int i = 0; i < arguments.getIteration(); i++) {
-                final RunEntity run = reason(arguments, file, arguments.isBatchMode());
-                if (arguments.isVerboseMode()) {
-                    LOGGER.info(file.getName() + " " + run.getInferenceTime() / 1000000 + "ms " + run.getNbInferedTriples() + " " + 100 * run.getNbInferedTriples()
-                            / run.getNbInitialTriples() + "%");
+        for (int i = 0; i < arguments.getIteration() + 2; i++) {
+            final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+            final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+            final IncrementalReasoner reasoner = new IncrementalReasoner(tripleStore, dictionary, arguments.getProfile(), arguments.getThreadsNb(), arguments.getBufferSize(),
+                    arguments.getTimeout());
+
+            final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+            reasoner.start();
+            long start, stop;
+
+            for (final File file : arguments.getFiles()) {
+
+                start = System.nanoTime();
+
+                final int inputSize = parser.parseStream(file.getAbsolutePath(), reasoner);
+                reasoner.waitFixPoint();
+
+                stop = System.nanoTime();
+
+                LOGGER.info(file.getName() + ";" + (stop - start) / 1000000 + ";" + arguments.getBufferSize() + ";" + arguments.getTimeout() + ";" + arguments.getProfile());
+                if (i > 1) { // Ignore warm-up
+                    System.out.println(file.getName() + ";" + (stop - start) / 1000000 + ";" + arguments.getBufferSize() + ";" + arguments.getTimeout() + ";"
+                            + arguments.getProfile());
                 }
+
             }
+
+            reasoner.closeAndWait();
+
         }
         LOGGER.info("---Done---");
     }
@@ -443,18 +458,19 @@ public final class Main {
             }
         }
 
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(final File f1, final File f2) {
-                if (f1.length() > f2.length()) {
-                    return 1;
-                }
-                if (f2.length() > f1.length()) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
+        // Collections.sort(files, new Comparator<File>() {
+        // @Override
+        // public int compare(final File f1, final File f2) {
+        // if (f1.length() > f2.length()) {
+        // return 1;
+        // }
+        // if (f2.length() > f1.length()) {
+        // return -1;
+        // }
+        // return 0;
+        // }
+        // });
+        Collections.sort(files);
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("********* OPTIONS *********");

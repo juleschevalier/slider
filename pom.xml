@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.ujm.tse.lt2c.satin</groupId>
 	<artifactId>slider</artifactId>
-	<version>0.9.6-SNAPSHOT</version>
+	<version>0.9.7-SNAPSHOT</version>
 	<name>Slider</name>
 	<url>https://github.com/telecom-se/slider</url>
 	<distributionManagement>
@@ -91,7 +91,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>fr.ujm.tse.lt2c.satin.slider.main.Main</mainClass>
+							<mainClass>fr.ujm.tse.lt2c.satin.slider.main.MainIncremental</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
@@ -121,7 +121,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>fr.ujm.tse.lt2c.satin.slider.main.Main</mainClass>
+					<mainClass>fr.ujm.tse.lt2c.satin.slider.main.MainIncremental</mainClass>
 					<executable>maven</executable>
 				</configuration>
 			</plugin>

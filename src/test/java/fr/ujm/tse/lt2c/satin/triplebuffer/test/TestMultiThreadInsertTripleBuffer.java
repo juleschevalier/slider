@@ -39,8 +39,8 @@ import fr.ujm.tse.lt2c.satin.slider.buffer.QueuedTripleBufferLock;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.BufferListener;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleBuffer;
-import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
-import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
+import fr.ujm.tse.lt2c.satin.slider.rules.RuleModule;
+import fr.ujm.tse.lt2c.satin.slider.rules.run.Rule;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 
 public class TestMultiThreadInsertTripleBuffer {
@@ -56,8 +56,8 @@ public class TestMultiThreadInsertTripleBuffer {
         for (final int bufferSize : BUFFER_SIZES) {
             for (int k = 0; k < TESTS; k++) {
 
-                final Rule rule = new Rule(AvaibleRuns.CAX_SCO, null, new AtomicInteger(), null, null, bufferSize, 0, null);
-                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize, new BufferTimer(500), rule);
+                final RuleModule ruleModule = new RuleModule(Rule.CAX_SCO, null, new AtomicInteger(), null, null, bufferSize, 0, null);
+                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize, new BufferTimer(500), ruleModule);
                 final SimpleBufferListener listener = new SimpleBufferListener(tb);
                 tb.addBufferListener(listener);
                 final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());

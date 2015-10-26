@@ -24,7 +24,7 @@ import java.util.Collection;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-import fr.ujm.tse.lt2c.satin.slider.reasoner.ReasonerStreamed;
+import fr.ujm.tse.lt2c.satin.slider.reasoner.IncrementalReasoner;
 
 /**
  * @author Jules Chevalier
@@ -49,7 +49,7 @@ public interface Parser {
      * @return The number of triples parsed
      * @see Triple
      */
-    int parseStream(String fileInput, ReasonerStreamed reasoner);
+    int parseStream(String fileInput, IncrementalReasoner reasoner);
 
     /**
      * Parse and "save" the ontology's triples from a model in the TripleStore

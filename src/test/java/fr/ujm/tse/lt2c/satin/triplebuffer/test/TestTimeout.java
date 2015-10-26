@@ -31,8 +31,8 @@ import fr.ujm.tse.lt2c.satin.slider.dictionary.DictionaryPrimitrivesRWLock;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.slider.reasoner.ReasonerStreamed;
-import fr.ujm.tse.lt2c.satin.slider.rules.ReasonerProfile;
+import fr.ujm.tse.lt2c.satin.slider.reasoner.IncrementalReasoner;
+import fr.ujm.tse.lt2c.satin.slider.rules.Ruleset;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.ImmutableTriple;
 import fr.ujm.tse.lt2c.satin.slider.triplestore.VerticalPartioningTripleStoreRWLock;
 
@@ -43,7 +43,7 @@ public class TestTimeout {
 
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-        final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore, dictionary, ReasonerProfile.RHODF, ReasonerStreamed.DEFAULT_THREADS_NB,
+        final IncrementalReasoner reasoner = new IncrementalReasoner(tripleStore, dictionary, Ruleset.RHODF, IncrementalReasoner.DEFAULT_THREADS_NB,
                 QueuedTripleBufferLock.DEFAULT_BUFFER_SIZE, 1000);
 
         reasoner.start();

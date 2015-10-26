@@ -4,8 +4,8 @@
 
 Slider is an incremental forward-chaining reasoner supporting the following rule sets:
 
- - RhoDF Default
- - RhoDF Full
+ - &rho;df Default
+ - &rho;df Full
  - RDFS Light
  - RDFS Default
  - RDFS Full
@@ -65,17 +65,17 @@ Reason on all ontologies in the folder "~/Ontologies" with RDFS
 ```bash
 mvn exec:java -q -Dexec.args="-p RDFS -d ~/Ontologies"
 ```
-Reason over the ontology "ontology1.nt" with RhoDF with a buffer timeout of 1000ms
+Reason over the ontology "ontology1.nt" with &rho;df with a buffer timeout of 1000ms
 ```bash
-mvn exec:java -q -Dexec.args="-p RhoDF -t 1000 ~/Ontologies/ontology1.nt"
+mvn exec:java -q -Dexec.args="-p rhodf -t 1000 ~/Ontologies/ontology1.nt"
 ```
 Reason on all ontologies in the folder "~/Ontologies" with RDFS with a warm-up lap (no included in results) and 10 iterations for each file
 ```bash
 mvn exec:java -q -Dexec.args="-p RDFS -w -i 10 -d ~/Ontologies"
 ```
-Reason over the ontology "ontology1.nt" with RhoDF and write the output into "infered1.nt"
+Reason over the ontology "ontology1.nt" with &rho;df and write the output into "infered1.nt"
 ```bash
-mvn exec:java -q -Dexec.args="-p RhoDF -o infered.nt ~/Ontologies/ontology1.nt"
+mvn exec:java -q -Dexec.args="-p rhodf -o infered.nt ~/Ontologies/ontology1.nt"
 ```
 
 ###Use Slider's API
@@ -85,45 +85,28 @@ It provides both bash and incremental reasoning.
 
 ####Batch reasoning
 ```Java
-final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore,
-													   dictionary,
-													   ReasonerProfile.RDFS);
+        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+        final BatchReasoner reasoner = new BatchReasoner(tripleStore, dictionary, ReasonerProfile.RDFS);
 
-final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-final Collection<Triple> triples = parser.parse(file.getAbsolutePath());
-reasoner.start();
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        final Collection<Triple> triples = parser.parse(file);
 
-reasoner.addTriples(triples);
-
-reasoner.closeAndWait();
-try {
-    reasoner.join();
-} catch (final InterruptedException e) {
-    e.printStackTrace();
-}
+        reasoner.reasonOn(triples);
 ```
 
 ####Incremental reasoning
 ```Java
-final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
-final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
-final ReasonerStreamed reasoner = new ReasonerStreamed(tripleStore,
-													   dictionary,
-													   ReasonerProfile.RDFS);
+        final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
+        final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
+        final IncrementalReasoner reasoner = new IncrementalReasoner(tripleStore, dictionary, ReasonerProfile.RDFS);
 
-final Parser parser = new ParserImplNaive(dictionary, tripleStore);
-reasoner.start();
+        final Parser parser = new ParserImplNaive(dictionary, tripleStore);
+        reasoner.start();
 
-parser.parseStream(file.getAbsolutePath(), reasoner);
+        parser.parseStream(file.getAbsolutePath(), reasoner);
 
-reasoner.closeAndWait();
-try {
-    reasoner.join();
-} catch (final InterruptedException e) {
-    e.printStackTrace();
-}
+        reasoner.closeAndWait();
 ```
 
 ##Maven dependency
@@ -149,10 +132,10 @@ Then use the following dependency :
 <dependency>
     <groupId>fr.ujm.tse.lt2c.satin</groupId>
     <artifactId>slider</artifactId>
-    <version>0.9.6-SNAPSHOT</version>
+    <version>0.9.7-SNAPSHOT</version>
 </dependency>
 ```
-Have a look [here](https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider) to see all the available versions
+<!-- Have a look [here](https://github.com/juleschevalier/slider/tree/mvn-repo/fr/ujm/tse/lt2c/satin/slider) to see all the available versions -->
 
 ##Correctness
 
@@ -216,7 +199,7 @@ If you discover any bug, feel free to create an issue on GitHub: https://github.
 
 ##Contributors
 
- - Jules Chevalier [@juleschevalier](https://github.com/JulesChevalier)
+ - Jules Chevalier [@juleschevalier](https://github.com/juleschevalier)
  - Julien Subercaze [@jsubercaze](https://github.com/jsubercaze)
  - Christophe Gravier [@flaforest](https://github.com/flaforest)
  - Frédérique Laforest [@cgravier](https://github.com/cgravier)

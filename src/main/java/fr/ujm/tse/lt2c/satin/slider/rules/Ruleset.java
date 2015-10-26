@@ -1,4 +1,4 @@
-package fr.ujm.tse.lt2c.satin.slider.rules.run;
+package fr.ujm.tse.lt2c.satin.slider.rules;
 
 /*
  * #%L
@@ -24,6 +24,6 @@ package fr.ujm.tse.lt2c.satin.slider.rules.run;
  * @author Jules Chevalier
  *
  */
-public enum AvaibleRuns {
-    CAX_SCO, PRP_DOM, PRP_RNG, PRP_SPO1, SCM_DOM1, SCM_DOM2, SCM_EQC2, SCM_EQP2, SCM_RNG1, SCM_RNG2, SCM_SCO, SCM_SPO, RDFS4, RDFS6, RDFS8, RDFS10, RDFS12, RDFS13, RHODF6a, RHODF6b, RHODF6d, RHODF7a, RHODF7b;
+public enum Ruleset {
+    RHODF, BRHODF, RDFS, BRDFS, LRDFS;
 }

@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
-import fr.ujm.tse.lt2c.satin.slider.rules.Rule;
-import fr.ujm.tse.lt2c.satin.slider.rules.run.AvaibleRuns;
+import fr.ujm.tse.lt2c.satin.slider.rules.RuleModule;
+import fr.ujm.tse.lt2c.satin.slider.rules.run.Rule;
 
 /**
  * Links all the buffers together
@@ -45,7 +45,7 @@ public class TripleManager {
 
     private static final Logger LOGGER = Logger.getLogger(TripleManager.class);
 
-    private final List<Rule> rules;
+    private final List<RuleModule> ruleModules;
     private final TripleDistributor generalDistributor;
     private final Timer timer;
     private final BufferTimer bufferTimer;
@@ -58,7 +58,7 @@ public class TripleManager {
      */
     public TripleManager(final long timeout) {
         super();
-        this.rules = new ArrayList<>();
+        this.ruleModules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
         this.timer = new Timer();
         this.timeout = timeout;
@@ -67,8 +67,8 @@ public class TripleManager {
 
     public void start() {
         if (this.timeout > 0) {
-            for (final Rule rule : this.rules) {
-                this.bufferTimer.addRule(rule);
+            for (final RuleModule ruleModule : this.ruleModules) {
+                this.bufferTimer.addRule(ruleModule);
             }
             this.timer.scheduleAtFixedRate(this.bufferTimer, this.timeout, this.timeout);
         }
@@ -91,20 +91,20 @@ public class TripleManager {
      * @param maxThreads
      * @see Rule
      */
-    public void addRule(final AvaibleRuns run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary,
+    public void addRule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary,
             final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
 
-        final Rule newRule = new Rule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.bufferTimer);
-        this.rules.add(newRule);
+        final RuleModule newRule = new RuleModule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.bufferTimer);
+        this.ruleModules.add(newRule);
         this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
 
-        for (final Rule rule : this.rules) {
-            if (this.match(newRule.getOutputMatchers(), rule.getInputMatchers())) {
-                final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), rule.getInputMatchers());
-                newRule.getTripleDistributor().addSubscriber(rule.getTripleBuffer(), matchers);
+        for (final RuleModule ruleModule : this.ruleModules) {
+            if (this.match(newRule.getOutputMatchers(), ruleModule.getInputMatchers())) {
+                final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), ruleModule.getInputMatchers());
+                newRule.getTripleDistributor().addSubscriber(ruleModule.getTripleBuffer(), matchers);
             }
-            if (rule != newRule && this.match(rule.getOutputMatchers(), newRule.getInputMatchers())) {
-                rule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
+            if (ruleModule != newRule && this.match(ruleModule.getOutputMatchers(), newRule.getInputMatchers())) {
+                ruleModule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
             }
         }
     }
@@ -133,8 +133,8 @@ public class TripleManager {
      */
     public long nonEmptyBuffers() {
         long total = 0;
-        for (final Rule rule : this.rules) {
-            if (!rule.getTripleBuffer().isEmpty()) {
+        for (final RuleModule ruleModule : this.ruleModules) {
+            if (!ruleModule.getTripleBuffer().isEmpty()) {
                 total++;
             }
         }
@@ -150,10 +150,10 @@ public class TripleManager {
      */
     public long flushBuffers() {
         long total = 0;
-        for (final Rule rule : this.rules) {
-            if (rule.getTripleBuffer().getOccupation() > 0) {
+        for (final RuleModule ruleModule : this.ruleModules) {
+            if (ruleModule.getTripleBuffer().getOccupation() > 0) {
                 total++;
-                rule.bufferFull();
+                ruleModule.bufferFull();
             }
         }
         return total;
@@ -162,8 +162,8 @@ public class TripleManager {
     /**
      * @return a collection with the Manager rules
      */
-    public Collection<Rule> getRules() {
-        return this.rules;
+    public Collection<RuleModule> getRules() {
+        return this.ruleModules;
     }
 
     /**
