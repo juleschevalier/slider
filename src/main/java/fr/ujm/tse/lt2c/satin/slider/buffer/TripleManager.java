@@ -23,12 +23,15 @@ package fr.ujm.tse.lt2c.satin.slider.buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import fr.ujm.tse.lt2c.satin.slider.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
@@ -47,9 +50,8 @@ public class TripleManager {
 
     private final List<RuleModule> ruleModules;
     private final TripleDistributor generalDistributor;
-    private final Timer timer;
-    private final BufferTimer bufferTimer;
     private final long timeout;
+    private final Multimap<RuleModule, RuleModule> parents = HashMultimap.create();
 
     /**
      * Constructor
@@ -60,22 +62,22 @@ public class TripleManager {
         super();
         this.ruleModules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
-        this.timer = new Timer();
         this.timeout = timeout;
-        this.bufferTimer = new BufferTimer(this.timeout);
     }
 
     public void start() {
+        this.determineLevel(new long[] { AbstractDictionary.domain });
         if (this.timeout > 0) {
             for (final RuleModule ruleModule : this.ruleModules) {
-                this.bufferTimer.addRule(ruleModule);
+                ruleModule.getTimer().start();
             }
-            this.timer.scheduleAtFixedRate(this.bufferTimer, this.timeout, this.timeout);
         }
     }
 
     public void stop() {
-        this.timer.cancel();
+        for (final RuleModule ruleModule : this.ruleModules) {
+            ruleModule.getTimer().stop();
+        }
     }
 
     /**
@@ -91,10 +93,10 @@ public class TripleManager {
      * @param maxThreads
      * @see Rule
      */
-    public void addRule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary,
-            final TripleStore tripleStore, final int bufferSize, final int maxThreads) {
+    public void addRule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
+            final int bufferSize, final int maxThreads) {
 
-        final RuleModule newRule = new RuleModule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.bufferTimer);
+        final RuleModule newRule = new RuleModule(run, executor, phaser, dictionary, tripleStore, bufferSize, maxThreads, this.timeout);
         this.ruleModules.add(newRule);
         this.generalDistributor.addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
 
@@ -102,9 +104,11 @@ public class TripleManager {
             if (this.match(newRule.getOutputMatchers(), ruleModule.getInputMatchers())) {
                 final long[] matchers = this.extractMatchers(newRule.getOutputMatchers(), ruleModule.getInputMatchers());
                 newRule.getTripleDistributor().addSubscriber(ruleModule.getTripleBuffer(), matchers);
+                this.parents.put(ruleModule, newRule);
             }
             if (ruleModule != newRule && this.match(ruleModule.getOutputMatchers(), newRule.getInputMatchers())) {
                 ruleModule.getTripleDistributor().addSubscriber(newRule.getTripleBuffer(), newRule.getInputMatchers());
+                this.parents.put(newRule, ruleModule);
             }
         }
     }
@@ -221,4 +225,35 @@ public class TripleManager {
         return ms;
     }
 
+    private void determineLevel(final long[] predicates) {
+        Collection<RuleModule> tmpRules = new ArrayList<RuleModule>();
+        for (final RuleModule ruleModule : this.ruleModules) {
+            if (ruleModule.getOutputMatchers().length > 0 && this.match(ruleModule.getOutputMatchers(), predicates)) {
+                ruleModule.setLevel(1);
+                System.out.println(ruleModule.name() + " " + 1);
+                tmpRules.addAll(this.parents.get(ruleModule));
+            }
+        }
+        int currentLevel = 2;
+        Collection<RuleModule> tmpRules2 = new ArrayList<RuleModule>();
+        while (!tmpRules.isEmpty()) {
+            for (final RuleModule ruleModule : tmpRules) {
+                if (ruleModule.getLevel() == 0) {
+                    ruleModule.setLevel(currentLevel);
+                    System.out.println(ruleModule.name() + " " + currentLevel);
+                    tmpRules2.addAll(this.parents.get(ruleModule));
+                }
+            }
+            tmpRules = tmpRules2;
+            tmpRules2 = new ArrayList<RuleModule>();
+            currentLevel++;
+        }
+        for (final RuleModule ruleModule : this.ruleModules) {
+            if (ruleModule.getLevel() == 0) {
+                ruleModule.setLevel(currentLevel);
+                System.out.println(ruleModule.name() + " " + currentLevel);
+            }
+        }
+
+    }
 }

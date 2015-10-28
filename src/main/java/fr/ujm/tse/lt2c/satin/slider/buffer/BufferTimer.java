@@ -20,8 +20,7 @@ package fr.ujm.tse.lt2c.satin.slider.buffer;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
@@ -39,38 +38,40 @@ public class BufferTimer extends TimerTask {
 
     private static final Logger LOGGER = Logger.getLogger(QueuedTripleBufferLock.class);
 
-    private final Map<RuleModule, Long> rulesLastAdd;
-    private final Map<String, Boolean> rulesActivated;
+    private Long lastAdd;
+    private Boolean activated;
     private Dictionary dictionary;
-    private final long timeout;
+    private long timeout;
+    private final RuleModule ruleModule;
+    private final Timer timer;
 
-    public BufferTimer(final long timeout) {
+    public BufferTimer(final long timeout, final RuleModule ruleModule) {
         super();
-        this.rulesLastAdd = new HashMap<>();
-        this.rulesActivated = new HashMap<>();
+        this.lastAdd = System.nanoTime();
+        this.activated = false;
         if (timeout <= 0) {
             throw new IllegalArgumentException("Timeout=0!");
         }
         this.timeout = timeout;
         this.dictionary = null;
+        this.ruleModule = ruleModule;
+        this.timer = new Timer();
     }
 
     @Override
     public void run() {
-        Thread.currentThread().setName("BTimer");
+        Thread.currentThread().setName("BTimer-" + this.ruleModule.name());
         final Long now = System.nanoTime();
         final int nsToMs = 1_000_000;
         Long lastAdd;
         long toRead;
-        for (final RuleModule ruleModule : this.rulesLastAdd.keySet()) {
-            lastAdd = (now - this.rulesLastAdd.get(ruleModule)) / nsToMs;
-            if (!this.isActivated(ruleModule.name()) && lastAdd > this.timeout && ruleModule.getTripleBuffer().getOccupation() > 0
-                    && ruleModule.getTripleBuffer().size() < ruleModule.getTripleBuffer().getBufferLimit()) {
-                this.rulesActivated.put(ruleModule.name(), true);
-                toRead = ruleModule.getTripleBuffer().getOccupation();
-                ruleModule.getTripleBuffer().timerCall(toRead);
-                ruleModule.bufferFullTimer(toRead);
-            }
+        lastAdd = (now - this.lastAdd) / nsToMs;
+        if (!this.activated && lastAdd > this.timeout && this.ruleModule.getTripleBuffer().getOccupation() > 0
+                && this.ruleModule.getTripleBuffer().size() < this.ruleModule.getTripleBuffer().getBufferLimit()) {
+            this.activated = true;
+            toRead = this.ruleModule.getTripleBuffer().getOccupation();
+            this.ruleModule.getTripleBuffer().timerCall(toRead);
+            this.ruleModule.bufferFullTimer(toRead);
         }
         if (this.dictionary != null) {
             synchronized (this.dictionary) {
@@ -80,23 +81,31 @@ public class BufferTimer extends TimerTask {
 
     }
 
-    private boolean isActivated(final String rule) {
-        return this.rulesActivated.containsKey(rule) && this.rulesActivated.get(rule);
-    }
-
     public void notifyAdd(final RuleModule ruleModule) {
-        final long now = System.nanoTime();
-        this.rulesLastAdd.put(ruleModule, now);
+        this.lastAdd = System.nanoTime();
         if (this.dictionary == null) {
             this.dictionary = ruleModule.getDictionary();
         }
     }
 
     public void deactivateRule(final String rule) {
-        this.rulesActivated.put(rule, false);
+        this.activated = false;
     }
 
     public void addRule(final RuleModule ruleModule) {
         this.notifyAdd(ruleModule);
+    }
+
+    public void start() {
+        this.timer.scheduleAtFixedRate(this, this.timeout, this.timeout);
+
+    }
+
+    public void stop() {
+        this.timer.cancel();
+    }
+
+    public void setTimeout(final long timeout) {
+        this.timeout = timeout;
     }
 }

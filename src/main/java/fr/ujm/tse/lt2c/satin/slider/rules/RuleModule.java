@@ -48,6 +48,7 @@ public class RuleModule implements BufferListener {
      */
 
     private static final Logger LOGGER = Logger.getLogger(BufferListener.class);
+    private static final int ALPHA = 5;
 
     private final TripleBuffer tripleBuffer;
     private final TripleDistributor tripleDistributor;
@@ -58,10 +59,13 @@ public class RuleModule implements BufferListener {
     private final int maxThreads;
     private final BufferTimer timer;
 
+    private final long timeout;
+    private int level;
+
     private final ExecutorService executor;
 
-    public RuleModule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore,
-            final int bufferSize, final int maxThreads, final BufferTimer timer) {
+    public RuleModule(final Rule run, final ExecutorService executor, final AtomicInteger phaser, final Dictionary dictionary, final TripleStore tripleStore, final int bufferSize,
+            final int maxThreads, final long timeout) {
         super();
         this.run = run;
         this.executor = executor;
@@ -69,7 +73,9 @@ public class RuleModule implements BufferListener {
         this.dictionary = dictionary;
         this.tripleStore = tripleStore;
         this.maxThreads = maxThreads;
-        this.timer = timer;
+        this.level = 0;
+        this.timer = new BufferTimer(timeout, this);
+        this.timeout = timeout;
 
         this.tripleBuffer = new QueuedTripleBufferLock(bufferSize, this.timer, this);
         this.tripleBuffer.setDebugName(RunFactory.getRuleName(run));
@@ -87,8 +93,7 @@ public class RuleModule implements BufferListener {
                 synchronized (this.dictionary) {
                     this.dictionary.notify();
                 }
-                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
-                        this.phaser));
+                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser));
                 return true;
             }
             return false;
@@ -103,8 +108,8 @@ public class RuleModule implements BufferListener {
                 synchronized (this.dictionary) {
                     this.dictionary.notify();
                 }
-                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor,
-                        this.phaser, this.timer, triplesToRead));
+                this.executor.submit(RunFactory.getRunThread(this.run, this.dictionary, this.tripleStore, this.tripleBuffer, this.tripleDistributor, this.phaser, this.timer,
+                        triplesToRead));
                 return true;
             }
         }
@@ -135,6 +140,27 @@ public class RuleModule implements BufferListener {
 
     public Dictionary getDictionary() {
         return this.dictionary;
+    }
+
+    public void setLevel(final int level) {
+        this.level = level;
+        this.timer.setTimeout(this.leveler(level, this.timeout));
+        this.tripleBuffer.setBufferLimit(this.leveler(level, this.tripleBuffer.getBufferLimit()));
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    private long leveler(final int level, final long parameter) {
+        if (level == 0 || level == 1) {
+            return parameter;
+        }
+        return (long) (ALPHA * parameter * Math.log(level) + parameter);
+    }
+
+    public BufferTimer getTimer() {
+        return this.timer;
     }
 
 }

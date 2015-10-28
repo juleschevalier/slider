@@ -126,4 +126,6 @@ public interface TripleBuffer {
      */
     boolean isEmpty();
 
+    void setBufferLimit(long bufferSize);
+
 }

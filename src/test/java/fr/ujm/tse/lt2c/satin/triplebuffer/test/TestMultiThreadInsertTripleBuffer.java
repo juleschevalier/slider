@@ -56,8 +56,8 @@ public class TestMultiThreadInsertTripleBuffer {
         for (final int bufferSize : BUFFER_SIZES) {
             for (int k = 0; k < TESTS; k++) {
 
-                final RuleModule ruleModule = new RuleModule(Rule.CAX_SCO, null, new AtomicInteger(), null, null, bufferSize, 0, null);
-                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize, new BufferTimer(500), ruleModule);
+                final RuleModule ruleModule = new RuleModule(Rule.CAX_SCO, null, new AtomicInteger(), null, null, bufferSize, 0, 0);
+                final TripleBuffer tb = new QueuedTripleBufferLock(bufferSize, new BufferTimer(500, ruleModule), ruleModule);
                 final SimpleBufferListener listener = new SimpleBufferListener(tb);
                 tb.addBufferListener(listener);
                 final Set<Triple> generated = Collections.synchronizedSet(new HashSet<Triple>());

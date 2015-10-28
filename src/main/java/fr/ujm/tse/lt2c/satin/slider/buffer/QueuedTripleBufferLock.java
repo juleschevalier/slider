@@ -48,7 +48,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     public static final int DEFAULT_BUFFER_SIZE = 100000;
 
     /* Limit of the buffer (adding the last triple calls bufferfull()) */
-    private final long bufferSize;
+    private long bufferSize;
 
     private final Queue<Triple> triples;
     private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
@@ -202,6 +202,11 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public long getBufferLimit() {
         return this.bufferSize;
+    }
+
+    @Override
+    public void setBufferLimit(final long bufferSize) {
+        this.bufferSize = bufferSize;
     }
 
     @Override
