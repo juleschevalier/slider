@@ -107,5 +107,6 @@ public class BufferTimer extends TimerTask {
 
     public void setTimeout(final long timeout) {
         this.timeout = timeout;
+        // LOGGER.info(this.ruleModule.name() + " timer " + this.timeout);
     }
 }

@@ -48,7 +48,7 @@ public class RuleModule implements BufferListener {
      */
 
     private static final Logger LOGGER = Logger.getLogger(BufferListener.class);
-    private static final int ALPHA = 5;
+    private static final int ALPHA = 50;
 
     private final TripleBuffer tripleBuffer;
     private final TripleDistributor tripleDistributor;
@@ -146,6 +146,7 @@ public class RuleModule implements BufferListener {
         this.level = level;
         this.timer.setTimeout(this.leveler(level, this.timeout));
         this.tripleBuffer.setBufferLimit(this.leveler(level, this.tripleBuffer.getBufferLimit()));
+        LOGGER.info(this.name() + " level " + level);
     }
 
     public int getLevel() {

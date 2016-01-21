@@ -142,7 +142,7 @@ public final class Main {
         final TripleStore tripleStore = new VerticalPartioningTripleStoreRWLock();
         final Dictionary dictionary = new DictionaryPrimitrivesRWLock();
         final IncrementalReasoner reasoner = new IncrementalReasoner(tripleStore, dictionary, arguments.getProfile(), arguments.getThreadsNb(), arguments.getBufferSize(),
-                arguments.getTimeout());
+                arguments.getTimeout(), new long[] {});
 
         final Parser parser = new ParserImplNaive(dictionary, tripleStore);
         final long start = System.nanoTime();
@@ -157,6 +157,9 @@ public final class Main {
         if (arguments.isDumpMode()) {
             final String output = "inferred_" + file.getName();
             tripleStore.writeToFile(output, dictionary);
+        }
+        for (final Long[] value : GlobalValues.getTimestampInferedPredicates()) {
+            LOGGER.info(dictionary.get(value[0]).toString().split("#")[1] + "," + value[1] + "," + value[2]);
         }
 
         if (arguments.isVerboseMode()) {

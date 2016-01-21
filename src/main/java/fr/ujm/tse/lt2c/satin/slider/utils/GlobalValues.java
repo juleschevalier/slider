@@ -20,6 +20,8 @@ package fr.ujm.tse.lt2c.satin.slider.utils;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,6 +37,8 @@ public final class GlobalValues {
     private static Map<String, AtomicLong> inferedByRule;
     private static Map<String, AtomicLong> timeoutByRule;
     private static Map<String, Long> timeByFile;
+    private static Map<Long, Map<Long, Long>> timestampInferedPredicates; // <predicate,[timestamp,amount]>
+    private static long startTime;
 
     private GlobalValues() {
 
@@ -46,6 +50,8 @@ public final class GlobalValues {
         inferedByRule = new HashMap<String, AtomicLong>();
         timeoutByRule = new HashMap<String, AtomicLong>();
         timeByFile = new HashMap<String, Long>();
+        timestampInferedPredicates = new HashMap<>();
+        startTime = System.nanoTime();
     }
 
     public static void reset() {
@@ -53,6 +59,8 @@ public final class GlobalValues {
         duplicatesByRule = new HashMap<String, AtomicLong>();
         inferedByRule = new HashMap<String, AtomicLong>();
         timeoutByRule = new HashMap<String, AtomicLong>();
+        timestampInferedPredicates = new HashMap<>();
+        startTime = System.nanoTime();
     }
 
     public static void incRunsByRule(final String rule) {
@@ -107,6 +115,24 @@ public final class GlobalValues {
 
     }
 
+    public static void addTimestampPredicate(final long predicate, long timestamp, final long amount) {
+        synchronized (timestampInferedPredicates) {
+            timestamp = (timestamp - startTime) / 100_000_000;
+            if (!timestampInferedPredicates.containsKey(predicate)) {
+                final Map<Long, Long> tmp = new HashMap<Long, Long>();
+                tmp.put(timestamp, amount);
+                timestampInferedPredicates.put(predicate, tmp);
+            } else {
+                final Map<Long, Long> tmp = timestampInferedPredicates.get(predicate);
+                if (!tmp.containsKey(timestamp)) {
+                    tmp.put(timestamp, amount);
+                } else {
+                    tmp.put(timestamp, amount + tmp.get(timestamp));
+                }
+            }
+        }
+    }
+
     public static Map<String, AtomicLong> getRunsByRule() {
         synchronized (runsByRule) {
             return runsByRule;
@@ -134,6 +160,18 @@ public final class GlobalValues {
     public static Map<String, AtomicLong> getTimeoutByRule() {
         synchronized (timeoutByRule) {
             return timeoutByRule;
+        }
+    }
+
+    public static Collection<Long[]> getTimestampInferedPredicates() {
+        synchronized (timestampInferedPredicates) {
+            final Collection<Long[]> result = new ArrayList<Long[]>();
+            for (final Long predicate : timestampInferedPredicates.keySet()) {
+                for (final Long timestamp : timestampInferedPredicates.get(predicate).keySet()) {
+                    result.add(new Long[] { predicate, timestamp, timestampInferedPredicates.get(predicate).get(timestamp) });
+                }
+            }
+            return result;
         }
     }
 }

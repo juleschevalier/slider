@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import fr.ujm.tse.lt2c.satin.slider.dictionary.AbstractDictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Dictionary;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.Triple;
 import fr.ujm.tse.lt2c.satin.slider.interfaces.TripleStore;
@@ -52,21 +51,29 @@ public class TripleManager {
     private final TripleDistributor generalDistributor;
     private final long timeout;
     private final Multimap<RuleModule, RuleModule> parents = HashMultimap.create();
+    private final long[] predicatesToFavorise;
 
     /**
      * Constructor
      * 
      * @param timeout
      */
-    public TripleManager(final long timeout) {
+    public TripleManager(final long timeout, final long[] predicatesToFavorise) {
         super();
         this.ruleModules = new ArrayList<>();
         this.generalDistributor = new TripleDistributor();
         this.timeout = timeout;
+        this.predicatesToFavorise = predicatesToFavorise;
+    }
+
+    public TripleManager(final long timeout) {
+        this(timeout, null);
     }
 
     public void start() {
-        this.determineLevel(new long[] { AbstractDictionary.domain });
+        if (this.predicatesToFavorise != null) {
+            this.determineLevel(this.predicatesToFavorise);
+        }
         if (this.timeout > 0) {
             for (final RuleModule ruleModule : this.ruleModules) {
                 ruleModule.getTimer().start();
@@ -227,11 +234,21 @@ public class TripleManager {
 
     private void determineLevel(final long[] predicates) {
         Collection<RuleModule> tmpRules = new ArrayList<RuleModule>();
-        for (final RuleModule ruleModule : this.ruleModules) {
-            if (ruleModule.getOutputMatchers().length > 0 && this.match(ruleModule.getOutputMatchers(), predicates)) {
-                ruleModule.setLevel(1);
-                System.out.println(ruleModule.name() + " " + 1);
-                tmpRules.addAll(this.parents.get(ruleModule));
+        if (predicates.length > 0) {
+            for (final RuleModule ruleModule : this.ruleModules) {
+                if (ruleModule.getOutputMatchers().length > 0 && this.match(ruleModule.getOutputMatchers(), predicates)) {
+                    ruleModule.setLevel(1);
+                    // System.out.println(ruleModule.name() + " " + 1);
+                    tmpRules.addAll(this.parents.get(ruleModule));
+                }
+            }
+        } else {
+            for (final RuleModule ruleModule : this.ruleModules) {
+                if (ruleModule.getInputMatchers().length == 0) {
+                    ruleModule.setLevel(1);
+                    // System.out.println(ruleModule.name() + " " + 1);
+                    tmpRules.addAll(this.parents.get(ruleModule));
+                }
             }
         }
         int currentLevel = 2;
@@ -240,7 +257,7 @@ public class TripleManager {
             for (final RuleModule ruleModule : tmpRules) {
                 if (ruleModule.getLevel() == 0) {
                     ruleModule.setLevel(currentLevel);
-                    System.out.println(ruleModule.name() + " " + currentLevel);
+                    // System.out.println(ruleModule.name() + " " + currentLevel);
                     tmpRules2.addAll(this.parents.get(ruleModule));
                 }
             }
@@ -251,7 +268,7 @@ public class TripleManager {
         for (final RuleModule ruleModule : this.ruleModules) {
             if (ruleModule.getLevel() == 0) {
                 ruleModule.setLevel(currentLevel);
-                System.out.println(ruleModule.name() + " " + currentLevel);
+                // System.out.println(ruleModule.name() + " " + currentLevel);
             }
         }
 

@@ -21,8 +21,11 @@ package fr.ujm.tse.lt2c.satin.slider.rules.run;
  */
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
@@ -170,6 +173,22 @@ public abstract class AbstractRun implements RuleRun {
         GlobalValues.incDuplicatesByRule(this.ruleName, duplicates);
 
         this.distributor.distributeAll(newTriples);
+
+        /*******************************************/
+        /* ONLY FOR TESTS, MIGHT KILL PERFORMANCES */
+        /*******************************************/
+        final long now = System.nanoTime();
+        final Map<Long, AtomicLong[]> tmpHash = new HashMap<>();
+        for (final Triple triple : newTriples) {
+            if (tmpHash.containsKey(triple.getPredicate())) {
+                tmpHash.get(triple.getPredicate())[1].getAndIncrement();
+            } else {
+                tmpHash.put(triple.getPredicate(), new AtomicLong[] { new AtomicLong(now), new AtomicLong(1L) });
+            }
+        }
+        for (final long key : tmpHash.keySet()) {
+            GlobalValues.addTimestampPredicate(key, tmpHash.get(key)[0].get(), tmpHash.get(key)[1].get());
+        }
 
         return;
     }

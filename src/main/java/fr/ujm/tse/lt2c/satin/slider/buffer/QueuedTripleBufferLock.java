@@ -207,6 +207,7 @@ public class QueuedTripleBufferLock implements TripleBuffer {
     @Override
     public void setBufferLimit(final long bufferSize) {
         this.bufferSize = bufferSize;
+        // LOGGER.info(this.ruleModule.name() + " buffer " + this.bufferSize);
     }
 
     @Override

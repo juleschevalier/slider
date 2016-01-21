@@ -83,7 +83,8 @@ public class IncrementalReasoner {
      * @param tripleStore
      * @param dictionary
      */
-    public IncrementalReasoner(final TripleStore tripleStore, final Dictionary dictionary, final Ruleset profile, final int maxThreads, final int bufferSize, final long timeout) {
+    public IncrementalReasoner(final TripleStore tripleStore, final Dictionary dictionary, final Ruleset profile, final int maxThreads, final int bufferSize, final long timeout,
+            final long[] predicatesToFavorise) {
         super();
         this.maxThreads = maxThreads;
         this.bufferSize = bufferSize;
@@ -92,7 +93,7 @@ public class IncrementalReasoner {
         this.tripleStore = tripleStore;
         this.dictionary = dictionary;
 
-        this.tripleManager = new TripleManager(this.timeout);
+        this.tripleManager = new TripleManager(this.timeout, predicatesToFavorise);
         this.phaser = new AtomicInteger();
         if (this.maxThreads == 0) {
             this.executor = Executors.newCachedThreadPool();
@@ -102,6 +103,10 @@ public class IncrementalReasoner {
 
         /* Initialize rules used for inference on the defined fragment */
         this.initialiseReasoner();
+    }
+
+    public IncrementalReasoner(final TripleStore tripleStore, final Dictionary dictionary, final Ruleset profile, final int maxThreads, final int bufferSize, final long timeout) {
+        this(tripleStore, dictionary, profile, maxThreads, bufferSize, timeout, null);
     }
 
     public void addTriples(final Collection<Triple> triples) {
